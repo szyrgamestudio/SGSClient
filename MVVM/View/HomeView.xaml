@@ -1,0 +1,348 @@
+﻿<UserControl x:Class="SGSClient.MVVM.View.HomeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:SGSClient.MVVM.View" xmlns:viewmodel="clr-namespace:SGSClient.MVVM.ViewModel" d:DataContext="{d:DesignInstance Type=viewmodel:HomeViewModel}"
+             mc:Ignorable="d" 
+             d:DesignHeight="460" d:DesignWidth="800">
+    <UserControl.Resources>
+        <Style x:Key="FocusVisual">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle Margin="2" StrokeDashArray="1 2" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" SnapsToDevicePixels="true" StrokeThickness="1"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <SolidColorBrush x:Key="Button.Static.Background" Color="#FFDDDDDD"/>
+        <SolidColorBrush x:Key="Button.Static.Border" Color="#FF707070"/>
+        <SolidColorBrush x:Key="Button.MouseOver.Background" Color="#FFBEE6FD"/>
+        <SolidColorBrush x:Key="Button.MouseOver.Border" Color="#FF3C7FB1"/>
+        <SolidColorBrush x:Key="Button.Pressed.Background" Color="#FFC4E5F6"/>
+        <SolidColorBrush x:Key="Button.Pressed.Border" Color="#FF2C628B"/>
+        <SolidColorBrush x:Key="Button.Disabled.Background" Color="#FFF4F4F4"/>
+        <SolidColorBrush x:Key="Button.Disabled.Border" Color="#FFADB2B5"/>
+        <SolidColorBrush x:Key="Button.Disabled.Foreground" Color="#FF838383"/>
+        <Style x:Key="ButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+            <Setter Property="Background" Value="{StaticResource Button.Static.Background}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Button.Static.Border}"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="true">
+                            <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsDefaulted" Value="true">
+                                <Setter Property="BorderBrush" TargetName="border" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource Button.MouseOver.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.MouseOver.Border}"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="true">
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Pressed.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.Pressed.Border}"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Background" TargetName="border" Value="{StaticResource Button.Disabled.Background}"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource Button.Disabled.Border}"/>
+                                <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{StaticResource Button.Disabled.Foreground}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    <StackPanel>
+        <TextBlock
+                       Foreground="White"
+                       FontSize="28"
+                       HorizontalAlignment="Left"
+                       Margin="0,0,0,20"
+                       FontFamily="Poppins ExtraBold" FontWeight="Bold"><Run Language="pl-pl" Text="SGS POLECA:"/></TextBlock>
+
+        <StackPanel Orientation="Horizontal"
+                    Margin="0,0,0,10">
+            <Border Width="400"
+                    Height="200">
+
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,2">
+                        <GradientStop Color="#FFEAA114" Offset="0.0"/>
+                        <GradientStop Color="#FF865706" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+
+                <Border.Clip>
+                    <RectangleGeometry RadiusX="10"
+                                       RadiusY="10"
+                                       Rect="0,0,400,200"/>
+                </Border.Clip>
+                <Button Style="{DynamicResource ButtonStyle}" Background="Transparent"
+                        Command="{Binding AtorthViewCommand}" BorderThickness="0,0,0,0"
+                        >
+                    <Grid>
+
+                        <StackPanel>
+                            <TextBlock Text="Atorth:&#x0a;Tales Of Ulkimond"
+                                   Foreground="White"
+                                   FontSize="28"
+                                   Margin="20,10,10,0"
+                                   FontFamily="Poppins ExtraBold" FontWeight="Bold"/>
+                            <TextBlock Text="Zagraj w DEMO&#x0a;już teraz!"
+                                   Foreground="White"
+                                   FontSize="18"
+                                   Margin="20,10,10,0" FontStyle="Italic" FontFamily="Poppins Thin"/>
+                        </StackPanel>
+
+
+                        <Image Width="180"
+                           Height="180"
+                           Source="/Images/Atorth.png"
+                           HorizontalAlignment="Left"
+                           VerticalAlignment="Top"
+                           Margin="209,33,0,0"
+                           RenderTransformOrigin="0.5,0.5"
+                           >
+                            <Image.RenderTransform>
+                                <TransformGroup>
+                                    <ScaleTransform/>
+                                    <SkewTransform/>
+                                    <RotateTransform Angle="-7.259"/>
+                                    <TranslateTransform/>
+                                </TransformGroup>
+                            </Image.RenderTransform>
+                        </Image>
+
+                    </Grid>
+                </Button>
+            </Border>
+
+            <Border Width="200"
+                    Height="200"
+                    CornerRadius="10"
+                    Margin="45,0,0,0">
+
+
+
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,2">
+                        <GradientStop Color="#FF209442" Offset="0.0"/>
+                        <GradientStop Color="Black" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+
+                <Border.Clip>
+                    <RectangleGeometry RadiusX="10"
+                                       RadiusY="10"
+                                       Rect="0,0,200,200"/>
+                </Border.Clip>
+                
+                <Button Style="{DynamicResource ButtonStyle}" Background="Transparent"
+                        Command="{Binding DoddaniViewCommand}" BorderThickness="0,0,0,0"
+                        >
+                    <Grid>
+                        <StackPanel>
+                            <TextBlock Text="Doddani"
+                                   Foreground="White"
+                                   FontSize="28"
+                                   HorizontalAlignment="Center"
+                                   Margin="20,160,10,0" FontFamily="Poppins ExtraBold" FontWeight="Bold"/>
+                        </StackPanel>
+
+                        <Image Width="160"
+                           Height="160"
+                           Source="/Images/Doddani.png"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Top" Margin="0,1,0,0"
+                           >
+                            <Image.RenderTransform>
+                                <TransformGroup>
+                                    <ScaleTransform/>
+                                    <SkewTransform/>
+                                    <RotateTransform Angle="-0.039"/>
+                                    <TranslateTransform/>
+                                </TransformGroup>
+                            </Image.RenderTransform>
+                        </Image>
+                    </Grid>
+                </Button>
+            </Border>
+
+        </StackPanel>
+
+        <StackPanel>
+
+            <StackPanel.Resources>
+                <Style TargetType="{x:Type Border}">
+                    <Setter Property="Margin" Value="15,0,0,0"/>
+
+                </Style>
+            </StackPanel.Resources>
+            <TextBlock
+                       Foreground="White"
+                       FontSize="20"
+                       HorizontalAlignment="Left"
+                       Margin="0,0,0,10"
+                       FontFamily="Poppins ExtraBold" FontWeight="Bold"><Run Text="Warto też zagrać"/><Run Language="pl-pl" Text=":"/></TextBlock>
+
+            <StackPanel Orientation="Horizontal">
+                <Border Width="150"
+                        Height="150"
+                        CornerRadius="10"
+                        Margin="0">
+                    <Border.Background>
+                        <LinearGradientBrush EndPoint="0.3,1" StartPoint="0,0" SpreadMethod="Pad" MappingMode="RelativeToBoundingBox">
+                            <GradientStop Color="#FFED8282"/>
+                            <GradientStop Color="#FF630B0B" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
+
+                    <Border.Clip>
+                        <RectangleGeometry RadiusX="10"
+                                       RadiusY="10"
+                                       Rect="0,0,150,150"/>
+                    </Border.Clip>
+                    <Button Style="{DynamicResource ButtonStyle}" Background="Transparent"
+                        Command="{Binding CastlelineEvilViewCommand}" BorderThickness="0,0,0,0"
+                        >
+
+                        <Grid>
+                        <StackPanel>
+                            <TextBlock Text="Castleline Evil&#x0a;TECH DEMO"
+                                   Foreground="White"
+                                   FontSize="16"
+                                       HorizontalAlignment="Center"
+                                   Margin="-20,100,10,0" FontFamily="Poppins ExtraBold" FontWeight="Bold" VerticalAlignment="Center"/>
+                        </StackPanel>
+
+                        <Image
+                           Height="100"
+                           Source="/Images/CastlelineEvil.png"
+                           VerticalAlignment="Top" Margin="25,0,25,0"
+                           >
+                            <Image.RenderTransform>
+                                <TransformGroup>
+                                    <ScaleTransform/>
+                                    <SkewTransform/>
+                                    <RotateTransform Angle="0"/>
+                                    <TranslateTransform/>
+                                </TransformGroup>
+                            </Image.RenderTransform>
+                        </Image>
+                            
+                    </Grid>
+                    </Button>
+                </Border>
+
+                <Border Width="150"
+                        Height="150"
+                        CornerRadius="10">
+
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,2">
+                            <GradientStop Color="#FFC14419" Offset="0.0"/>
+                            <GradientStop Color="Black" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
+
+                    <Border.Clip>
+                        <RectangleGeometry RadiusX="10"
+                                       RadiusY="10"
+                                       Rect="0,0,150,150"/>
+                    </Border.Clip>
+                    <Button Style="{DynamicResource ButtonStyle}" Background="Transparent"
+                        Command="{Binding SciezkaBohateraViewCommand}" BorderThickness="0,0,0,0"
+                        >
+                        <Grid>
+                            <StackPanel>
+                                <TextBlock Text="Ścieżka&#x0a;Bohatera"
+                                   Foreground="White"
+                                   FontSize="18"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Margin="-50,100,10,0" FontFamily="Poppins ExtraBold" FontWeight="Bold"/>
+                            </StackPanel>
+
+                            <Image Width="150"
+                           Height="150"
+                           Source="/Images/SciezkaBohatera.png"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Top" Margin="0,-21,0,0"
+                           >
+                                <Image.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform/>
+                                        <SkewTransform/>
+                                        <RotateTransform Angle="-0.039"/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </Image.RenderTransform>
+                            </Image>
+                        </Grid>
+                    </Button>
+                </Border>
+
+                <Border Width="150"
+                        Height="150"
+                        CornerRadius="10">
+
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,2">
+                            <GradientStop Color="#FF40131D" Offset="0.0"/>
+                            <GradientStop Color="#FF000008" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
+
+                    <Border.Clip>
+                        <RectangleGeometry RadiusX="10"
+                                       RadiusY="10"
+                                       Rect="0,0,150,150"/>
+                    </Border.Clip>
+                    <Button Style="{DynamicResource ButtonStyle}" Background="Transparent"
+                        Command="{Binding ZacmienieViewCommand}" BorderThickness="0,0,0,0"
+                        >
+
+                        <Grid>
+                            <Image Width="110"
+                           Height="110"
+                           Source="/Images/Zacmienie.png"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Top" Margin="0,10,0,0"
+                           >
+                                <Image.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform/>
+                                        <SkewTransform/>
+                                        <RotateTransform Angle="0"/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </Image.RenderTransform>
+                            </Image>
+
+                            <StackPanel>
+                                <TextBlock Text="Zaćmienie"
+                                   Foreground="White"
+                                   FontSize="18"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   Margin="10,123,10,0" FontFamily="Poppins ExtraBold" FontWeight="Bold"/>
+                            </StackPanel>
+                        </Grid>
+                    </Button>
+                </Border>
+
+            </StackPanel>
+        </StackPanel>
+    </StackPanel>
+</UserControl>
