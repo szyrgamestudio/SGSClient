@@ -6,7 +6,7 @@
 Już jest - nowy, przebudowany, nasz własny launcher.
 >Od teraz wszystkie gry SGS znajdziesz w jednym miejscu.
 
-#### Aktualna wersja: v.1.0.2(03/06/2022)
+#### Aktualna wersja: v.1.0.3(03/06/2022)
 #### Aktualna wersja testowa: v.1.1.0a (03/06/2022)
 ## Funkcje
 
