@@ -16,7 +16,7 @@ Już jest - nowy, przebudowany, nasz własny launcher.
 - [@szyrgamestudio](https://www.github.com/szyrgamestudio)
 
 ## 📷 Galeria
-![Zrzut ekranu 2022-06-21 233736](https://user-images.githubusercontent.com/51244922/174901518-567f9456-8aa3-4b35-891c-79b3bbae1676.png)
+![x](https://user-images.githubusercontent.com/51244922/174906595-bd78fa56-f3d1-459f-a000-4d9fa2b9e21e.png)
 ![Logo](https://user-images.githubusercontent.com/51244922/174900731-135f8228-5154-41a7-9482-f4059551d4d7.png)
 
 ## Support
