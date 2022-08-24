@@ -1,17 +1,114 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
+﻿// This Source Code Form is subject to the terms of the MIT License.
+// If a copy of the MIT was not distributed with this file, You can obtain one at https://opensource.org/licenses/MIT.
+// Copyright (C) Leszek Pomianowski and WPF UI Contributors.
+// All Rights Reserved.
 
-namespace SGSClient
+using System.IO;
+using System.Reflection;
+using System.Windows;
+using System.Windows.Threading;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using SGSClient.Services;
+using SGSClient.Services.Contracts;
+using SGSClient.ViewModels;
+using Wpf.Ui.Mvvm.Contracts;
+using Wpf.Ui.Mvvm.Services;
+
+namespace SGSClient;
+
+/// <summary>
+/// Interaction logic for App.xaml
+/// </summary>
+public partial class App
 {
     /// <summary>
-    /// Logika interakcji dla klasy App.xaml
+    /// A program abstraction.
     /// </summary>
-    public partial class App : Application
+    private IHost _host;
+
+    /// <summary>
+    /// Occurs when the application is loading.
+    /// </summary>
+    private async void OnStartup(object sender, StartupEventArgs e)
     {
+        // For more information about .NET generic host see https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host?view=aspnetcore-6.0
+        _host = Host.CreateDefaultBuilder(e.Args)
+            .ConfigureAppConfiguration(c =>
+            {
+                c.SetBasePath(Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location));
+            })
+            .ConfigureServices(ConfigureServices)
+            .Build();
+
+        await _host.StartAsync();
+    }
+
+    /// <summary>
+    /// Configures the services for the application.
+    /// </summary>
+    private void ConfigureServices(HostBuilderContext context, IServiceCollection services)
+    {
+        // App Host
+        services.AddHostedService<ApplicationHostService>();
+
+        // Theme manipulation
+        services.AddSingleton<IThemeService, ThemeService>();
+
+        // Taskbar manipulation
+        services.AddSingleton<ITaskBarService, TaskBarService>();
+
+        // Tray icon
+        // Just in case you wondering, it  does not work yet
+        // !! Experimental
+        services.AddSingleton<INotifyIconService, NotifyIconService>();
+
+        // Page resolver service
+        services.AddSingleton<IPageService, PageService>();
+
+        // Page resolver service
+        services.AddSingleton<ITestWindowService, TestWindowService>();
+
+        // Service containing navigation, same as INavigationWindow... but without window
+        services.AddSingleton<INavigationService, NavigationService>();
+
+        // Main window container with navigation
+        services.AddScoped<INavigationWindow, Views.Container>();
+        services.AddScoped<ContainerViewModel>();
+
+        // Views and ViewModels
+        services.AddScoped<Views.Pages.Dashboard>();
+        services.AddScoped<Views.Pages.Store>();
+
+
+        // Test windows
+        //services.AddTransient<Views.Windows.EditorWindow>();
+        //services.AddTransient<Views.Windows.TaskManagerWindow>();
+        //services.AddTransient<Views.Windows.SettingsWindow>();
+        // services.AddScoped<Views.Windows.StoreWindow>();
+        //services.AddScoped<Views.Windows.ExperimentalWindow>();
+
+        // Configuration
+        //services.Configure<AppConfig>(context.Configuration.GetSection(nameof(AppConfig)));
+    }
+
+    /// <summary>
+    /// Occurs when the application is closing.
+    /// </summary>
+    private async void OnExit(object sender, ExitEventArgs e)
+    {
+        await _host.StopAsync();
+
+        _host.Dispose();
+        _host = null;
+    }
+
+    /// <summary>
+    /// Occurs when an exception is thrown by an application but not handled.
+    /// </summary>
+    private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+    {
+        // For more info see https://docs.microsoft.com/en-us/dotnet/api/system.windows.application.dispatcherunhandledexception?view=windowsdesktop-6.0
     }
 }

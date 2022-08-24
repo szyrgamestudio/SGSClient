@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-D:\DEVELOPMENT\SGSClient\obj\Debug\net6.0-windows\
+D:\DEVELOPMENT\Visual Studio Projects\SGSClient\obj\Debug\net6.0-windows\
 SGSClient
 none
 false
 TRACE;DEBUG;NET;NET6_0;NETCOREAPP
-D:\DEVELOPMENT\SGSClient\App.xaml
-8-1149639310
-1598072354
-201811383811
-226-1373346688
-MainWindow.xaml;MVVM\View\AtorthView.xaml;MVVM\View\CastlelineEvilView.xaml;MVVM\View\DoddaniView.xaml;MVVM\View\HomeView.xaml;MVVM\View\SciezkaBohateraView.xaml;MVVM\View\ZacmienieView.xaml;Theme\MenuButtonTheme.xaml;
+D:\DEVELOPMENT\Visual Studio Projects\SGSClient\App.xaml
+3-1738163377
+1-1875208551
+121695015940
+2212090245027
+Views\Container.xaml;Views\Pages\Dashboard.xaml;Views\Pages\Store.xaml;
 
 False
 

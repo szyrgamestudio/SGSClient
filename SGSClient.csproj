@@ -1,80 +1,35 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <UseWPF>true</UseWPF>
-    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
-    <ApplicationIcon>Images\SGS.ico</ApplicationIcon>
-    <PlatformTarget>x64</PlatformTarget>
-    <SignAssembly>False</SignAssembly>
-    <PackageProjectUrl>https://szyrgamestudio.com</PackageProjectUrl>
-    <PackageIcon>SGS.png</PackageIcon>
     <TargetFramework>net6.0-windows</TargetFramework>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>Resources\SGS.ico</ApplicationIcon>
   </PropertyGroup>
+
   <ItemGroup>
-    <Content Include="Images\SGS.ico" />
+    <Content Include="Resources\SGS.ico" />
   </ItemGroup>
+
   <ItemGroup>
-    <Resource Include="Fonts\Poppins-Black.ttf" />
-    <Resource Include="Fonts\Poppins-BlackItalic.ttf" />
-    <Resource Include="Fonts\Poppins-Bold.ttf" />
-    <Resource Include="Fonts\Poppins-BoldItalic.ttf" />
-    <Resource Include="Fonts\Poppins-ExtraBold.ttf" />
-    <Resource Include="Fonts\Poppins-ExtraBoldItalic.ttf" />
-    <Resource Include="Fonts\Poppins-ExtraLight.ttf" />
-    <Resource Include="Fonts\Poppins-ExtraLightItalic.ttf" />
-    <Resource Include="Fonts\Poppins-Italic.ttf" />
-    <Resource Include="Fonts\Poppins-Light.ttf" />
-    <Resource Include="Fonts\Poppins-LightItalic.ttf" />
-    <Resource Include="Fonts\Poppins-Medium.ttf" />
-    <Resource Include="Fonts\Poppins-MediumItalic.ttf" />
-    <Resource Include="Fonts\Poppins-Regular.ttf" />
-    <Resource Include="Fonts\Poppins-SemiBold.ttf" />
-    <Resource Include="Fonts\Poppins-SemiBoldItalic.ttf" />
-    <Resource Include="Fonts\Poppins-Thin.ttf" />
-    <Resource Include="Fonts\Poppins-ThinItalic.ttf" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
+    <PackageReference Include="WPF-UI" Version="2.0.1" />
   </ItemGroup>
+
   <ItemGroup>
-    <Folder Include="MVVM\Model\" />
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
   </ItemGroup>
+
   <ItemGroup>
-    <Resource Include="Images\Atorth.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\Doddani.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\backgroundSGS.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\SGS.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\CastlelineEvil.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\SciezkaBohatera.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\Zacmienie.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="squirrel.windows" Version="2.0.1" />
-    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
-    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.3.255803">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Windows.Compatibility" Version="6.0.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="Images\SGS.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-    <None Update="VersionSGSCLIENT.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
+
 </Project>

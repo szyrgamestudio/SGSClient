@@ -2,24 +2,29 @@
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup />
   <ItemGroup>
-    <Compile Update="MVVM\View\CastlelineEvilView.xaml.cs">
+    <ApplicationDefinition Update="App.xaml">
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Views\Container.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="MVVM\View\SciezkaBohateraView.xaml.cs">
+    <Compile Update="Views\Pages\Dashboard.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="MVVM\View\ZacmienieView.xaml.cs">
+    <Compile Update="Views\Pages\Store.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="MVVM\View\CastlelineEvilView.xaml">
+    <Page Update="Views\Container.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="MVVM\View\SciezkaBohateraView.xaml">
+    <Page Update="Views\Pages\Dashboard.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="MVVM\View\ZacmienieView.xaml">
+    <Page Update="Views\Pages\Store.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
