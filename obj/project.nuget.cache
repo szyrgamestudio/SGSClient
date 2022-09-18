@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "joRB4gv5rdBbw1ey05CcCJ/3aKALNP05zneQ6TewVP3DsynMPtFeMhoi/ikDcP07GoLc5gkc/Kt9ldiFMAfPYw==",
+  "dgSpecHash": "yV0cMyan5qm3ZTVDYKM/fqNj/Q2Xq1SVjs6oJgoIVxIDAwM3Q985K5w+slniD0YnkSgSID2SK8tXlUa4u6A4LQ==",
   "success": true,
-  "projectFilePath": "D:\\DEVELOPMENT\\Visual Studio Projects\\SGSClient\\SGSClient.csproj",
+  "projectFilePath": "D:\\DEVELOPMENT\\GitHub\\_SGS\\SGSClient\\SGSClient.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\DEVMASSYN\\.nuget\\packages\\microsoft.extensions.configuration\\6.0.0\\microsoft.extensions.configuration.6.0.0.nupkg.sha512",
     "C:\\Users\\DEVMASSYN\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\6.0.0\\microsoft.extensions.configuration.abstractions.6.0.0.nupkg.sha512",

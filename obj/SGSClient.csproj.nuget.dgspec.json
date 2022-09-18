@@ -1,28 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "D:\\DEVELOPMENT\\Visual Studio Projects\\SGSClient\\SGSClient.csproj": {}
+    "D:\\DEVELOPMENT\\GitHub\\_SGS\\SGSClient\\SGSClient.csproj": {}
   },
   "projects": {
-    "D:\\DEVELOPMENT\\Visual Studio Projects\\SGSClient\\SGSClient.csproj": {
+    "D:\\DEVELOPMENT\\GitHub\\_SGS\\SGSClient\\SGSClient.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\DEVELOPMENT\\Visual Studio Projects\\SGSClient\\SGSClient.csproj",
+        "projectUniqueName": "D:\\DEVELOPMENT\\GitHub\\_SGS\\SGSClient\\SGSClient.csproj",
         "projectName": "SGSClient",
-        "projectPath": "D:\\DEVELOPMENT\\Visual Studio Projects\\SGSClient\\SGSClient.csproj",
+        "projectPath": "D:\\DEVELOPMENT\\GitHub\\_SGS\\SGSClient\\SGSClient.csproj",
         "packagesPath": "C:\\Users\\DEVMASSYN\\.nuget\\packages\\",
-        "outputPath": "D:\\DEVELOPMENT\\Visual Studio Projects\\SGSClient\\obj\\",
+        "outputPath": "D:\\DEVELOPMENT\\GitHub\\_SGS\\SGSClient\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "D:\\PROGRAMY\\x86\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
           "C:\\Users\\DEVMASSYN\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
-          "net6.0-windows7.0"
+          "net6.0-windows"
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
@@ -59,7 +55,8 @@
             "net47",
             "net471",
             "net472",
-            "net48"
+            "net48",
+            "net481"
           ],
           "assetTargetFallback": true,
           "warn": true,
@@ -71,7 +68,7 @@
               "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.301\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.400\\RuntimeIdentifierGraph.json"
         }
       }
     }
