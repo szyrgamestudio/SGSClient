@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\DEVELOPMENT\\GitHub\\_SGS\\SGSClient\\SGSClient.csproj": {}
+    "D:\\REPOZYTORIA\\SGSClient\\SGSClient.csproj": {}
   },
   "projects": {
-    "D:\\DEVELOPMENT\\GitHub\\_SGS\\SGSClient\\SGSClient.csproj": {
+    "D:\\REPOZYTORIA\\SGSClient\\SGSClient.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\DEVELOPMENT\\GitHub\\_SGS\\SGSClient\\SGSClient.csproj",
+        "projectUniqueName": "D:\\REPOZYTORIA\\SGSClient\\SGSClient.csproj",
         "projectName": "SGSClient",
-        "projectPath": "D:\\DEVELOPMENT\\GitHub\\_SGS\\SGSClient\\SGSClient.csproj",
+        "projectPath": "D:\\REPOZYTORIA\\SGSClient\\SGSClient.csproj",
         "packagesPath": "C:\\Users\\DEVMASSYN\\.nuget\\packages\\",
-        "outputPath": "D:\\DEVELOPMENT\\GitHub\\_SGS\\SGSClient\\obj\\",
+        "outputPath": "D:\\REPOZYTORIA\\SGSClient\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\DEVMASSYN\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -68,7 +68,7 @@
               "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.400\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.102\\RuntimeIdentifierGraph.json"
         }
       }
     }

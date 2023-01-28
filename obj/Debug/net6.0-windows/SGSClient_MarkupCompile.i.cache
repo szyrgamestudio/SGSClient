@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-D:\DEVELOPMENT\GitHub\_SGS\SGSClient\obj\Debug\net6.0-windows\
+D:\REPOZYTORIA\SGSClient\obj\Debug\net6.0-windows\
 SGSClient
 none
 false
 TRACE;DEBUG;NET;NET6_0;NETCOREAPP
-D:\DEVELOPMENT\GitHub\_SGS\SGSClient\App.xaml
+D:\REPOZYTORIA\SGSClient\App.xaml
 3-1738163377
 1-1875208551
 14-329206598
-2211986952188
+221-1869595949
 Views\Container.xaml;Views\Pages\Dashboard.xaml;Views\Pages\Store.xaml;
 
-False
+True
 
