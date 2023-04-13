@@ -8,6 +8,6 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("images/sgs.ico")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("resources/sgs.ico")]
 
 

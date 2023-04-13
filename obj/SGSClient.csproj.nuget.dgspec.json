@@ -1,24 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "D:\\DEVELOPMENT\\SGSClient\\SGSClient.csproj": {}
+    "D:\\REPOZYTORIA\\SGSClient\\SGSClient.csproj": {}
   },
   "projects": {
-    "D:\\DEVELOPMENT\\SGSClient\\SGSClient.csproj": {
+    "D:\\REPOZYTORIA\\SGSClient\\SGSClient.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\DEVELOPMENT\\SGSClient\\SGSClient.csproj",
+        "projectUniqueName": "D:\\REPOZYTORIA\\SGSClient\\SGSClient.csproj",
         "projectName": "SGSClient",
-        "projectPath": "D:\\DEVELOPMENT\\SGSClient\\SGSClient.csproj",
+        "projectPath": "D:\\REPOZYTORIA\\SGSClient\\SGSClient.csproj",
         "packagesPath": "C:\\Users\\DEVMASSYN\\.nuget\\packages\\",
-        "outputPath": "D:\\DEVELOPMENT\\SGSClient\\obj\\",
+        "outputPath": "D:\\REPOZYTORIA\\SGSClient\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\DEVMASSYN\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
-          "net6.0-windows7.0"
+          "net6.0-windows"
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
@@ -40,24 +40,11 @@
         "net6.0-windows7.0": {
           "targetAlias": "net6.0-windows",
           "dependencies": {
-            "Microsoft.CSharp": {
+            "Microsoft.Extensions.Hosting": {
               "target": "Package",
-              "version": "[4.7.0, )"
+              "version": "[6.0.1, )"
             },
-            "Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers": {
-              "suppressParent": "All",
-              "target": "Package",
-              "version": "[0.3.255803, )"
-            },
-            "Microsoft.Windows.Compatibility": {
-              "target": "Package",
-              "version": "[6.0.0, )"
-            },
-            "System.Data.DataSetExtensions": {
-              "target": "Package",
-              "version": "[4.5.0, )"
-            },
-            "squirrel.windows": {
+            "WPF-UI": {
               "target": "Package",
               "version": "[2.0.1, )"
             }
@@ -68,7 +55,8 @@
             "net47",
             "net471",
             "net472",
-            "net48"
+            "net48",
+            "net481"
           ],
           "assetTargetFallback": true,
           "warn": true,
@@ -80,7 +68,7 @@
               "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.102\\RuntimeIdentifierGraph.json"
         }
       }
     }

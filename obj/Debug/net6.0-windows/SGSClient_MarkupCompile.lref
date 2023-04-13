@@ -1,10 +1,6 @@
 ﻿
-FD:\DEVELOPMENT\SGSClient\App.xaml;;
-FD:\DEVELOPMENT\SGSClient\MainWindow.xaml;;
-FD:\DEVELOPMENT\SGSClient\MVVM\View\AtorthView.xaml;;
-FD:\DEVELOPMENT\SGSClient\MVVM\View\CastlelineEvilView.xaml;;
-FD:\DEVELOPMENT\SGSClient\MVVM\View\DoddaniView.xaml;;
-FD:\DEVELOPMENT\SGSClient\MVVM\View\HomeView.xaml;;
-FD:\DEVELOPMENT\SGSClient\MVVM\View\SciezkaBohateraView.xaml;;
-FD:\DEVELOPMENT\SGSClient\MVVM\View\ZacmienieView.xaml;;
+FD:\REPOZYTORIA\SGSClient\App.xaml;;
+FD:\REPOZYTORIA\SGSClient\Views\Container.xaml;;
+FD:\REPOZYTORIA\SGSClient\Views\Pages\Dashboard.xaml;;
+FD:\REPOZYTORIA\SGSClient\Views\Pages\Store.xaml;;
 
