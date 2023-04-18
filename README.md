@@ -6,12 +6,9 @@
 Już jest - nowy, przebudowany, nasz własny launcher.
 >Od teraz wszystkie gry SGS znajdziesz w jednym miejscu.
 
-#### Aktualna wersja: v.1.0.3(03/06/2022)
->#### Aktualna wersja testowa: v2.0.0 (21/06/2022)
-
+#### Wersja: v.1.5.0 (Unreleased)
 
 ## Twórcy
-
 - [@devmassyn](https://github.com/devmassyn)
 - [@szyrgamestudio](https://www.github.com/szyrgamestudio)
 
@@ -20,5 +17,4 @@ Już jest - nowy, przebudowany, nasz własny launcher.
 ![Logo](https://user-images.githubusercontent.com/51244922/174900731-135f8228-5154-41a7-9482-f4059551d4d7.png)
 
 ## Support
-
 Aby uzyskać pomoc, wyślij wiadomość e-mail na adres:<br>kontakt@szyrgamestudio.com lub devmassyn@outlook.com.
