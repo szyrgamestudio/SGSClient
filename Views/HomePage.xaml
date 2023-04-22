@@ -36,7 +36,6 @@
             Padding="24,0,24,0"
             AutomationProperties.AutomationId="ItemGridView"
             AutomationProperties.Name="Items In Group"
-            
             IsItemClickEnabled="True"
             IsSwipeEnabled="False"
             >
