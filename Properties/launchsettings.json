@@ -1,0 +1,10 @@
+﻿{
+    "profiles": {
+      "SGSClient (Package)": {
+        "commandName": "MsixPackage"
+      },
+      "SGSClient (Unpackaged)": {
+        "commandName": "Project"
+      }
+    }
+}
