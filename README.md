@@ -1,27 +1,26 @@
-﻿*Recommended Markdown Viewer: [Markdown Editor](https://marketplace.visualstudio.com/items?itemName=MadsKristensen.MarkdownEditor2)*
+﻿![SGSClient LOGO](https://user-images.githubusercontent.com/51244922/174903969-d59b1dc3-1b2c-4cc5-ad1f-8ef89a5086c6.png)
 
-## Getting Started
+# SGS CLIENT
+##### [Created by DEVMASSYN using Windows UI Library in the Windows App SDK (WinUI 3)](https://massyn.dev/)
+##### Application available for download from the Microsoft Store.
 
-Browse and address `TODO:` comments in `View -> Task List` to learn the codebase and understand next steps for turning the generated code into production code.
+Już jest - nowy, przebudowany, nasz własny launcher.
+>Od teraz wszystkie gry SGS znajdziesz w jednym miejscu.
+Jeśli kochasz nasze gry, to SGSClient jest dla Ciebie idealny!
+Odkrywaj niesamowite tytuły i korzystaj z tego, co nasza aplikacja ma do zaoferowania.
 
-Explore the [WinUI Gallery](https://www.microsoft.com/store/productId/9P3JFPWWDZRC) to learn about available controls and design patterns.
+SGSClient oferuje:
+- Dostęp do fantastycznych gier stworzonych przez SzyrGameStudio oraz zweryfikowanych gier przesłanych przez członków serwera DEVSZYR
+- Łatwe zarządzanie swoją biblioteką gier i szybkie uruchamianie ich z jednego miejsca
+- Możliwość dołączenia do wspaniałej społeczności graczy i dzielenia się swoimi grami, a po pomyślnej weryfikacji, także z możliwością ich pobierania
 
-Relaunch Template Studio to modify the project by right-clicking on the project in `View -> Solution Explorer` then selecting `Add -> New Item (Template Studio)`.
+Nie zwlekaj, pobierz naszą aplikację już teraz i ciesz się najlepszym doświadczeniem gamingowym na PC!
 
-## Publishing
+#### Wersja: v.1.9.1.0 BETA (22/04/2023)
+## Twórcy
+- [@devmassyn](https://github.com/devmassyn)
+- [@szyrgamestudio](https://www.github.com/szyrgamestudio)
 
-For projects with MSIX packaging, right-click on the application project and select `Package and Publish -> Create App Packages...` to create an MSIX package.
-
-For projects without MSIX packaging, follow the [deployment guide](https://docs.microsoft.com/windows/apps/windows-app-sdk/deploy-unpackaged-apps) or add the `Self-Contained` Feature to enable xcopy deployment.
-
-## CI Pipelines
-
-See [README.md](https://github.com/microsoft/TemplateStudio/blob/main/docs/WinUI/pipelines/README.md) for guidance on building and testing projects in CI pipelines.
-
-## Changelog
-
-See [releases](https://github.com/microsoft/TemplateStudio/releases) and [milestones](https://github.com/microsoft/TemplateStudio/milestones).
-
-## Feedback
-
-Bugs and feature requests should be filed at https://aka.ms/templatestudio.
+## 📷 Galeria
+## Support
+Aby uzyskać pomoc, wyślij wiadomość e-mail na adres:<br>kontakt@szyrgamestudio.com.
