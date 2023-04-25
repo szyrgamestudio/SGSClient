@@ -26,4 +26,9 @@ public sealed partial class GamesPage : Page
     {
         Frame.Navigate(typeof(DoddaniPage), null, new DrillInNavigationTransitionInfo());
     }
+
+    private void ButtonCastlelineEvil_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+        Frame.Navigate(typeof(CastlelineEvilPage), null, new DrillInNavigationTransitionInfo());
+    }
 }

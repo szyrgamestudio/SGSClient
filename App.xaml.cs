@@ -70,6 +70,8 @@ public partial class App : Application
             services.AddSingleton<IFileService, FileService>();
 
             // Views and ViewModels
+            services.AddTransient<CastlelineEvilViewModel>();
+            services.AddTransient<CastlelineEvilPage>();
             services.AddTransient<DoddaniViewModel>();
             services.AddTransient<DoddaniPage>();
             services.AddTransient<Atorth_TalesOfUlkimondViewModel>();

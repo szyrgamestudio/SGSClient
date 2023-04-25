@@ -117,7 +117,7 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <Button Grid.Column="0" Margin="0,0,4,0">
+                        <Button Grid.Column="0" Margin="0,0,4,0" Click="ButtonCastlelineEvil_Click">
                             <StackPanel>
                                 <Image
                             Margin="14"
@@ -147,7 +147,8 @@
                             </StackPanel>
                         </Button>
 
-                        <Button Grid.Column="1" Margin="0,0,4,0">
+                        
+                        <Button Grid.Column="1" Margin="0,0,4,0" IsEnabled="False">
                             <StackPanel>
                                 <Image
                             Margin="14"
@@ -174,11 +175,11 @@
                             Grid.Row="0"
                             FontSize="12"
                             FontWeight="Bold"
-                            Text="Dostępne" />
+                            Text="Niedostępne" />
                             </StackPanel>
                         </Button>
 
-                        <Button Grid.Column="2" Margin="0,0,4,0">
+                        <Button Grid.Column="2" Margin="0,0,4,0" IsEnabled="False">
                             <StackPanel>
                                 <Image
                             Margin="14"
@@ -204,7 +205,7 @@
                             Grid.Row="0"
                             FontSize="12"
                             FontWeight="Bold"
-                            Text="Dostępne" />
+                            Text="Niedostępne" />
                             </StackPanel>
                         </Button>
 

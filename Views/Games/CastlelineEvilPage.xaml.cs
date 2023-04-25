@@ -10,7 +10,8 @@ using static System.Net.WebRequestMethods;
 using File = System.IO.File;
 
 namespace SGSClient.Views;
-public sealed partial class Atorth_TalesOfUlkimondPage : Page
+
+public sealed partial class CastlelineEvilPage : Page
 {
     private readonly string rootPath; //określenie folderu klienta sgs
     private readonly string gamepath; //okreslenie folderu z gra
@@ -19,8 +20,8 @@ public sealed partial class Atorth_TalesOfUlkimondPage : Page
     private readonly string gameExe; //okreslenie pliku exe gry
     private LauncherStatus _status; //status plików gry
 
-    private readonly string gameZipLink = "https://github.com/szyrgamestudio/ATORTH-Tales-Of-Ulkimond/releases/latest/download/AtorhTalesOfUlkimond.zip";
-    private readonly string gameVersionLink = "https://github.com/szyrgamestudio/ATORTH-Tales-Of-Ulkimond/releases/latest/download/versionATH.txt";
+    private readonly string gameZipLink = "https://github.com/devmassyn/Castleline-Evil/releases/latest/download/CastlelineEvil.zip";
+    private readonly string gameVersionLink = "https://github.com/devmassyn/Castleline-Evil/releases/latest/download/versionCE.txt";
 
     WebClient webClient = new WebClient();
 
@@ -83,29 +84,30 @@ public sealed partial class Atorth_TalesOfUlkimondPage : Page
             }
         }
     }
-    public Atorth_TalesOfUlkimondViewModel ViewModel
+
+    public CastlelineEvilViewModel ViewModel
     {
         get;
     }
-    public Atorth_TalesOfUlkimondPage()
+
+    public CastlelineEvilPage()
     {
-        ViewModel = App.GetService<Atorth_TalesOfUlkimondViewModel>();
+        ViewModel = App.GetService<CastlelineEvilViewModel>();
         InitializeComponent();
 
         //rootPath = Directory.GetCurrentDirectory();
         var location = System.Reflection.Assembly.GetEntryAssembly().Location;
         rootPath = Path.GetDirectoryName(location);
 
-        versionFile = Path.Combine(rootPath, "versionATH.txt");
-        gameZip = Path.Combine(rootPath, "AtorhTalesOfUlkimond.zip");
-        gameExe = Path.Combine(rootPath, "AtorhTalesOfUlkimond", "game.exe");
-        gamepath = Path.Combine(rootPath, "AtorhTalesOfUlkimond");
+        versionFile = Path.Combine(rootPath, "versionCE.txt");
+        gameZip = Path.Combine(rootPath, "CastlelineEvil.zip");
+        gameExe = Path.Combine(rootPath, "CastlelineEvil", "CastlelineEvil.exe");
+        gamepath = Path.Combine(rootPath, "CastlelineEvil");
 
         DownloadProgressBorder.IsActive = false;
         UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
 
         isUpdated();
-
     }
 
     private void isUpdated()
@@ -191,7 +193,7 @@ public sealed partial class Atorth_TalesOfUlkimondPage : Page
         {
             string onlineVersion = ((SGSVersion.Version)e.UserState).ToString();
             ZipFile.ExtractToDirectory(gameZip, rootPath, true);
-            File.Delete(gameZip);
+            //File.Delete(gameZip);
 
             File.WriteAllText(versionFile, onlineVersion);
 
@@ -214,7 +216,7 @@ public sealed partial class Atorth_TalesOfUlkimondPage : Page
             try
             {
                 ProcessStartInfo startInfo = new ProcessStartInfo(gameExe);
-                startInfo.WorkingDirectory = Path.Combine(rootPath, "AtorhTalesOfUlkimond");
+                startInfo.WorkingDirectory = Path.Combine(rootPath, "CastlelineEvil");
                 Process.Start(startInfo);
                 //System.Windows.Application.Current.Shutdown();
                 CoreApplication.Exit();

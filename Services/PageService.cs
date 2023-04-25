@@ -19,6 +19,7 @@ public class PageService : IPageService
         Configure<SettingsViewModel, SettingsPage>();
         Configure<Atorth_TalesOfUlkimondViewModel, Atorth_TalesOfUlkimondPage>();
         Configure<DoddaniViewModel, DoddaniPage>();
+        Configure<CastlelineEvilViewModel, CastlelineEvilPage>();
     }
 
     public Type GetPageType(string key)

@@ -176,4 +176,7 @@
   <data name="Shell_Doddani.Content" xml:space="preserve">
     <value>Doddani</value>
   </data>
+  <data name="Shell_CastlelineEvil.Content" xml:space="preserve">
+    <value>CastlelineEvil</value>
+  </data>
 </root>
