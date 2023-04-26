@@ -11,11 +11,11 @@
   IgnorableNamespaces="uap rescap genTemplate">
 
   <Identity
-    Name="SZYRGAMESTUDIO-SGSClient"
-    Publisher="CN=DEVMASSYN"
-    Version="1.9.1.0" />
+    Name="17212DEVMASSYN.SGSClient"
+    Publisher="CN=B5A74391-DF3D-4F92-B9DB-36657C9E25E9"
+    Version="1.9.2.0" />
     
-  <mp:PhoneIdentity PhoneProductId="e4ac1407-50ed-4a4b-9749-c124b9f3b23f" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="fc80e0d7-45af-49e9-b31b-27d7528c9276" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
     
   <Properties>
     <DisplayName>SGSClient</DisplayName>

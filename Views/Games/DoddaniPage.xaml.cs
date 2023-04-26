@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Controls;
 using SGSClient.Controllers;
 using SGSClient.ViewModels;
 using Windows.ApplicationModel.Core;
+using Windows.Storage;
 
 namespace SGSClient.Views;
 
@@ -17,6 +18,7 @@ public sealed partial class DoddaniPage : Page
     private string gameZip; //okreslenie zipu gry
     private string gameExe; //okreslenie pliku exe gry
     private LauncherStatus _status; //status plików gry
+
 
     WebClient webClient = new WebClient();
     internal LauncherStatus Status //co robic wedlug statusu gry
@@ -87,8 +89,10 @@ public sealed partial class DoddaniPage : Page
         ViewModel = App.GetService<DoddaniViewModel>();
         InitializeComponent();
 
-        var location = System.Reflection.Assembly.GetEntryAssembly().Location;
+        //var location = System.Reflection.Assembly.GetEntryAssembly().Location;
+        string location = Path.Combine(ApplicationData.Current.LocalFolder.Path,"LocalState");
         rootPath = Path.GetDirectoryName(location);
+
 
         versionFile = Path.Combine(rootPath, "VersionDODDANI.txt");
         gameZip = Path.Combine(rootPath, "Doddani.zip");

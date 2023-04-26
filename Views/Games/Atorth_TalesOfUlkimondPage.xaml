@@ -89,10 +89,10 @@
                     <FlipView HorizontalAlignment="Left" MaxWidth="400" Height="230" Margin="5">
                         <Image Source="/Assets/Games/Atorth/Gallery_1.png" AutomationProperties.Name="Gallery_1"/>
                         <Image Source="/Assets/Games/Atorth/Gallery_2.png" AutomationProperties.Name="Gallery_2"/>
-                        <Image Source="/Assets/Games/Atorth/Gallery_3.png" AutomationProperties.Name="Gallery_3"/>
+                        <!--<Image Source="/Assets/Games/Atorth/Gallery_3.png" AutomationProperties.Name="Gallery_3"/>
                         <Image Source="/Assets/Games/Atorth/Gallery_4.jpg" AutomationProperties.Name="Gallery_4"/>
                         <Image Source="/Assets/Games/Atorth/Gallery_5.jpg" AutomationProperties.Name="Gallery_5"/>
-                        <Image Source="/Assets/Games/Atorth/Gallery_6.jpg" AutomationProperties.Name="Gallery_6"/>
+                        <Image Source="/Assets/Games/Atorth/Gallery_6.jpg" AutomationProperties.Name="Gallery_6"/>-->
                     </FlipView>
                 </StackPanel>
                 <StackPanel Grid.Row="1"

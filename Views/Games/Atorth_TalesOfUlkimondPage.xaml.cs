@@ -8,6 +8,7 @@ using System.Diagnostics;
 using Windows.ApplicationModel.Core;
 using static System.Net.WebRequestMethods;
 using File = System.IO.File;
+using Windows.Storage;
 
 namespace SGSClient.Views;
 public sealed partial class Atorth_TalesOfUlkimondPage : Page
@@ -92,8 +93,8 @@ public sealed partial class Atorth_TalesOfUlkimondPage : Page
         ViewModel = App.GetService<Atorth_TalesOfUlkimondViewModel>();
         InitializeComponent();
 
-        //rootPath = Directory.GetCurrentDirectory();
-        var location = System.Reflection.Assembly.GetEntryAssembly().Location;
+        //var location = System.Reflection.Assembly.GetEntryAssembly().Location;
+        string location = Path.Combine(ApplicationData.Current.LocalFolder.Path, "LocalState");
         rootPath = Path.GetDirectoryName(location);
 
         versionFile = Path.Combine(rootPath, "versionATH.txt");
