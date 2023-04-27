@@ -25,7 +25,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <InfoBar IsOpen="True" Margin="0,40,0,0" IsClosable="False" Severity="Error" Title="Uwaga" Message="Używasz wersję testową SGSClienta. Prosimy o zgłaszanie błedów na adres kontakt@szyrgamestudio.com." />
+                    <!--<InfoBar IsOpen="True" Margin="0,40,0,0" IsClosable="False" Severity="Error" Title="Uwaga" Message="Używasz wersję testową SGSClienta. Prosimy o zgłaszanie błedów na adres kontakt@szyrgamestudio.com." />-->
 
                     <TextBlock Grid.Row="0" FontSize="16" FontWeight="Bold" Text="Gry stworzone przez SGS" />
 

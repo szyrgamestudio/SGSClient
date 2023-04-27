@@ -68,10 +68,10 @@
                             FontWeight="Light"
                             Text="https://szyrgamestudio.com/" />
                     </StackPanel>
-                    <controls:TileGallery IsEnabled="False"
+                    <!--<controls:TileGallery IsEnabled="False"
                         x:Name="headerTileGallery"
                         Grid.Row="1"
-                        Margin="0,0,0,0" />
+                        Margin="0,0,0,0" />-->
                 </Grid>
             </GridView.Header>
 
