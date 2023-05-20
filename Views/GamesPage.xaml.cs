@@ -31,4 +31,9 @@ public sealed partial class GamesPage : Page
     {
         Frame.Navigate(typeof(CastlelineEvilPage), null, new DrillInNavigationTransitionInfo());
     }
+
+    private void ButtonTurboNinja2D_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+        Frame.Navigate(typeof(TurboNinja2DPage), null, new DrillInNavigationTransitionInfo());
+    }
 }

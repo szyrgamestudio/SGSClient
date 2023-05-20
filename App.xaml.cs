@@ -70,6 +70,8 @@ public partial class App : Application
             services.AddSingleton<IFileService, FileService>();
 
             // Views and ViewModels
+            services.AddTransient<TurboNinja2DViewModel>();
+            services.AddTransient<TurboNinja2DPage>();
             services.AddTransient<CastlelineEvilViewModel>();
             services.AddTransient<CastlelineEvilPage>();
             services.AddTransient<DoddaniViewModel>();

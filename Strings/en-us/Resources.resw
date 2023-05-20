@@ -179,4 +179,7 @@
   <data name="Shell_CastlelineEvil.Content" xml:space="preserve">
     <value>CastlelineEvil</value>
   </data>
+  <data name="Shell_TurboNinja2D.Content" xml:space="preserve">
+    <value>TurboNinja2D</value>
+  </data>
 </root>

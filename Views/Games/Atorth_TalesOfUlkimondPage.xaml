@@ -75,8 +75,8 @@
                     <RowDefinition Height="300"/>
                     <RowDefinition Height="205"/>
                     <RowDefinition Height="180"/>
-                    <RowDefinition Height="200"/>
-                    <RowDefinition Height="63"/>
+                    <!--<RowDefinition Height="200"/>-->
+                    <!--<RowDefinition Height="63"/>-->
                 </Grid.RowDefinitions>
                 <StackPanel Grid.Row="0"
                             Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
@@ -127,27 +127,7 @@
 						<LineBreak/>• Karta graficzna: zgodna z DirectX 9 i OpenGL 4.1;
 						<LineBreak/>• System operacyjny: Microsoft Windows 7, 8, 8.1 i 10 (32-/64-bit).
                     </TextBlock>
-
-
                 </StackPanel>
-                <StackPanel Grid.Row="3"
-                            Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
-                            BorderBrush="{ThemeResource ControlElevationBorderBrush}"
-                            BorderThickness="0.5"
-                            CornerRadius="5"
-                            Margin="5">
-                    <TextBlock Text="Pozostałe informacje" FontSize="20" Padding="5" Margin="5" Style="{ThemeResource BodyStrongTextBlockStyle}"/>
-                    <Rectangle HorizontalAlignment="Stretch" Fill="{ThemeResource ControlElevationBorderBrush}" Height="1"/>
-
-                </StackPanel>
-                <!--<StackPanel Grid.Row="4"
-                            Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
-                            BorderBrush="{ThemeResource ControlElevationBorderBrush}"
-                            BorderThickness="0.5"
-                            CornerRadius="5"
-                            Margin="5">
-					<InfoBar IsOpen="True" IsClosable="False" Severity="Error" Title="Uwaga" Message="Używasz wersję testową SGSClienta. Prosimy o zgłaszanie błedów na adres kontakt@szyrgamestudio.com." />
-				</StackPanel>-->
             </Grid>
         </ScrollViewer>
     </Grid>

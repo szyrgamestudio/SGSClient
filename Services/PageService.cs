@@ -20,6 +20,7 @@ public class PageService : IPageService
         Configure<Atorth_TalesOfUlkimondViewModel, Atorth_TalesOfUlkimondPage>();
         Configure<DoddaniViewModel, DoddaniPage>();
         Configure<CastlelineEvilViewModel, CastlelineEvilPage>();
+        Configure<TurboNinja2DViewModel, TurboNinja2DPage>();
     }
 
     public Type GetPageType(string key)
