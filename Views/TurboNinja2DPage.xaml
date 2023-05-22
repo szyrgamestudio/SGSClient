@@ -8,7 +8,7 @@
     behaviors:NavigationViewHeaderBehavior.HeaderMode="Never"
     mc:Ignorable="d">
 
-	<Grid x:Name="ContentArea">
+    <Grid x:Name="ContentArea">
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="Auto"/>
 			<ColumnDefinition Width="*"/>
@@ -69,85 +69,62 @@
 				</StackPanel>
 			</Grid>
 		</StackPanel>
-		<ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Visible">
-			<Grid>
-				<Grid.RowDefinitions>
-					<RowDefinition Height="300"/>
-					<RowDefinition Height="280"/>
-					<RowDefinition Height="200"/>
-					<RowDefinition Height="200"/>
-					<RowDefinition Height="63"/>
-				</Grid.RowDefinitions>
-				<StackPanel Grid.Row="0"
+        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Visible">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="300"/>
+                    <RowDefinition Height="210"/>
+                    <RowDefinition Height="200"/>
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0"
 							Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
 							BorderBrush="{ThemeResource ControlElevationBorderBrush}"
 							BorderThickness="0.5"
 							CornerRadius="5"
 							Margin="5">
-					<TextBlock Text="Zrzuty ekranu" FontSize="20" Padding="5" Margin="5" Style="{ThemeResource BodyStrongTextBlockStyle}"/>
-					<Rectangle HorizontalAlignment="Stretch" Fill="{ThemeResource ControlElevationBorderBrush}" Height="1"/>
-					<FlipView HorizontalAlignment="Left" MaxWidth="400" Height="230" Margin="5">
-						<Image Source="/Assets/Games/TurboNinja2D/Gallery_1.png" AutomationProperties.Name="Gallery_1"/>
-						<Image Source="/Assets/Games/TurboNinja2D/Gallery_2.png" AutomationProperties.Name="Gallery_2"/>
-						<Image Source="/Assets/Games/TurboNinja2D/Gallery_3.png" AutomationProperties.Name="Gallery_3"/>
-					</FlipView>
-				</StackPanel>
-				<StackPanel Grid.Row="1"
+                    <TextBlock Text="Zrzuty ekranu" FontSize="20" Padding="5" Margin="5" Style="{ThemeResource BodyStrongTextBlockStyle}"/>
+                    <Rectangle HorizontalAlignment="Stretch" Fill="{ThemeResource ControlElevationBorderBrush}" Height="1"/>
+                    <FlipView HorizontalAlignment="Left" MaxWidth="400" Height="230" Margin="5">
+                        <Image Source="/Assets/Games/TurboNinja2D/Gallery_1.png" AutomationProperties.Name="Gallery_1"/>
+                        <Image Source="/Assets/Games/TurboNinja2D/Gallery_2.png" AutomationProperties.Name="Gallery_2"/>
+                        <Image Source="/Assets/Games/TurboNinja2D/Gallery_3.png" AutomationProperties.Name="Gallery_3"/>
+                    </FlipView>
+                </StackPanel>
+                <StackPanel Grid.Row="1"
 							Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
 							BorderBrush="{ThemeResource ControlElevationBorderBrush}"
 							BorderThickness="0.5"
 							CornerRadius="5"
 							Margin="5">
-					<TextBlock Text="Opis" FontSize="20" Padding="5" Margin="5" Style="{ThemeResource BodyStrongTextBlockStyle}"/>
-					<Rectangle HorizontalAlignment="Stretch" Fill="{ThemeResource ControlElevationBorderBrush}" Height="1"/>
-					<TextBlock Margin="15" HorizontalAlignment="Left">
+                    <TextBlock Text="Opis" FontSize="20" Padding="5" Margin="5" Style="{ThemeResource BodyStrongTextBlockStyle}"/>
+                    <Rectangle HorizontalAlignment="Stretch" Fill="{ThemeResource ControlElevationBorderBrush}" Height="1"/>
+                    <TextBlock Margin="15" HorizontalAlignment="Left">
 						Witaj w Turbo Ninja 2D!
 						<LineBreak/>Twoim zadaniem w tej grze jest zostać potężnym ninją,
 					<LineBreak/>a co za tym idzie pokonać wielkiego mistrza ninja Żeralta z Piwii!
 					<LineBreak/>Powodzenia! 
 						
 						<LineBreak/><LineBreak/>#adventure #platformer #fishing #AAA
-					</TextBlock>
-				</StackPanel>
-				<StackPanel Grid.Row="2"
+                    </TextBlock>
+                </StackPanel>
+                <StackPanel Grid.Row="2"
 							Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
 							BorderBrush="{ThemeResource ControlElevationBorderBrush}"
 							BorderThickness="0.5"
 							CornerRadius="5"
 							Margin="5">
-					<TextBlock Text="Wymagania systemowe" FontSize="20" Padding="5" Margin="5" Style="{ThemeResource BodyStrongTextBlockStyle}"/>
-					<Rectangle HorizontalAlignment="Stretch" Fill="{ThemeResource ControlElevationBorderBrush}" Height="1"/>
-					<TextBlock FontSize="14" Padding="5" Margin="5" Style="{ThemeResource CaptionTextBlockStyle}">
+                    <TextBlock Text="Wymagania systemowe" FontSize="20" Padding="5" Margin="5" Style="{ThemeResource BodyStrongTextBlockStyle}"/>
+                    <Rectangle HorizontalAlignment="Stretch" Fill="{ThemeResource ControlElevationBorderBrush}" Height="1"/>
+                    <TextBlock FontSize="14" Padding="5" Margin="5" Style="{ThemeResource CaptionTextBlockStyle}">
 						• Procesor: Intel Core 2 Quad CPU Q6600 @ 2.40GHz (4 CPUs) / AMD Phenom 9850 Quad-Core Processor (4 CPUs) @ 2.5GHz;
 						<LineBreak/>• Pamięć RAM: 4 GB lub więcej;
 						<LineBreak/>• HDD: 1 GB wolnego miejsca na dysku twardym;
 						<LineBreak/>• Karta graficzna: zgodna z DirectX 9 i OpenGL 4.1;
 						<LineBreak/>• System operacyjny: Microsoft Windows 7, 8, 8.1 i 10 (32-/64-bit).
-					</TextBlock>
+                    </TextBlock>
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
 
-
-				</StackPanel>
-				<StackPanel Grid.Row="3"
-							Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
-							BorderBrush="{ThemeResource ControlElevationBorderBrush}"
-							BorderThickness="0.5"
-							CornerRadius="5"
-							Margin="5">
-					<TextBlock Text="Pozostałe informacje" FontSize="20" Padding="5" Margin="5" Style="{ThemeResource BodyStrongTextBlockStyle}"/>
-					<Rectangle HorizontalAlignment="Stretch" Fill="{ThemeResource ControlElevationBorderBrush}" Height="1"/>
-					<TextBlock Margin="15">
-						• Gra została wydana na potrzeby drugiej edycji konkursu na gre widzow organizowanego na serwerze DISCORD DEVSZYR
-					</TextBlock>
-				</StackPanel>
-				<!--<StackPanel Grid.Row="4"
-                            Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
-                            BorderBrush="{ThemeResource ControlElevationBorderBrush}"
-                            BorderThickness="0.5"
-                            CornerRadius="5"
-                            Margin="5">
-					<InfoBar IsOpen="True" IsClosable="False" Severity="Error" Title="Uwaga" Message="Używasz wersję testową SGSClienta. Prosimy o zgłaszanie błedów na adres kontakt@szyrgamestudio.com." />
-				</StackPanel>-->
-			</Grid>
-		</ScrollViewer>
-	</Grid>
+    </Grid>
 </Page>

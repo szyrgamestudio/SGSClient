@@ -75,8 +75,6 @@
                     <RowDefinition Height="300"/>
                     <RowDefinition Height="205"/>
                     <RowDefinition Height="180"/>
-                    <!--<RowDefinition Height="200"/>-->
-                    <!--<RowDefinition Height="63"/>-->
                 </Grid.RowDefinitions>
                 <StackPanel Grid.Row="0"
                             Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
@@ -89,10 +87,6 @@
                     <FlipView HorizontalAlignment="Left" MaxWidth="400" Height="230" Margin="5">
                         <Image Source="/Assets/Games/Atorth/Gallery_1.png" AutomationProperties.Name="Gallery_1"/>
                         <Image Source="/Assets/Games/Atorth/Gallery_2.png" AutomationProperties.Name="Gallery_2"/>
-                        <!--<Image Source="/Assets/Games/Atorth/Gallery_3.png" AutomationProperties.Name="Gallery_3"/>
-                        <Image Source="/Assets/Games/Atorth/Gallery_4.jpg" AutomationProperties.Name="Gallery_4"/>
-                        <Image Source="/Assets/Games/Atorth/Gallery_5.jpg" AutomationProperties.Name="Gallery_5"/>
-                        <Image Source="/Assets/Games/Atorth/Gallery_6.jpg" AutomationProperties.Name="Gallery_6"/>-->
                     </FlipView>
                 </StackPanel>
                 <StackPanel Grid.Row="1"
@@ -103,7 +97,7 @@
                             Margin="5">
                     <TextBlock Text="Opis" FontSize="20" Padding="5" Margin="5" Style="{ThemeResource BodyStrongTextBlockStyle}"/>
                     <Rectangle HorizontalAlignment="Stretch" Fill="{ThemeResource ControlElevationBorderBrush}" Height="1"/>
-                    <TextBlock Margin="15" HorizontalAlignment="Left">
+                    <TextBlock Margin="5" Padding="5" FontSize="14" HorizontalAlignment="Left" Style="{ThemeResource CaptionTextBlockStyle}">
 						Od stuleci trwa wojna między czterema rasami.
 						<LineBreak/>Przy granicach miast pobojowiska spływały krwią wielu niewinnych a władcy zmuszali ludność do ciężkiej pracy. 
 						<LineBreak/>Wrogów zabierano do niewoli i wykorzystywano w ciężkich fizycznych pracach.

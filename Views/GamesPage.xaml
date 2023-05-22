@@ -27,9 +27,9 @@
                     </Grid.RowDefinitions>
                     <!--<InfoBar IsOpen="True" Margin="0,40,0,0" IsClosable="False" Severity="Error" Title="Uwaga" Message="Używasz wersję testową SGSClienta. Prosimy o zgłaszanie błedów na adres kontakt@szyrgamestudio.com." />-->
 
-                    <TextBlock Grid.Row="0" FontSize="16" FontWeight="Bold" Text="Gry stworzone przez SGS" />
+                    <TextBlock Grid.Row="0" FontSize="16" FontWeight="Bold" Text="Polecane przez SGS" />
 
-                    <!--#region PASEK Z GRAMI POZIOMY (Gry stworzone przez SGS)-->
+                    <!--#region PASEK Z GRAMI POZIOMY (Polecane przez SGS)-->
                     <Grid Grid.Row="2" Margin="0,12,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -118,7 +118,37 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <Button Grid.Column="0" Margin="0,0,4,0" Click="ButtonCastlelineEvil_Click">
+                        <Button Grid.Column="0" Margin="0,0,4,0" Click="ButtonCastlelineEvil_Click" IsEnabled="False">
+                            <StackPanel>
+                                <Image
+                            Margin="14"
+                            VerticalAlignment="Center"
+                            Source="/Assets/placeholder.png" />
+                                <TextBlock
+                            Grid.Row="0"
+                            FontSize="16"
+                            FontWeight="Bold"
+                            Text="Biały Kowal" />
+                                <TextBlock
+                            Grid.Row="0"
+                            FontSize="12"
+                            Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                            Text="TOGII" />
+                                <RatingControl
+                            Margin="0,0,0,40"
+                            AutomationProperties.Name="RatingControl with placeholder"
+                            HorizontalAlignment="Left"
+                            PlaceholderValue="5"
+                            IsReadOnly="True"/>
+                                <TextBlock
+                            Grid.Row="0"
+                            FontSize="12"
+                            FontWeight="Bold"
+                            Text="Niedostępne" />
+                            </StackPanel>
+                        </Button>
+
+                        <Button Grid.Column="1" Margin="0,0,4,0" Click="ButtonCastlelineEvil_Click">
                             <StackPanel>
                                 <Image
                             Margin="14"
@@ -148,8 +178,7 @@
                             </StackPanel>
                         </Button>
 
-                        
-                        <Button Grid.Column="1" Margin="0,0,4,0" IsEnabled="False">
+                        <Button Grid.Column="2" Margin="0,0,4,0" IsEnabled="False">
                             <StackPanel>
                                 <Image
                             Margin="14"
@@ -180,7 +209,83 @@
                             </StackPanel>
                         </Button>
 
-                        <Button Grid.Column="2" Margin="0,0,4,0" IsEnabled="True" Click="ButtonTurboNinja2D_Click">
+                        <Button Grid.Column="3" Margin="0,0,4,0" Click="ButtonTurboNinja2D_Click" IsEnabled="False">
+                            <StackPanel>
+                                <Image
+                            Margin="14"
+                            VerticalAlignment="Center"
+                            
+                            Source="/Assets/placeholder.png" />
+                                <TextBlock
+                            Grid.Row="0"
+                            FontSize="16"
+                            FontWeight="Bold"
+                            Text="Staff of hell" />
+                                <TextBlock
+                            Grid.Row="0"
+                            FontSize="12"
+                            Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                            Text="SZYRGAMESTUDIO" />
+                                <RatingControl
+                            Margin="0,0,0,40"
+                            AutomationProperties.Name="RatingControl with placeholder"
+                            HorizontalAlignment="Left"
+                            PlaceholderValue="5"
+                            IsReadOnly="True"/>
+                                <TextBlock
+                            Grid.Row="0"
+                            FontSize="12"
+                            FontWeight="Bold"
+                            Text="Dostępne" />
+                            </StackPanel>
+                        </Button>
+
+                        <Button Grid.Column="4" Margin="0,0,4,0" IsEnabled="False" Click="ButtonTurboNinja2D_Click">
+                            <StackPanel>
+                                <Image
+                            Margin="14"
+                            VerticalAlignment="Center"
+                            
+                            Source="/Assets/placeholder.png" />
+                                <TextBlock
+                            Grid.Row="0"
+                            FontSize="16"
+                            FontWeight="Bold"
+                            Text="Ścieżka Bohatera" />
+                                <TextBlock
+                            Grid.Row="0"
+                            FontSize="12"
+                            Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                            Text="SZYRROGI" />
+                                <RatingControl
+                            Margin="0,0,0,40"
+                            AutomationProperties.Name="RatingControl with placeholder"
+                            HorizontalAlignment="Left"
+                            PlaceholderValue="5"
+                            IsReadOnly="True"/>
+                                <TextBlock
+                            Grid.Row="0"
+                            FontSize="12"
+                            FontWeight="Bold"
+                            Text="Dostępne" />
+                            </StackPanel>
+                        </Button>
+
+                    </Grid>
+                    <!--#endregion-->
+
+                    <!--#region PASEK Z GRAMI POZIOMY-->
+                    <Grid Grid.Row="5" Margin="0,12,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Button Grid.Column="0" Margin="0,0,4,0" IsEnabled="True" Click="ButtonTurboNinja2D_Click">
                             <StackPanel>
                                 <Image
                             Margin="14"
@@ -211,8 +316,7 @@
                             </StackPanel>
                         </Button>
 
-
-                        <Button Grid.Column="3" Margin="0,0,4,0" IsEnabled="False">
+                        <Button Grid.Column="1" Margin="0,0,4,0" IsEnabled="False">
                             <StackPanel>
                                 <Image
                             Margin="14"
@@ -244,11 +348,9 @@
 
                     </Grid>
                     <!--#endregion-->
+
                 </Grid>
             </Grid>
-
-
         </ScrollViewer>
-
     </Grid>
 </Page>
