@@ -220,7 +220,7 @@
                             Grid.Row="0"
                             FontSize="16"
                             FontWeight="Bold"
-                            Text="Staff of hell" />
+                            Text="Staff of Hell" />
                                 <TextBlock
                             Grid.Row="0"
                             FontSize="12"
