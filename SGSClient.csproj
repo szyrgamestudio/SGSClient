@@ -89,6 +89,8 @@
 
   <ItemGroup>
     <Folder Include="Assets\Games\BialyKowal\" />
+    <Folder Include="Assets\Games\SciezkaBohatera\" />
+    <Folder Include="Assets\Games\StaffOfHell\" />
   </ItemGroup>
   
   <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">

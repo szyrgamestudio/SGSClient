@@ -146,7 +146,7 @@
                             FontWeight="Bold"
                             Text="Niedostępne" />
                             </StackPanel>
-                        </Button>
+                        </Button> <!--Bialy Kowal-->
 
                         <Button Grid.Column="1" Margin="0,0,4,0" Click="ButtonCastlelineEvil_Click">
                             <StackPanel>
@@ -209,13 +209,13 @@
                             </StackPanel>
                         </Button>
 
-                        <Button Grid.Column="3" Margin="0,0,4,0" Click="ButtonTurboNinja2D_Click" IsEnabled="False">
+                        <Button Grid.Column="3" Margin="0,0,4,0" Click="ButtonStaffOfHell_Click" IsEnabled="True">
                             <StackPanel>
                                 <Image
                             Margin="14"
                             VerticalAlignment="Center"
                             
-                            Source="/Assets/placeholder.png" />
+                            Source="/Assets/Games/StaffOfHell/Logo.png" />
                                 <TextBlock
                             Grid.Row="0"
                             FontSize="16"
@@ -240,13 +240,13 @@
                             </StackPanel>
                         </Button>
 
-                        <Button Grid.Column="4" Margin="0,0,4,0" IsEnabled="False" Click="ButtonTurboNinja2D_Click">
+                        <Button Grid.Column="4" Margin="0,0,4,0" IsEnabled="True" Click="ButtonSciezkaBohatera_Click">
                             <StackPanel>
                                 <Image
                             Margin="14"
                             VerticalAlignment="Center"
                             
-                            Source="/Assets/placeholder.png" />
+                            Source="/Assets/Games/SciezkaBohatera/Logo.png" />
                                 <TextBlock
                             Grid.Row="0"
                             FontSize="16"
@@ -316,7 +316,7 @@
                             </StackPanel>
                         </Button>
 
-                        <Button Grid.Column="1" Margin="0,0,4,0" IsEnabled="False">
+                        <Button Grid.Column="1" Margin="0,0,4,0" IsEnabled="True" Click="ButtonZacmienie_Click">
                             <StackPanel>
                                 <Image
                             Margin="14"
@@ -342,7 +342,7 @@
                             Grid.Row="0"
                             FontSize="12"
                             FontWeight="Bold"
-                            Text="Niedostępne" />
+                            Text="Dostępne" />
                             </StackPanel>
                         </Button>
 

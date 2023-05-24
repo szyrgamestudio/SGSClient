@@ -21,6 +21,9 @@ public class PageService : IPageService
         Configure<DoddaniViewModel, DoddaniPage>();
         Configure<CastlelineEvilViewModel, CastlelineEvilPage>();
         Configure<TurboNinja2DViewModel, TurboNinja2DPage>();
+        Configure<StaffOfHellViewModel, StaffOfHellPage>();
+        Configure<SciezkaBohateraViewModel, SciezkaBohateraPage>();
+        Configure<ZacmienieViewModel, ZacmieniePage>();
     }
 
     public Type GetPageType(string key)

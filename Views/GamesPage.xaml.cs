@@ -36,4 +36,19 @@ public sealed partial class GamesPage : Page
     {
         Frame.Navigate(typeof(TurboNinja2DPage), null, new DrillInNavigationTransitionInfo());
     }
+
+    private void ButtonSciezkaBohatera_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+        Frame.Navigate(typeof(SciezkaBohateraPage), null, new DrillInNavigationTransitionInfo());
+    }
+
+    private void ButtonZacmienie_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+        Frame.Navigate(typeof(ZacmieniePage), null, new DrillInNavigationTransitionInfo());
+    }
+
+    private void ButtonStaffOfHell_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+        Frame.Navigate(typeof(StaffOfHellPage), null, new DrillInNavigationTransitionInfo());
+    }
 }
