@@ -48,7 +48,7 @@
                 </NavigationViewItem>
                 <NavigationViewItem x:Uid="Shell_UploadGame" helpers:NavigationHelper.NavigateTo="SGSClient.ViewModels.UploadGameViewModel">
                     <NavigationViewItem.Icon>
-                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xe774;"/>
+                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE898;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
             </NavigationView.MenuItems>

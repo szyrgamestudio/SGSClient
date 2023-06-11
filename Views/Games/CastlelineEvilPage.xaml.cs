@@ -9,6 +9,8 @@ using Windows.ApplicationModel.Core;
 using static System.Net.WebRequestMethods;
 using File = System.IO.File;
 using Windows.Storage;
+using SGSClient.Contracts.Services;
+using SGSClient.Helpers;
 
 namespace SGSClient.Views;
 
@@ -200,6 +202,8 @@ public sealed partial class CastlelineEvilPage : Page
 
             //VersionText.Text = onlineVersion;
             Status = LauncherStatus.ready;
+            App.GetService<IAppNotificationService>().Show(string.Format("CastlelineEvilNotificationPayload".GetLocalized(), AppContext.BaseDirectory));
+
         }
         catch (Exception ex)
         {
@@ -208,8 +212,6 @@ public sealed partial class CastlelineEvilPage : Page
             //MessageBox.Show($"Błąd podczas pobierania plików gry. Spróbuj usunąć pliki gry klikając przycisk kosza znajdujący się poniżej, lub kliknij przycisk \"spróbuj ponownie\"", "SGSClient", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
-
-
     private void playClickButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
         if (File.Exists(gameExe))

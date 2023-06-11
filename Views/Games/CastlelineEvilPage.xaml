@@ -53,7 +53,7 @@
                   Width="100"
                   Click="playClickButton"
                   ClickMode="Press"/>
-          <Button Content="Odinstaluj" x:Name="UninstallButton" Width="100">
+          <Button Content="Odinstaluj" x:Name="UninstallButton" Width="100" Margin="0,5,0,0">
             <Button.Flyout>
               <Flyout x:Name="uninstallFlyout">
                 <StackPanel>
@@ -64,7 +64,7 @@
             </Button.Flyout>
           </Button>
         </StackPanel>
-        <StackPanel Grid.Row="5" HorizontalAlignment="Center">
+        <StackPanel Grid.Row="5" HorizontalAlignment="Center" Margin="0,5,0,0">
           <ProgressRing x:Name="DownloadProgressBorder" IsActive="True" Background="LightGray" Height="100" Width="100"/>
         </StackPanel>
       </Grid>

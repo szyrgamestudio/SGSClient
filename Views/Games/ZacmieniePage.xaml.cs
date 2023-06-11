@@ -9,6 +9,8 @@ using Windows.ApplicationModel.Core;
 using static System.Net.WebRequestMethods;
 using File = System.IO.File;
 using Windows.Storage;
+using SGSClient.Contracts.Services;
+using SGSClient.Helpers;
 
 namespace SGSClient.Views;
 
@@ -189,6 +191,8 @@ public sealed partial class ZacmieniePage : Page
             File.WriteAllText(versionFile, onlineVersion);
 
             Status = LauncherStatus.ready;
+            App.GetService<IAppNotificationService>().Show(string.Format("ZacmienieNotificationPayload".GetLocalized(), AppContext.BaseDirectory));
+
         }
         catch (Exception ex)
         {

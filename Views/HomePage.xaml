@@ -129,7 +129,7 @@
                                                 <TextBlock
                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                     Style="{StaticResource CaptionTextBlockStyle}"
-                                                    Text="Przeglądaj wszysztkie dostępne gry." />
+                                                    Text="Przeglądaj wszystkie dostępne gry." />
                                             </StackPanel>
                                         </Grid>
                                     </Button>

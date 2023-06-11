@@ -9,6 +9,8 @@ using Windows.ApplicationModel.Core;
 using static System.Net.WebRequestMethods;
 using File = System.IO.File;
 using Windows.Storage;
+using SGSClient.Contracts.Services;
+using SGSClient.Helpers;
 
 namespace SGSClient.Views;
 
@@ -196,10 +198,12 @@ public sealed partial class TurboNinja2DPage : Page
 
             //VersionText.Text = onlineVersion;
             Status = LauncherStatus.ready;
+            App.GetService<IAppNotificationService>().Show(string.Format("TurboNinja2DNotificationPayload".GetLocalized(), AppContext.BaseDirectory));
         }
         catch (Exception ex)
         {
             Status = LauncherStatus.failed;
+
             //MessageBox.Show($"Błąd podczas kończenia pobierania: {ex}. Spróbuj usunąć pliki gry klikając przycisk kosza znajdujący się poniżej.");
             //MessageBox.Show($"Błąd podczas pobierania plików gry. Spróbuj usunąć pliki gry klikając przycisk kosza znajdujący się poniżej, lub kliknij przycisk \"spróbuj ponownie\"", "SGSClient", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
