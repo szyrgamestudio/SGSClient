@@ -24,6 +24,7 @@ public class PageService : IPageService
         Configure<StaffOfHellViewModel, StaffOfHellPage>();
         Configure<SciezkaBohateraViewModel, SciezkaBohateraPage>();
         Configure<ZacmienieViewModel, ZacmieniePage>();
+        Configure<UploadGameViewModel, UploadGamePage>();
     }
 
     public Type GetPageType(string key)

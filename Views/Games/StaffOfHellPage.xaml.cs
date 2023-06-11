@@ -9,6 +9,8 @@ using Windows.ApplicationModel.Core;
 using static System.Net.WebRequestMethods;
 using File = System.IO.File;
 using Windows.Storage;
+using SGSClient.Contracts.Services;
+using SGSClient.Helpers;
 
 namespace SGSClient.Views;
 
@@ -194,6 +196,8 @@ public sealed partial class StaffOfHellPage : Page
 
             //VersionText.Text = onlineVersion;
             Status = LauncherStatus.ready;
+            App.GetService<IAppNotificationService>().Show(string.Format("StaffOfHellNotificationPayload".GetLocalized(), AppContext.BaseDirectory));
+
         }
         catch (Exception ex)
         {

@@ -57,6 +57,7 @@ public partial class App : Application
             services.AddTransient<IActivationHandler, AppNotificationActivationHandler>();
 
             // Services
+            services.AddTransient<IWebViewService, WebViewService>();
             services.AddSingleton<IAppNotificationService, AppNotificationService>();
             services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
             services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
@@ -70,6 +71,8 @@ public partial class App : Application
             services.AddSingleton<IFileService, FileService>();
 
             // Views and ViewModels
+            services.AddTransient<UploadGameViewModel>();
+            services.AddTransient<UploadGamePage>();
             services.AddTransient<ZacmienieViewModel>();
             services.AddTransient<ZacmieniePage>();
             services.AddTransient<SciezkaBohateraViewModel>();
@@ -113,7 +116,7 @@ public partial class App : Application
     {
         base.OnLaunched(args);
 
-        //App.GetService<IAppNotificationService>().Show(string.Format("AppNotificationSamplePayload".GetLocalized(), AppContext.BaseDirectory));
+        App.GetService<IAppNotificationService>().Show(string.Format("SGSClientWelcomeNotificationPayload".GetLocalized(), AppContext.BaseDirectory));
 
         await App.GetService<IActivationService>().ActivateAsync(args);
     }

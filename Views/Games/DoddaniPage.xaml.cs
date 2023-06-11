@@ -3,7 +3,9 @@ using System.Diagnostics;
 using System.IO.Compression;
 using System.Net;
 using Microsoft.UI.Xaml.Controls;
+using SGSClient.Contracts.Services;
 using SGSClient.Controllers;
+using SGSClient.Helpers;
 using SGSClient.ViewModels;
 using Windows.ApplicationModel.Core;
 using Windows.Storage;
@@ -83,7 +85,6 @@ public sealed partial class DoddaniPage : Page
     {
         get;
     }
-
     public DoddaniPage()
     {
         ViewModel = App.GetService<DoddaniViewModel>();
@@ -197,6 +198,8 @@ public sealed partial class DoddaniPage : Page
 
             //VersionText.Text = onlineVersion;
             Status = LauncherStatus.ready;
+            App.GetService<IAppNotificationService>().Show(string.Format("DoddaniNotificationPayload".GetLocalized(), AppContext.BaseDirectory));
+
         }
         catch (Exception ex)
         {
