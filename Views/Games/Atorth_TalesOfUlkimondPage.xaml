@@ -52,7 +52,7 @@
                     HorizontalAlignment="Center"
                     FontSize="11"
                     Style="{StaticResource BodyStrongTextBlockStyle}">
-                    <Hyperlink NavigateUri="http://szyrgamestudio.com/">
+                    <Hyperlink NavigateUri="https://szyrgamestudio.github.io/">
                         SZYRGAMESTUDIO
                     </Hyperlink>
                 </TextBlock>

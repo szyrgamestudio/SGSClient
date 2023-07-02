@@ -206,7 +206,7 @@ public sealed partial class ZacmieniePage : Page
             try
             {
                 ProcessStartInfo startInfo = new ProcessStartInfo(gameExe);
-                startInfo.WorkingDirectory = Path.Combine(rootPath, "SciezkaBohatera");
+                startInfo.WorkingDirectory = Path.Combine(rootPath, "Zacmienie");
                 Process.Start(startInfo);
                 //System.Windows.Application.Current.Shutdown();
                 CoreApplication.Exit();

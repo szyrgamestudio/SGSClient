@@ -52,7 +52,7 @@
                     HorizontalAlignment="Center"
                     FontSize="11"
                     Style="{StaticResource BodyStrongTextBlockStyle}">
-                    <Hyperlink NavigateUri="https://www.szyrgamestudio.com">
+                    <Hyperlink NavigateUri="https://szyrgamestudio.github.io/">
                         SZYRGAMESTUDIO
                     </Hyperlink>
                 </TextBlock>
@@ -77,8 +77,8 @@
                     <Button
                         x:Name="UninstallButton"
                         Width="100"
-                        Content="Odinstaluj"
-                        Margin="0,5,0,0">
+                        Margin="0,5,0,0"
+                        Content="Odinstaluj">
                         <Button.Flyout>
                             <Flyout x:Name="uninstallFlyout">
                                 <StackPanel>
@@ -92,7 +92,10 @@
                         </Button.Flyout>
                     </Button>
                 </StackPanel>
-                <StackPanel Grid.Row="5" HorizontalAlignment="Center" Margin="0,5,0,0">
+                <StackPanel
+                    Grid.Row="5"
+                    Margin="0,5,0,0"
+                    HorizontalAlignment="Center">
                     <ProgressRing
                         x:Name="DownloadProgressBorder"
                         Width="100"

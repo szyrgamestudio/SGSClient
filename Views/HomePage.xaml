@@ -44,7 +44,7 @@
                             x:Name="smallHeaderText"
                             FontSize="24"
                             FontWeight="Light"
-                            Text="https://szyrgamestudio.com/" />
+                            Text="https://szyrgamestudio.github.io/" />
                     </StackPanel>
                     <ScrollViewer
                         x:Name="scroller"
