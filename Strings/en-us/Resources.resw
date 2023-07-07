@@ -315,4 +315,7 @@
 &lt;/toast&gt;</value>
     <comment>Zainstalowano Zaćmienie</comment>
   </data>
+  <data name="Shell_Klikacz24H.Content" xml:space="preserve">
+    <value>Klikacz24H</value>
+  </data>
 </root>

@@ -71,6 +71,8 @@ public partial class App : Application
             services.AddSingleton<IFileService, FileService>();
 
             // Views and ViewModels
+            services.AddTransient<Klikacz24HViewModel>();
+            services.AddTransient<Klikacz24HPage>();
             services.AddTransient<UploadGameViewModel>();
             services.AddTransient<UploadGamePage>();
             services.AddTransient<ZacmienieViewModel>();

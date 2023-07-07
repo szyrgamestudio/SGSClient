@@ -14,7 +14,7 @@ using SGSClient.Helpers;
 
 namespace SGSClient.Views;
 
-public sealed partial class StaffOfHellPage : Page
+public sealed partial class Klikacz24HPage : Page
 {
     private readonly string rootPath; //określenie folderu klienta sgs
     private readonly string gamepath; //okreslenie folderu z gra
@@ -23,9 +23,9 @@ public sealed partial class StaffOfHellPage : Page
     private readonly string gameExe; //okreslenie pliku exe gry
     private LauncherStatus _status; //status plików gry
 
-    private readonly string gameZipLink = "https://onedrive.live.com/download?cid=6B420D3CABAB13DF&resid=6B420D3CABAB13DF%211263546&authkey=AO5iQHNk6tVSFX4";
-    private readonly string gameVersionLink = "https://onedrive.live.com/download?cid=6B420D3CABAB13DF&resid=6B420D3CABAB13DF%211263545&authkey=AL-jHlJ3du6fhJs";
-    
+    private readonly string gameZipLink = "https://onedrive.live.com/download?resid=6B420D3CABAB13DF%211265133&authkey=!AI9RR6Ly3P6NwRY";
+    private readonly string gameVersionLink = "https://onedrive.live.com/download?resid=6B420D3CABAB13DF%211265134&authkey=!ABGVvWkxhwhuxJY";
+
     WebClient webClient = new WebClient();
     internal LauncherStatus Status //co robic wedlug statusu gry
     {
@@ -85,22 +85,22 @@ public sealed partial class StaffOfHellPage : Page
             }
         }
     }
-    public StaffOfHellViewModel ViewModel
+    public Klikacz24HViewModel ViewModel
     {
         get;
     }
-    public StaffOfHellPage()
+    public Klikacz24HPage()
     {
-        ViewModel = App.GetService<StaffOfHellViewModel>();
+        ViewModel = App.GetService<Klikacz24HViewModel>();
         InitializeComponent();
 
         string location = Path.Combine(ApplicationData.Current.LocalFolder.Path, "LocalState");
         rootPath = Path.GetDirectoryName(location);
 
-        versionFile = Path.Combine(rootPath, "versionSOH.txt");
-        gameZip = Path.Combine(rootPath, "StaffOfHell.zip");
-        gameExe = Path.Combine(rootPath, "StaffOfHell", "Game.exe");
-        gamepath = Path.Combine(rootPath, "StaffOfHell");
+        versionFile = Path.Combine(rootPath, "versionKlikacz24H.txt");
+        gameZip = Path.Combine(rootPath, "Klikacz24H.zip");
+        gameExe = Path.Combine(rootPath, "Klikacz24H", "gra24h.exe");
+        gamepath = Path.Combine(rootPath, "Klikacz24H");
 
         DownloadProgressBorder.IsActive = false;
         UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
@@ -173,15 +173,11 @@ public sealed partial class StaffOfHellPage : Page
                 DownloadProgressBorder.IsActive = false;
                 //DownloadProgressBar.Visibility = Visibility.Hidden;
                 // any other code to process the file
-
             };
-
         }
         catch (Exception)
         {
             Status = LauncherStatus.failed;
-            //MessageBox.Show($"Błąd podczas instalowania plików gry: {ex}");
-            //MessageBox.Show($"Błąd podczas instalowania plików gry. Spróbuj usunąć pliki gry klikając przycisk kosza znajdujący się poniżej.", "SGSClient", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }//instalacja plików gry
     private void DownloadGameCompletedCallback(object sender, AsyncCompletedEventArgs e) //zwracanie, że gra jest sciagnieta
@@ -194,16 +190,13 @@ public sealed partial class StaffOfHellPage : Page
 
             File.WriteAllText(versionFile, onlineVersion);
 
-            //VersionText.Text = onlineVersion;
             Status = LauncherStatus.ready;
-            App.GetService<IAppNotificationService>().Show(string.Format("StaffOfHellNotificationPayload".GetLocalized(), AppContext.BaseDirectory));
+            App.GetService<IAppNotificationService>().Show(string.Format("Klikacz24HNotificationPayload".GetLocalized(), AppContext.BaseDirectory));
 
         }
         catch (Exception ex)
         {
             Status = LauncherStatus.failed;
-            //MessageBox.Show($"Błąd podczas kończenia pobierania: {ex}. Spróbuj usunąć pliki gry klikając przycisk kosza znajdujący się poniżej.");
-            //MessageBox.Show($"Błąd podczas pobierania plików gry. Spróbuj usunąć pliki gry klikając przycisk kosza znajdujący się poniżej, lub kliknij przycisk \"spróbuj ponownie\"", "SGSClient", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
     private void playClickButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
@@ -213,7 +206,7 @@ public sealed partial class StaffOfHellPage : Page
             try
             {
                 ProcessStartInfo startInfo = new ProcessStartInfo(gameExe);
-                startInfo.WorkingDirectory = Path.Combine(rootPath, "StaffOfHell");
+                startInfo.WorkingDirectory = Path.Combine(rootPath, "Klikacz24H");
                 Process.Start(startInfo);
                 //System.Windows.Application.Current.Shutdown();
                 CoreApplication.Exit();
@@ -230,7 +223,6 @@ public sealed partial class StaffOfHellPage : Page
             try
             {
                 SGSVersion.Version localVersion = new SGSVersion.Version(File.ReadAllText(versionFile));
-                //VersionText.Text = localVersion.ToString();
 
                 WebClient webClient = new WebClient();
                 SGSVersion.Version onlineVersion = new SGSVersion.Version(webClient.DownloadString(gameVersionLink));
@@ -256,8 +248,8 @@ public sealed partial class StaffOfHellPage : Page
             {
                 checkForUpdates();
             }
-        }
 
+        }
     }
     private void uninstallClickButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
@@ -274,7 +266,7 @@ public sealed partial class StaffOfHellPage : Page
         }
         else
         {
-            //MessageBox.Show($"Nie zlokalizowano gry do usunięcia", "SGSClient", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
+
 }

@@ -25,6 +25,7 @@ public class PageService : IPageService
         Configure<SciezkaBohateraViewModel, SciezkaBohateraPage>();
         Configure<ZacmienieViewModel, ZacmieniePage>();
         Configure<UploadGameViewModel, UploadGamePage>();
+        Configure<Klikacz24HViewModel, Klikacz24HPage>();
     }
 
     public Type GetPageType(string key)

@@ -89,8 +89,21 @@
 
   <ItemGroup>
     <Folder Include="Assets\Games\BialyKowal\" />
+    <Folder Include="Assets\Games\Nowy folder\" />
     <Folder Include="Assets\Games\SciezkaBohatera\" />
     <Folder Include="Assets\Games\StaffOfHell\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Assets\Games\Klikacz24H\Gallery_1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Games\Klikacz24H\Gallery_2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Games\Klikacz24H\Logo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   
   <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
