@@ -14,7 +14,7 @@ using SGSClient.Helpers;
 
 namespace SGSClient.Views;
 
-public sealed partial class Klikacz24HPage : Page
+public sealed partial class StarmanSystemPage : Page
 {
     private readonly string rootPath; //określenie folderu klienta sgs
     private readonly string gamepath; //okreslenie folderu z gra
@@ -23,9 +23,8 @@ public sealed partial class Klikacz24HPage : Page
     private readonly string gameExe; //okreslenie pliku exe gry
     private LauncherStatus _status; //status plików gry
 
-    private readonly string gameZipLink = "https://onedrive.live.com/download?resid=6B420D3CABAB13DF%211265133&authkey=!AI9RR6Ly3P6NwRY";
-    private readonly string gameVersionLink = "https://onedrive.live.com/download?resid=6B420D3CABAB13DF%211265134&authkey=!ABGVvWkxhwhuxJY";
-
+    private readonly string gameZipLink = "https://onedrive.live.com/download?resid=6B420D3CABAB13DF%211267078&authkey=!AM-lmxZnpFeofok";
+    private readonly string gameVersionLink = "https://onedrive.live.com/download?resid=6B420D3CABAB13DF%211267079&authkey=!AJfEZ0iOs89ywNc";
     WebClient webClient = new WebClient();
     internal LauncherStatus Status //co robic wedlug statusu gry
     {
@@ -85,22 +84,24 @@ public sealed partial class Klikacz24HPage : Page
             }
         }
     }
-    public Klikacz24HViewModel ViewModel
+
+    public StarmanSystemViewModel ViewModel
     {
         get;
     }
-    public Klikacz24HPage() 
+
+    public StarmanSystemPage()
     {
-        ViewModel = App.GetService<Klikacz24HViewModel>();
+        ViewModel = App.GetService<StarmanSystemViewModel>();
         InitializeComponent();
 
         string location = Path.Combine(ApplicationData.Current.LocalFolder.Path, "LocalState");
         rootPath = Path.GetDirectoryName(location);
 
-        versionFile = Path.Combine(rootPath, "versionKlikacz24H.txt");
-        gameZip = Path.Combine(rootPath, "Klikacz24H.zip");
-        gameExe = Path.Combine(rootPath, "Klikacz24H", "gra24h.exe");
-        gamepath = Path.Combine(rootPath, "Klikacz24H");
+        versionFile = Path.Combine(rootPath, "versionStarmanSystem.txt");
+        gameZip = Path.Combine(rootPath, "StarmanSystem.zip");
+        gameExe = Path.Combine(rootPath, "StarmanSystem", "StarmanSystem.exe");
+        gamepath = Path.Combine(rootPath, "StarmanSystem");
 
         DownloadProgressBorder.IsActive = false;
         UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
@@ -191,7 +192,7 @@ public sealed partial class Klikacz24HPage : Page
             File.WriteAllText(versionFile, onlineVersion);
 
             Status = LauncherStatus.ready;
-            App.GetService<IAppNotificationService>().Show(string.Format("Klikacz24HNotificationPayload".GetLocalized(), AppContext.BaseDirectory));
+            App.GetService<IAppNotificationService>().Show(string.Format("StarmanSystemNotificationPayload".GetLocalized(), AppContext.BaseDirectory));
 
         }
         catch (Exception ex)
@@ -206,7 +207,7 @@ public sealed partial class Klikacz24HPage : Page
             try
             {
                 ProcessStartInfo startInfo = new ProcessStartInfo(gameExe);
-                startInfo.WorkingDirectory = Path.Combine(rootPath, "Klikacz24H");
+                startInfo.WorkingDirectory = Path.Combine(rootPath, "StarmanSystem");
                 Process.Start(startInfo);
                 //System.Windows.Application.Current.Shutdown();
                 CoreApplication.Exit();

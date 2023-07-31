@@ -128,39 +128,43 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <!--<Button Grid.Column="0" Margin="0,0,4,0" Click="ButtonCastlelineEvil_Click" IsEnabled="False">
+                        <Button
+                            Grid.Column="0"
+                            Margin="0,0,4,0"
+                            Click="ButtonCastlelineEvil_Click"
+                            IsEnabled="True">
                             <StackPanel>
                                 <Image
-                            Margin="14"
-                            VerticalAlignment="Center"
-                            Source="/Assets/placeholder.png" />
+                                    Margin="14"
+                                    VerticalAlignment="Center"
+                                    Source="/Assets/Games/BlackWhiteJump/Logo.png" />
                                 <TextBlock
-                            Grid.Row="0"
-                            FontSize="16"
-                            FontWeight="Bold"
-                            Text="Biały Kowal" />
+                                    Grid.Row="0"
+                                    FontSize="15"
+                                    FontWeight="Bold"
+                                    Text="Black White Jump" />
                                 <TextBlock
-                            Grid.Row="0"
-                            FontSize="12"
-                            Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                            Text="TOGII" />
+                                    Grid.Row="0"
+                                    FontSize="12"
+                                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                    Text="Dino Jakub" />
                                 <RatingControl
-                            Margin="0,0,0,40"
-                            AutomationProperties.Name="RatingControl with placeholder"
-                            HorizontalAlignment="Left"
-                            PlaceholderValue="5"
-                            IsReadOnly="True"/>
+                                    Margin="0,0,0,40"
+                                    HorizontalAlignment="Left"
+                                    AutomationProperties.Name="RatingControl with placeholder"
+                                    IsReadOnly="True"
+                                    PlaceholderValue="5" />
                                 <TextBlock
-                            Grid.Row="0"
-                            FontSize="12"
-                            FontWeight="Bold"
-                            Text="Niedostępne" />
+                                    Grid.Row="0"
+                                    FontSize="12"
+                                    FontWeight="Bold"
+                                    Text="Dostępne" />
                             </StackPanel>
-                        </Button>-->
+                        </Button>
                         <!--  Bialy Kowal  -->
 
                         <Button
-                            Grid.Column="0"
+                            Grid.Column="1"
                             Margin="0,0,4,0"
                             Click="ButtonCastlelineEvil_Click">
                             <StackPanel>
@@ -193,7 +197,7 @@
                         </Button>
 
                         <Button
-                            Grid.Column="1"
+                            Grid.Column="2"
                             Margin="0,0,4,0"
                             IsEnabled="False">
                             <StackPanel>
@@ -226,10 +230,10 @@
                         </Button>
 
                         <Button
-                            Grid.Column="2"
+                            Grid.Column="3"
                             Margin="0,0,4,0"
-                            IsEnabled="True"
-                            Click="ButtonKlikacz24H_Click">
+                            Click="ButtonKlikacz24H_Click"
+                            IsEnabled="True">
                             <StackPanel>
                                 <Image
                                     Margin="14"
@@ -260,7 +264,7 @@
                         </Button>
 
                         <Button
-                            Grid.Column="3"
+                            Grid.Column="4"
                             Margin="0,0,4,0"
                             Click="ButtonStaffOfHell_Click"
                             IsEnabled="False">
@@ -310,6 +314,72 @@
                         <Button
                             Grid.Column="0"
                             Margin="0,0,4,0"
+                            Click="ButtonShadowSquad_Click"
+                            IsEnabled="True">
+                            <StackPanel>
+                                <Image
+                                    Margin="14"
+                                    VerticalAlignment="Center"
+                                    Source="/Assets/Games/ShadowSquad/Logo.png" />
+                                <TextBlock
+                                    Grid.Row="0"
+                                    FontSize="16"
+                                    FontWeight="Bold"
+                                    Text="Shadow Squad" />
+                                <TextBlock
+                                    Grid.Row="0"
+                                    FontSize="12"
+                                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                    Text="Shadow Inside" />
+                                <RatingControl
+                                    Margin="0,0,0,40"
+                                    HorizontalAlignment="Left"
+                                    AutomationProperties.Name="RatingControl with placeholder"
+                                    IsReadOnly="True"
+                                    PlaceholderValue="5" />
+                                <TextBlock
+                                    Grid.Row="0"
+                                    FontSize="12"
+                                    FontWeight="Bold"
+                                    Text="Dostępne" />
+                            </StackPanel>
+                        </Button>
+                        <Button
+                            Grid.Column="1"
+                            Margin="0,0,4,0"
+                            Click="ButtonStarmanSystem_Click"
+                            IsEnabled="True">
+                            <StackPanel>
+                                <Image
+                                    Margin="14"
+                                    VerticalAlignment="Center"
+                                    Source="/Assets/Games/StarmanSystem/Logo.png" />
+                                <TextBlock
+                                    Grid.Row="0"
+                                    FontSize="16"
+                                    FontWeight="Bold"
+                                    Text="Starman System" />
+                                <TextBlock
+                                    Grid.Row="0"
+                                    FontSize="12"
+                                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                    Text="Dino Jakub" />
+                                <RatingControl
+                                    Margin="0,0,0,40"
+                                    HorizontalAlignment="Left"
+                                    AutomationProperties.Name="RatingControl with placeholder"
+                                    IsReadOnly="True"
+                                    PlaceholderValue="5" />
+                                <TextBlock
+                                    Grid.Row="0"
+                                    FontSize="12"
+                                    FontWeight="Bold"
+                                    Text="Dostępne" />
+                            </StackPanel>
+                        </Button>
+                        <Button
+                            Grid.Column="2"
+                            Margin="0,0,4,0"
                             Click="ButtonSciezkaBohatera_Click"
                             IsEnabled="True">
                             <StackPanel>
@@ -340,9 +410,9 @@
                                     Text="Dostępne" />
                             </StackPanel>
                         </Button>
-                        
+
                         <Button
-                            Grid.Column="1"
+                            Grid.Column="3"
                             Margin="0,0,4,0"
                             Click="ButtonTurboNinja2D_Click"
                             IsEnabled="True">
@@ -376,7 +446,7 @@
                         </Button>
 
                         <Button
-                            Grid.Column="2"
+                            Grid.Column="4"
                             Margin="0,0,4,0"
                             Click="ButtonZacmienie_Click"
                             IsEnabled="True">

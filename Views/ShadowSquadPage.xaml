@@ -1,0 +1,229 @@
+﻿<Page
+    x:Class="SGSClient.Views.ShadowSquadPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:behaviors="using:SGSClient.Behaviors"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    behaviors:NavigationViewHeaderBehavior.HeaderMode="Never"
+    mc:Ignorable="d">
+
+    <Grid x:Name="ContentArea">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <StackPanel
+            Grid.Column="0"
+            Width="300"
+            Height="Auto"
+            Margin="5"
+            Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
+            BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+            BorderThickness="0.5"
+            CornerRadius="5">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="30" />
+                    <RowDefinition Height="90" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Border Grid.Row="0" Padding="0,20,0,0">
+                    <Image
+                        Grid.Row="0"
+                        Width="150"
+                        Height="150"
+                        HorizontalAlignment="Center"
+                        Source="/Assets/Games/ShadowSquad/Logo.png" />
+                </Border>
+
+                <TextBlock
+                    Grid.Row="1"
+                    HorizontalAlignment="Center"
+                    FontSize="30"
+                    Style="{StaticResource TitleTextBlockStyle}"
+                    Text="Shadow Squad" />
+                <TextBlock
+                    Grid.Row="2"
+                    Padding="0,10,0,0"
+                    HorizontalAlignment="Center"
+                    FontSize="11"
+                    Style="{StaticResource BodyStrongTextBlockStyle}">
+                    <Hyperlink NavigateUri="https://www.lipsum.com/">
+                        Shadow Inside
+                    </Hyperlink>
+                </TextBlock>
+                <!--<Border Grid.Row="3">
+                    <RatingControl
+                        AutomationProperties.Name="Simple RatingControl"
+                        IsClearEnabled="False"
+                        IsReadOnly="True"
+                        PlaceholderValue="4" />
+                </Border>-->
+                <StackPanel
+                    Grid.Row="4"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+                    <Button
+                        x:Name="PlayButton"
+                        Width="100"
+                        Click="playClickButton"
+                        ClickMode="Press"
+                        Content="Zainstaluj"
+                        Style="{StaticResource AccentButtonStyle}" />
+                    <Button
+                        x:Name="UninstallButton"
+                        Width="100"
+                        Margin="0,5,0,0"
+                        Content="Odinstaluj">
+                        <Button.Flyout>
+                            <Flyout x:Name="uninstallFlyout">
+                                <StackPanel>
+                                    <TextBlock
+                                        Margin="0,0,0,12"
+                                        Style="{ThemeResource BaseTextBlockStyle}"
+                                        Text="Ta aplikacja i powiązane z nią informacje zostaną odinstalowane." />
+                                    <Button Click="uninstallClickButton" Content="Odinstaluj" />
+                                </StackPanel>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+                </StackPanel>
+                <StackPanel
+                    Grid.Row="5"
+                    Margin="0,5,0,0"
+                    HorizontalAlignment="Center">
+                    <ProgressRing
+                        x:Name="DownloadProgressBorder"
+                        Width="100"
+                        Height="100"
+                        Background="LightGray"
+                        IsActive="True" />
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Visible">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="300" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <StackPanel
+                    Grid.Row="0"
+                    Margin="5"
+                    Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+                    BorderThickness="0.5"
+                    CornerRadius="5">
+                    <TextBlock
+                        Margin="5"
+                        Padding="5"
+                        FontSize="20"
+                        Style="{ThemeResource BodyStrongTextBlockStyle}"
+                        Text="Zrzuty ekranu" />
+                    <Rectangle
+                        Height="1"
+                        HorizontalAlignment="Stretch"
+                        Fill="{ThemeResource ControlElevationBorderBrush}" />
+                    <FlipView
+                        Height="230"
+                        MaxWidth="400"
+                        Margin="5"
+                        HorizontalAlignment="Left">
+                        <Image AutomationProperties.Name="Gallery_1" Source="/Assets/Games/ShadowSquad/Gallery_1.png" />
+                        <Image AutomationProperties.Name="Gallery_2" Source="/Assets/Games/ShadowSquad/Gallery_2.png" />
+                        <Image AutomationProperties.Name="Gallery_2" Source="/Assets/Games/ShadowSquad/Gallery_3.png" />
+                        <Image AutomationProperties.Name="Gallery_2" Source="/Assets/Games/ShadowSquad/Gallery_4.png" />
+                    </FlipView>
+                </StackPanel>
+                <StackPanel
+                    Grid.Row="1"
+                    Margin="5"
+                    Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+                    BorderThickness="0.5"
+                    CornerRadius="5">
+                    <TextBlock
+                        Margin="5"
+                        Padding="5"
+                        FontSize="20"
+                        Style="{ThemeResource BodyStrongTextBlockStyle}"
+                        Text="Opis" />
+                    <Rectangle
+                        Height="1"
+                        HorizontalAlignment="Stretch"
+                        Fill="{ThemeResource ControlElevationBorderBrush}" />
+                    <TextBlock
+                        Margin="5"
+                        Padding="5"
+                        HorizontalAlignment="Left"
+                        FontSize="14"
+                        Style="{ThemeResource CaptionTextBlockStyle}">
+                        Shadow Inside trafia do tajemnej krainy zwanej ubojnią.<LineBreak />
+                        Aby wrócić do domu musi zebrać drużynę i pokonać wielkiego Lorda Pimpusia</TextBlock>
+                </StackPanel>
+                <StackPanel
+                    Grid.Row="2"
+                    Margin="5"
+                    Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+                    BorderThickness="0.5"
+                    CornerRadius="5">
+                    <TextBlock
+                        Margin="5"
+                        Padding="5"
+                        FontSize="20"
+                        Style="{ThemeResource BodyStrongTextBlockStyle}"
+                        Text="Wymagania systemowe" />
+                    <Rectangle
+                        Height="1"
+                        HorizontalAlignment="Stretch"
+                        Fill="{ThemeResource ControlElevationBorderBrush}" />
+                    <TextBlock
+                        Margin="5"
+                        Padding="5"
+                        FontSize="14"
+                        Style="{ThemeResource CaptionTextBlockStyle}">
+                        • Procesor: Intel Core i3-4340;<LineBreak />
+                        • Pamięć RAM: 4 GB lub więcej;<LineBreak />
+                        • HDD: 1 GB wolnego miejsca na dysku twardym;<LineBreak />
+                        • Karta graficzna: zgodna z DirectX 9 i OpenGL 4.1;<LineBreak />
+                        • System operacyjny: Microsoft Windows 7, 8, 8.1 i 10 (32-/64-bit).</TextBlock>
+                </StackPanel>
+                <StackPanel
+                    Grid.Row="3"
+                    Margin="5"
+                    Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+                    BorderThickness="0.5"
+                    CornerRadius="5">
+                    <TextBlock
+                        Margin="5"
+                        Padding="5"
+                        FontSize="20"
+                        Style="{ThemeResource BodyStrongTextBlockStyle}"
+                        Text="Dodatkowe informacje" />
+                    <Rectangle
+                        Height="1"
+                        HorizontalAlignment="Stretch"
+                        Fill="{ThemeResource ControlElevationBorderBrush}" />
+                    <TextBlock
+                        Margin="5"
+                        Padding="5"
+                        FontSize="14"
+                        Style="{ThemeResource CaptionTextBlockStyle}">
+                        • Silnik gry: RPG Maker VX Ace;<LineBreak />
+                        • Gatunek gry: RPG;<LineBreak />
+                        • Tryby gry: Gra jednoosobowa;</TextBlock>
+                </StackPanel>
+
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</Page>

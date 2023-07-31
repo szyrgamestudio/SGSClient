@@ -56,4 +56,14 @@ public sealed partial class GamesPage : Page
     {
         Frame.Navigate(typeof(Klikacz24HPage), null, new DrillInNavigationTransitionInfo());
     }
+
+    private void ButtonShadowSquad_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+        Frame.Navigate(typeof(ShadowSquadPage), null, new DrillInNavigationTransitionInfo());
+    }
+
+    private void ButtonStarmanSystem_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+        Frame.Navigate(typeof(StarmanSystemPage), null, new DrillInNavigationTransitionInfo());
+    }
 }

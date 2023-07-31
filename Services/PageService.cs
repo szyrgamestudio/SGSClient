@@ -26,6 +26,9 @@ public class PageService : IPageService
         Configure<ZacmienieViewModel, ZacmieniePage>();
         Configure<UploadGameViewModel, UploadGamePage>();
         Configure<Klikacz24HViewModel, Klikacz24HPage>();
+        Configure<BlackWhiteJumpViewModel, BlackWhiteJumpPage>();
+        Configure<StarmanSystemViewModel, StarmanSystemPage>();
+        Configure<ShadowSquadViewModel, ShadowSquadPage>();
     }
 
     public Type GetPageType(string key)

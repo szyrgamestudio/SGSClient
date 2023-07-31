@@ -71,6 +71,12 @@ public partial class App : Application
             services.AddSingleton<IFileService, FileService>();
 
             // Views and ViewModels
+            services.AddTransient<ShadowSquadViewModel>();
+            services.AddTransient<ShadowSquadPage>();
+            services.AddTransient<StarmanSystemViewModel>();
+            services.AddTransient<StarmanSystemPage>();
+            services.AddTransient<BlackWhiteJumpViewModel>();
+            services.AddTransient<BlackWhiteJumpPage>();
             services.AddTransient<Klikacz24HViewModel>();
             services.AddTransient<Klikacz24HPage>();
             services.AddTransient<UploadGameViewModel>();
