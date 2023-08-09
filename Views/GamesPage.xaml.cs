@@ -66,4 +66,9 @@ public sealed partial class GamesPage : Page
     {
         Frame.Navigate(typeof(StarmanSystemPage), null, new DrillInNavigationTransitionInfo());
     }
+
+    private void ButtonBlackWhiteJump_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+        Frame.Navigate(typeof(BlackWhiteJumpPage), null, new DrillInNavigationTransitionInfo());
+    }
 }

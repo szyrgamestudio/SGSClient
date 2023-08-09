@@ -23,7 +23,7 @@ public sealed partial class StarmanSystemPage : Page
     private readonly string gameExe; //okreslenie pliku exe gry
     private LauncherStatus _status; //status plików gry
 
-    private readonly string gameZipLink = "https://onedrive.live.com/download?resid=6B420D3CABAB13DF%211267078&authkey=!AM-lmxZnpFeofok";
+    private readonly string gameZipLink = "https://onedrive.live.com/download?resid=6B420D3CABAB13DF%211267090&authkey=!AIk0jGD3hcqPmfc";
     private readonly string gameVersionLink = "https://onedrive.live.com/download?resid=6B420D3CABAB13DF%211267079&authkey=!AJfEZ0iOs89ywNc";
     WebClient webClient = new WebClient();
     internal LauncherStatus Status //co robic wedlug statusu gry

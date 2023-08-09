@@ -131,7 +131,7 @@
                         <Button
                             Grid.Column="0"
                             Margin="0,0,4,0"
-                            Click="ButtonCastlelineEvil_Click"
+                            Click="ButtonBlackWhiteJump_Click"
                             IsEnabled="True">
                             <StackPanel>
                                 <Image
@@ -140,7 +140,7 @@
                                     Source="/Assets/Games/BlackWhiteJump/Logo.png" />
                                 <TextBlock
                                     Grid.Row="0"
-                                    FontSize="15"
+                                    FontSize="14"
                                     FontWeight="Bold"
                                     Text="Black White Jump" />
                                 <TextBlock
