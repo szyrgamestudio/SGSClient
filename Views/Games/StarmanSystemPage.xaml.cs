@@ -105,7 +105,6 @@ public sealed partial class StarmanSystemPage : Page
 
         DownloadProgressBorder.IsActive = false;
         UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-
         isUpdated();
     }
     private void isUpdated()
