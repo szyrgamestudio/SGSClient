@@ -55,7 +55,7 @@
                                     Grid.Row="0"
                                     FontSize="16"
                                     FontWeight="Bold"
-                                    Text="Atorth: Tales of Ulkimond DEMO" />
+                                    Text="Atorth: Tales of Ulkimond" />
                                 <TextBlock
                                     Grid.Row="0"
                                     FontSize="12"
@@ -225,7 +225,7 @@
                                     Grid.Row="0"
                                     FontSize="12"
                                     FontWeight="Bold"
-                                    Text="Niedostępne" />
+                                    Text="Wkrótce dostępne" />
                             </StackPanel>
                         </Button>
 

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <UserControl
     x:Class="SGSClient.Controls.HomePageHeaderImage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -37,17 +37,16 @@
             <Image
                 x:Name="HeroImage"
                 toolkit:VisualExtensions.NormalizedCenterPoint="0.5"
-                Opacity="0.5"
                 ImageOpened="OnImageOpened"
+                Opacity="0.1"
                 Source="ms-appx:///Assets/GalleryHeaderImage.png"
-                Stretch="UniformToFill" 
-                />
+                Stretch="UniformToFill" />
 
             <Image
                 x:Name="HeroOverlayImage"
                 toolkit:VisualExtensions.NormalizedCenterPoint="0.5"
-                Opacity="0.5"
-                Source="/Assets/GalleryHeaderImage.png"
+                Opacity="0.8"
+                Source="ms-appx:///Assets/GalleryHeaderImage.png"
                 Stretch="UniformToFill" />
 
         </Grid>

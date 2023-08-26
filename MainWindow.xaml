@@ -6,8 +6,11 @@
     xmlns:local="using:SGSClient"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:windowex="using:WinUIEx"
-    MinWidth="800"
-    MinHeight="500"
+    MinWidth="960"
+    MinHeight="540"
+    MaxWidth="1280"
+    MaxHeight="720"
+    IsMaximizable="False"
     PersistenceId="MainWindow"
     mc:Ignorable="d">
     <Window.SystemBackdrop>

@@ -253,8 +253,8 @@
     <value>&lt;toast launch="SGSClientWelcomeNotificationPayload"&gt;
     &lt;visual&gt;
         &lt;binding template='ToastGeneric'&gt;
-            &lt;text&gt;Witamy w SGSClient 2.0&lt;/text&gt;
-            &lt;text&gt;Kliknij na powiadomienie, aby dowiedzieć się, co nowego względem poprzedniej wersji programu.&lt;/text&gt;
+            &lt;text&gt;Witamy w SGSClient 2.1&lt;/text&gt;
+            &lt;text&gt;Kliknij na powiadomienie, aby dowiedzieć się, co nowego względem wcześniejszej wersji klienta.&lt;/text&gt;
             &lt;image placement='hero' src='ms-appx:///Assets/GalleryHeaderImage.png'/&gt;
         &lt;/binding&gt;
     &lt;/visual&gt;

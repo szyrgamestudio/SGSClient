@@ -45,6 +45,8 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
+        //MainWindow.CenterOnScreen();
+        Environment.SetEnvironmentVariable("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", "--lang=pl-PL");
 
         Host = Microsoft.Extensions.Hosting.Host.
         CreateDefaultBuilder().

@@ -39,21 +39,21 @@ public sealed partial class Klikacz24HPage : Page
                 case LauncherStatus.ready: //jesli gra jest aktualna / gotowa do uruchomienia
                     PlayButton.Content = "Graj";
                     PlayButton.IsEnabled = true;
-                    DownloadProgressBorder.IsActive = false;
+                    DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
                     UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
                     File.Delete(gameZip);
                     break;
                 case LauncherStatus.failed: //jesli gra nie zostala dobrze pobrana
                     UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-                    DownloadProgressBorder.IsActive = false;
+                    DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
                     break;
                 case LauncherStatus.downloadingGame: //jesli gra jest pobierana z serwera
                     UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                    DownloadProgressBorder.IsActive = true;
+                    DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
                     break;
                 case LauncherStatus.downloadingUpdate: //jesli jest pobierany update gry
                     UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                    DownloadProgressBorder.IsActive = true;
+                    DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
                     break;
                 default:
                     break;
@@ -77,7 +77,7 @@ public sealed partial class Klikacz24HPage : Page
         gameExe = Path.Combine(rootPath, "Klikacz24H", "gra24h.exe");
         gamepath = Path.Combine(rootPath, "Klikacz24H");
 
-        DownloadProgressBorder.IsActive = false;
+        DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
         UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
 
         isUpdated();
@@ -155,7 +155,7 @@ public sealed partial class Klikacz24HPage : Page
             };
             webClient.DownloadFileCompleted += (s, e) =>
             {
-                DownloadProgressBorder.IsActive = false;
+                DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
                 CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
 
                 //DownloadProgressBar.Visibility = Visibility.Hidden;

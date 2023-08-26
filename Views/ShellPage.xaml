@@ -48,6 +48,13 @@
                     <NavigationViewItem.Icon>
                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE7FC;" />
                     </NavigationViewItem.Icon>
+                    <NavigationViewItem.InfoBadge>
+                        <InfoBadge
+                            x:Name="infoBadge1"
+                            Opacity="100"
+                            Style="{StaticResource InformationalIconInfoBadgeStyle}"
+                            Value="10" />
+                    </NavigationViewItem.InfoBadge>
                 </NavigationViewItem>
                 <NavigationViewItem x:Uid="Shell_UploadGame" helpers:NavigationHelper.NavigateTo="SGSClient.ViewModels.UploadGameViewModel">
                     <NavigationViewItem.Icon>
