@@ -1,7 +1,6 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using SGSClient.ViewModels;
-
 namespace SGSClient.Views;
 
 public sealed partial class GamesPage : Page
