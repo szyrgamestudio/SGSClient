@@ -1,7 +1,7 @@
-﻿using Microsoft.UI.Xaml;
-
-using SGSClient.Contracts.Services;
+﻿using SGSClient.Contracts.Services;
 using SGSClient.Helpers;
+
+using Microsoft.UI.Xaml;
 
 namespace SGSClient.Services;
 
@@ -37,6 +37,8 @@ public class ThemeSelectorService : IThemeSelectorService
         if (App.MainWindow.Content is FrameworkElement rootElement)
         {
             rootElement.RequestedTheme = Theme;
+
+            TitleBarHelper.UpdateTitleBar(Theme);
         }
 
         await Task.CompletedTask;

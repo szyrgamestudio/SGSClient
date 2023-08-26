@@ -23,8 +23,8 @@ public sealed partial class BlackWhiteJumpPage : Page
     private readonly string gameExe; //okreslenie pliku exe gry
     private LauncherStatus _status; //status plików gry
 
-    private readonly string gameZipLink = "https://onedrive.live.com/download?resid=6B420D3CABAB13DF%211267076&authkey=!AHyY8rABofuV17E";
-    private readonly string gameVersionLink = "https://onedrive.live.com/download?resid=6B420D3CABAB13DF%211267072&authkey=!AJnafD2fFUrGEYY";
+    private readonly string gameZipLink = "https://dl.dropboxusercontent.com/scl/fi/n95vbm3jdvzvrjd0qwv42/BlackWhiteJump.zip?rlkey=nkyob4e67xena53rfdb4v4prb&dl=0";
+    private readonly string gameVersionLink = "https://dl.dropboxusercontent.com/scl/fi/5zacox2h5shimjhk5a8wy/versionBlackWhiteJump.txt?rlkey=c8gs3lxpsm6a79hi997igu4vl&dl=0";
     WebClient webClient = new WebClient();
     internal LauncherStatus Status //co robic wedlug statusu gry
     {
@@ -121,16 +121,17 @@ public sealed partial class BlackWhiteJumpPage : Page
             UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
         }
     }
-    private void checkForUpdates()
+    private async void checkForUpdates()
     {
         if (File.Exists(versionFile))
         {
             SGSVersion.Version localVersion = new SGSVersion.Version(File.ReadAllText(versionFile));
-            SGSVersion.Version onlineVersion = new SGSVersion.Version(webClient.DownloadString(gameZipLink)); //PLIK WERSJA GRY
+            SGSVersion.Version onlineVersion = new SGSVersion.Version(webClient.DownloadString(gameVersionLink)); //PLIK WERSJA GRY
             try
             {
                 if (onlineVersion.IsDifferentThan(localVersion))
                 {
+                    //MessageBox.Show("This is a test text!", "Some title", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
                     InstallGameFiles(true, onlineVersion);
                 }
                 else

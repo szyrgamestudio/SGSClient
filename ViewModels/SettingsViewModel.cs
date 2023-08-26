@@ -13,23 +13,15 @@ using Windows.ApplicationModel;
 
 namespace SGSClient.ViewModels;
 
-public class SettingsViewModel : ObservableRecipient
+public partial class SettingsViewModel : ObservableRecipient
 {
     private readonly IThemeSelectorService _themeSelectorService;
+
+    [ObservableProperty]
     private ElementTheme _elementTheme;
+
+    [ObservableProperty]
     private string _versionDescription;
-
-    public ElementTheme ElementTheme
-    {
-        get => _elementTheme;
-        set => SetProperty(ref _elementTheme, value);
-    }
-
-    public string VersionDescription
-    {
-        get => _versionDescription;
-        set => SetProperty(ref _versionDescription, value);
-    }
 
     public ICommand SwitchThemeCommand
     {

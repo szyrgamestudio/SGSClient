@@ -11,6 +11,7 @@ using File = System.IO.File;
 using Windows.Storage;
 using SGSClient.Contracts.Services;
 using SGSClient.Helpers;
+using System.Windows;
 
 namespace SGSClient.Views;
 
@@ -36,49 +37,23 @@ public sealed partial class Klikacz24HPage : Page
             switch (_status)
             {
                 case LauncherStatus.ready: //jesli gra jest aktualna / gotowa do uruchomienia
-                    //UpdateButton.Content = "Sprawdź aktualizację";
                     PlayButton.Content = "Graj";
                     PlayButton.IsEnabled = true;
                     DownloadProgressBorder.IsActive = false;
-                    //DownloadProgressBar.Visibility = Visibility.Hidden;
                     UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+                    File.Delete(gameZip);
                     break;
                 case LauncherStatus.failed: //jesli gra nie zostala dobrze pobrana
-                    //PlayButton.IsEnabled = false;
-                    //UpdateButton.IsEnabled = true;
-                    //UpdateButton.Content = "Spróbuj ponownie";
-                    //if (File.Exists(gameExe))
-                    //{
-                    //    PlayButton.Content = "Graj";
-                    //    UpdateButton.Content = "Sprawdź aktualizację";
-                    //    PlayButton.IsEnabled = true;
-                    //}
-                    //else
-                    //{
-                    //    PlayButton.IsEnabled = false;
-                    //}
-                    //UpdateButton.IsEnabled = true;
                     UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
                     DownloadProgressBorder.IsActive = false;
-                    //DownloadProgressBar.Visibility = Visibility.Hidden;
                     break;
                 case LauncherStatus.downloadingGame: //jesli gra jest pobierana z serwera
-                    //PlayButton.Content = "Graj";
-                    //UpdateButton.Content = "Pobieranie gry";
-                    //PlayButton.IsEnabled = false;
-                    //UpdateButton.IsEnabled = false;
                     UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
                     DownloadProgressBorder.IsActive = true;
-                    //DownloadProgressBar.Visibility = Visibility.Visible;
                     break;
                 case LauncherStatus.downloadingUpdate: //jesli jest pobierany update gry
-                    //PlayButton.Content = "Graj";
-                    //UpdateButton.Content = "Aktualizowanie";
-                    //PlayButton.IsEnabled = false;
-                    //UpdateButton.IsEnabled = false;
-                    //UninstallButton.Visibility = Visibility.Hidden;
+                    UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
                     DownloadProgressBorder.IsActive = true;
-                    //DownloadProgressBar.Visibility = Visibility.Visible;
                     break;
                 default:
                     break;
@@ -89,7 +64,7 @@ public sealed partial class Klikacz24HPage : Page
     {
         get;
     }
-    public Klikacz24HPage() 
+    public Klikacz24HPage()
     {
         ViewModel = App.GetService<Klikacz24HViewModel>();
         InitializeComponent();
@@ -111,25 +86,35 @@ public sealed partial class Klikacz24HPage : Page
     {
         if (File.Exists(gameExe))
         {
+            SGSVersion.Version localVersion = new SGSVersion.Version(File.ReadAllText(versionFile));
+            SGSVersion.Version onlineVersion = new SGSVersion.Version(webClient.DownloadString(gameVersionLink)); //PLIK WERSJA GRY
+
             PlayButton.Content = "Graj";
             UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+            if (!onlineVersion.IsDifferentThan(localVersion))
+            {
+                CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+            }
+            Status = LauncherStatus.ready;
         }
         else
         {
             PlayButton.Content = "Zainstaluj";
             UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+            CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
         }
     }
-    private void checkForUpdates()
+    private async void checkForUpdates()
     {
         if (File.Exists(versionFile))
         {
             SGSVersion.Version localVersion = new SGSVersion.Version(File.ReadAllText(versionFile));
-            SGSVersion.Version onlineVersion = new SGSVersion.Version(webClient.DownloadString(gameZipLink)); //PLIK WERSJA GRY
+            SGSVersion.Version onlineVersion = new SGSVersion.Version(webClient.DownloadString(gameVersionLink)); //PLIK WERSJA GRY
             try
             {
                 if (onlineVersion.IsDifferentThan(localVersion))
                 {
+                    Status = LauncherStatus.downloadingUpdate;
                     InstallGameFiles(true, onlineVersion);
                 }
                 else
@@ -171,6 +156,8 @@ public sealed partial class Klikacz24HPage : Page
             webClient.DownloadFileCompleted += (s, e) =>
             {
                 DownloadProgressBorder.IsActive = false;
+                CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+
                 //DownloadProgressBar.Visibility = Visibility.Hidden;
                 // any other code to process the file
             };
@@ -179,7 +166,8 @@ public sealed partial class Klikacz24HPage : Page
         {
             Status = LauncherStatus.failed;
         }
-    }//instalacja plików gry
+    }
+    //instalacja plików gry
     private void DownloadGameCompletedCallback(object sender, AsyncCompletedEventArgs e) //zwracanie, że gra jest sciagnieta
     {
         try
@@ -208,14 +196,11 @@ public sealed partial class Klikacz24HPage : Page
                 ProcessStartInfo startInfo = new ProcessStartInfo(gameExe);
                 startInfo.WorkingDirectory = Path.Combine(rootPath, "Klikacz24H");
                 Process.Start(startInfo);
-                //System.Windows.Application.Current.Shutdown();
                 CoreApplication.Exit();
             }
             catch (Exception ex)
             {
-                //MessageBox.Show($"Error: {ex}");
                 CoreApplication.Exit();
-                //System.Windows.Application.Current.Shutdown();
             }
         }
         else
@@ -233,7 +218,6 @@ public sealed partial class Klikacz24HPage : Page
                 }
                 else if (File.Exists(gameExe) && Status == LauncherStatus.ready)
                 {
-                    //MessageBox.Show("Posiadasz aktualną wersję gry", "SGSClient", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else if (Status == LauncherStatus.failed)
                 {
@@ -263,10 +247,16 @@ public sealed partial class Klikacz24HPage : Page
             //USTAWIENIE PRZYCISKÓW DO STANU POCZĄTKOWEGO
             PlayButton.Content = "Zainstaluj";
             UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+            CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+
         }
         else
         {
         }
+    }
+    private void updateClickButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+        checkForUpdates();
     }
 
 }

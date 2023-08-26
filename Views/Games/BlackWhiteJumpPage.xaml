@@ -75,6 +75,12 @@
                         Content="Zainstaluj"
                         Style="{StaticResource AccentButtonStyle}" />
                     <Button
+                        x:Name="CheckUpdateButton"
+                        Width="100"
+                        Margin="0,5,0,0"
+                        Content="Aktualizuj"
+                        Style="{StaticResource AccentButtonStyle}" />
+                    <Button
                         x:Name="UninstallButton"
                         Width="100"
                         Margin="0,5,0,0"
