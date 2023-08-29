@@ -1,19 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Numerics;
-using System.Runtime.InteropServices.WindowsRuntime;
 using Microsoft.UI.Composition;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -23,7 +12,7 @@ namespace SGSClient.Controls
     public sealed partial class HeaderTile : UserControl
     {
         Compositor _compositor = Microsoft.UI.Xaml.Media.CompositionTarget.GetCompositorForCurrentThread();
-        private SpringVector3NaturalMotionAnimation _springAnimation;
+        private SpringVector3NaturalMotionAnimation? _springAnimation;
 
         public string Title
         {
@@ -92,15 +81,15 @@ namespace SGSClient.Controls
         private void Element_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
             CreateOrUpdateSpringAnimation(1.1f);
-            (sender as UIElement).CenterPoint = new Vector3(70, 40, 1f);
-            (sender as UIElement).StartAnimation(_springAnimation);
+            ((UIElement)sender).CenterPoint = new Vector3(70, 40, 1f);
+            ((UIElement)sender).StartAnimation(_springAnimation);
         }
 
         private void Element_PointerExited(object sender, PointerRoutedEventArgs e)
         {
             CreateOrUpdateSpringAnimation(1.0f);
-            (sender as UIElement).CenterPoint = new Vector3(70, 40, 1f);
-            (sender as UIElement).StartAnimation(_springAnimation);
+            ((UIElement)sender).CenterPoint = new Vector3(70, 40, 1f);
+            ((UIElement)sender).StartAnimation(_springAnimation);
         }
 
         private void CreateOrUpdateSpringAnimation(float finalValue)
@@ -114,7 +103,10 @@ namespace SGSClient.Controls
                 }
             }
 
-            _springAnimation.FinalValue = new Vector3(finalValue);
+            if (_springAnimation != null) // Check if _springAnimation is not null
+            {
+                _springAnimation.FinalValue = new Vector3(finalValue);
+            }
         }
     }
 }

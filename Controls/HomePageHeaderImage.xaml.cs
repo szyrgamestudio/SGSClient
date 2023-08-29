@@ -31,6 +31,7 @@ namespace SGSClient.Controls
         public HomePageHeaderImage()
         {
             this.InitializeComponent();
+            _compositor = ElementCompositionPreview.GetElementVisual(this).Compositor;
         }
 
         private void OnLoaded(object sender, RoutedEventArgs e)
@@ -87,6 +88,8 @@ namespace SGSClient.Controls
             _imageGridSizeAnimation?.Dispose();
             _bottomGradientStartPointAnimation?.Dispose();
             _bottomGradientStartPointAnimation = null;
+
+
         }
         private void OnLoading(FrameworkElement sender, object args)
         {
