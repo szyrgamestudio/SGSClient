@@ -349,4 +349,15 @@
 &lt;/toast&gt;</value>
     <comment>ShadowSquad - zainstalowano pomyślnie</comment>
   </data>
+  <data name="Klikacz24HNotificationPayload" xml:space="preserve">
+    <value>&lt;toast launch="Klikacz24HNotificationPayload"&gt;
+    &lt;visual&gt;
+        &lt;binding template='ToastGeneric'&gt;
+            &lt;text&gt;Klikacz24H- zainstalowano pomyślnie&lt;/text&gt;
+            &lt;image placement='appLogoOverride' src='ms-appx:///Assets/Games/Klikacz24H/Logo.png'/&gt;
+        &lt;/binding&gt;
+    &lt;/visual&gt;
+&lt;/toast&gt;</value>
+    <comment>Zainstalowano Klikacz24H</comment>
+  </data>
 </root>

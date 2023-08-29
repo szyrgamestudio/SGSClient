@@ -7,6 +7,8 @@ using Windows.ApplicationModel.Core;
 using File = System.IO.File;
 using Windows.Storage;
 using System.Windows;
+using SGSClient.Contracts.Services;
+using SGSClient.Helpers;
 
 namespace SGSClient.Views
 {
@@ -47,23 +49,23 @@ namespace SGSClient.Views
                         break;
                     case LauncherStatus.ready:
                         PlayButton.Content = "Graj";
-                        PlayButton.IsEnabled = true;
                         PlayButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
                         DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
                         UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
                         DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-
-                        File.Delete(gameZip);
+                        File.Delete(gameZip); //delete file zip (free memory is important)
                         break;
                     case LauncherStatus.failed:
                         UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
                         DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
                         break;
                     case LauncherStatus.downloadingGame:
+                        PlayButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
                         UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
                         DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
                         break;
                     case LauncherStatus.downloadingUpdate:
+                        PlayButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
                         UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
                         DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
                         break;
@@ -74,7 +76,6 @@ namespace SGSClient.Views
         }
 
         public Klikacz24HViewModel ViewModel { get; }
-
         public Klikacz24HPage()
         {
             ViewModel = App.GetService<Klikacz24HViewModel>();
@@ -91,7 +92,6 @@ namespace SGSClient.Views
             Status = LauncherStatus.pageLauched;
             isUpdated();
         }
-
         private async void isUpdated()
         {
             if (File.Exists(gameExe))
@@ -110,7 +110,6 @@ namespace SGSClient.Views
                 Status = LauncherStatus.readyNoGame;
             }
         }
-
         private async void checkForUpdates()
         {
             if (File.Exists(versionFile))
@@ -139,7 +138,6 @@ namespace SGSClient.Views
                 InstallGameFiles(false, SGSVersion.Version.zero);
             }
         }
-
         private async void InstallGameFiles(bool _isUpdate, SGSVersion.Version _onlineVersion)
         {
             try
@@ -171,7 +169,7 @@ namespace SGSClient.Views
                 File.WriteAllText(versionFile, _onlineVersion.ToString());
 
                 Status = LauncherStatus.ready;
-                //App.GetService<IAppNotificationService>().Show(string.Format("Klikacz24HNotificationPayload".GetLocalized(), AppContext.BaseDirectory));
+                App.GetService<IAppNotificationService>().Show(string.Format("Klikacz24HNotificationPayload".GetLocalized(), AppContext.BaseDirectory));
             }
             catch (Exception ex)
             {
@@ -180,6 +178,7 @@ namespace SGSClient.Views
             }
         }
 
+        #region Buttons
         private void playClickButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
             if (File.Exists(gameExe))
@@ -208,7 +207,6 @@ namespace SGSClient.Views
                 }
             }
         }
-
         private void uninstallClickButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
             if (Directory.Exists(gamepath))
@@ -225,10 +223,10 @@ namespace SGSClient.Views
                 // Handle else case...
             }
         }
-
         private void updateClickButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
             checkForUpdates();
         }
+        #endregion
     }
 }
