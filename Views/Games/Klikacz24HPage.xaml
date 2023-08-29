@@ -145,19 +145,6 @@
                         </Button>
 
                     </StackPanel>
-                    <!--<StackPanel
-                        Grid.Row="7"
-                        Margin="0,5,0,0"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Bottom">
-                        <ProgressRing
-                            x:Name="DownloadProgressBorder"
-                            Width="100"
-                            Height="100"
-                            Background="LightGray"
-                            IsActive="True" />
-                    </StackPanel>-->
-
                 </Grid>
             </Grid>
         </StackPanel>
