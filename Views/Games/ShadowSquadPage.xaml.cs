@@ -1,83 +1,73 @@
-﻿using SGSClient.Controllers;
+﻿using SGSClient.Contracts.Services;
+using SGSClient.Controllers;
+using SGSClient.Helpers;
 using SGSClient.ViewModels;
 using Microsoft.UI.Xaml.Controls;
-using System.Net;
-using System.ComponentModel;
 using System.IO.Compression;
 using System.Diagnostics;
+using System.Windows;
 using Windows.ApplicationModel.Core;
-using static System.Net.WebRequestMethods;
-using File = System.IO.File;
 using Windows.Storage;
-using SGSClient.Contracts.Services;
-using SGSClient.Helpers;
+using File = System.IO.File;
 
 namespace SGSClient.Views;
 
 public sealed partial class ShadowSquadPage : Page
 {
-    private readonly string rootPath; //określenie folderu klienta sgs
-    private readonly string gamepath; //okreslenie folderu z gra
-    private readonly string versionFile; //okreslenie pliku zawierającego wersję gry
-    private readonly string gameZip; //okreslenie zipu gry
-    private readonly string gameExe; //okreslenie pliku exe gry
-    private LauncherStatus _status; //status plików gry
+    private readonly string rootPath;
+    private readonly string gamepath;
+    private readonly string versionFile;
+    private readonly string gameZip;
+    private readonly string gameExe;
+    private LauncherStatus _status;
 
-    private readonly string gameZipLink = "https://onedrive.live.com/download?resid=6B420D3CABAB13DF%211267083&authkey=!AM4ru4x5s-f-9Ys";
-    private readonly string gameVersionLink = "https://onedrive.live.com/download?resid=6B420D3CABAB13DF%211267082&authkey=!AM1nt_WhDP1xNWo";
-    WebClient webClient = new WebClient();
-    internal LauncherStatus Status //co robic wedlug statusu gry
+    private readonly string gameZipLink = "https://dl.dropboxusercontent.com/scl/fi/su6u92j7px6zzs6jmhgew/ShadowSquad.zip?rlkey=bu66iyqgpktftkb9o0o68etzx&dl=0";
+    private readonly string gameVersionLink = "https://dl.dropboxusercontent.com/scl/fi/n3frtrdvh9drwhhmtm1qt/versionShadowSquad.txt?rlkey=9pnn7peykslzqebr9zj0kvv1p&dl=0";
+
+    private readonly HttpClient httpClient = new();
+
+    internal LauncherStatus Status
     {
-        get => _status; //okresl status
+        get => _status;
         set
         {
-            _status = value; //ustaw status
+            _status = value;
             switch (_status)
             {
-                case LauncherStatus.ready: //jesli gra jest aktualna / gotowa do uruchomienia
-                    //UpdateButton.Content = "Sprawdź aktualizację";
-                    PlayButton.Content = "Graj";
-                    PlayButton.IsEnabled = true;
-                    DownloadProgressBorder.IsActive = false;
-                    //DownloadProgressBar.Visibility = Visibility.Hidden;
-                    UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-                    break;
-                case LauncherStatus.failed: //jesli gra nie zostala dobrze pobrana
-                    //PlayButton.IsEnabled = false;
-                    //UpdateButton.IsEnabled = true;
-                    //UpdateButton.Content = "Spróbuj ponownie";
-                    //if (File.Exists(gameExe))
-                    //{
-                    //    PlayButton.Content = "Graj";
-                    //    UpdateButton.Content = "Sprawdź aktualizację";
-                    //    PlayButton.IsEnabled = true;
-                    //}
-                    //else
-                    //{
-                    //    PlayButton.IsEnabled = false;
-                    //}
-                    //UpdateButton.IsEnabled = true;
-                    UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-                    DownloadProgressBorder.IsActive = false;
-                    //DownloadProgressBar.Visibility = Visibility.Hidden;
-                    break;
-                case LauncherStatus.downloadingGame: //jesli gra jest pobierana z serwera
-                    //PlayButton.Content = "Graj";
-                    //UpdateButton.Content = "Pobieranie gry";
-                    //PlayButton.IsEnabled = false;
-                    //UpdateButton.IsEnabled = false;
+                case LauncherStatus.pageLauched:
+                    PlayButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                    CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
                     UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                    DownloadProgressBorder.IsActive = true;
-                    //DownloadProgressBar.Visibility = Visibility.Visible;
+                    DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
                     break;
-                case LauncherStatus.downloadingUpdate: //jesli jest pobierany update gry
-                    //PlayButton.Content = "Graj";
-                    //UpdateButton.Content = "Aktualizowanie";
-                    //PlayButton.IsEnabled = false;
-                    //UpdateButton.IsEnabled = false;
-                    //UninstallButton.Visibility = Visibility.Hidden;
-                    DownloadProgressBorder.IsActive = true;
-                    //DownloadProgressBar.Visibility = Visibility.Visible;
+                case LauncherStatus.readyNoGame:
+                    PlayButton.Content = "Zainstaluj";
+                    PlayButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+                    DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                    UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                    CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                    break;
+                case LauncherStatus.ready:
+                    PlayButton.Content = "Graj";
+                    PlayButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+                    DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                    UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+                    DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                    File.Delete(gameZip); //delete file zip (free memory is important)
+                    break;
+                case LauncherStatus.failed:
+                    UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+                    DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                    break;
+                case LauncherStatus.downloadingGame:
+                    PlayButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                    UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                    DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+                    break;
+                case LauncherStatus.downloadingUpdate:
+                    PlayButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                    UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                    DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
                     break;
                 default:
                     break;
@@ -85,10 +75,7 @@ public sealed partial class ShadowSquadPage : Page
         }
     }
 
-    public ShadowSquadViewModel ViewModel
-    {
-        get;
-    }
+    public ShadowSquadViewModel ViewModel { get; }
 
     public ShadowSquadPage()
 
@@ -97,41 +84,45 @@ public sealed partial class ShadowSquadPage : Page
         InitializeComponent();
 
         string location = Path.Combine(ApplicationData.Current.LocalFolder.Path, "LocalState");
-        rootPath = Path.GetDirectoryName(location);
+        rootPath = Path.GetDirectoryName(location) ?? string.Empty;
 
         versionFile = Path.Combine(rootPath, "versionShadowSquad.txt");
         gameZip = Path.Combine(rootPath, "ShadowSquad.zip");
         gameExe = Path.Combine(rootPath, "ShadowSquad", "Game.exe");
         gamepath = Path.Combine(rootPath, "ShadowSquad");
 
-        DownloadProgressBorder.IsActive = false;
-        UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-
-        isUpdated();
+        Status = LauncherStatus.pageLauched;
+        IsUpdated();
     }
-    private void isUpdated()
+    private async void IsUpdated()
     {
         if (File.Exists(gameExe))
         {
-            PlayButton.Content = "Graj";
-            UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+            SGSVersion.Version localVersion = new(File.ReadAllText(versionFile));
+            SGSVersion.Version onlineVersion = new(await httpClient.GetStringAsync(gameVersionLink));
+
+            if (!onlineVersion.IsDifferentThan(localVersion))
+            {
+                CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+            }
+            Status = LauncherStatus.ready;
         }
         else
         {
-            PlayButton.Content = "Zainstaluj";
-            UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+            Status = LauncherStatus.readyNoGame;
         }
     }
-    private void checkForUpdates()
+    private async void CheckForUpdates()
     {
         if (File.Exists(versionFile))
         {
-            SGSVersion.Version localVersion = new SGSVersion.Version(File.ReadAllText(versionFile));
-            SGSVersion.Version onlineVersion = new SGSVersion.Version(webClient.DownloadString(gameZipLink)); //PLIK WERSJA GRY
+            SGSVersion.Version localVersion = new(File.ReadAllText(versionFile));
+            SGSVersion.Version onlineVersion = new(await httpClient.GetStringAsync(gameVersionLink));
             try
             {
                 if (onlineVersion.IsDifferentThan(localVersion))
                 {
+                    Status = LauncherStatus.downloadingUpdate;
                     InstallGameFiles(true, onlineVersion);
                 }
                 else
@@ -149,7 +140,7 @@ public sealed partial class ShadowSquadPage : Page
             InstallGameFiles(false, SGSVersion.Version.zero);
         }
     }
-    private void InstallGameFiles(bool _isUpdate, SGSVersion.Version _onlineVersion)
+    private async void InstallGameFiles(bool _isUpdate, SGSVersion.Version _onlineVersion)
     {
         try
         {
@@ -160,100 +151,67 @@ public sealed partial class ShadowSquadPage : Page
             else
             {
                 Status = LauncherStatus.downloadingGame;
-                _onlineVersion = new SGSVersion.Version(webClient.DownloadString(gameVersionLink)); //PLIK WERSJA GRY
+                _onlineVersion = new SGSVersion.Version(await httpClient.GetStringAsync(gameVersionLink));
             }
 
-            webClient.DownloadFileCompleted += new AsyncCompletedEventHandler(DownloadGameCompletedCallback);
-            webClient.DownloadFileAsync(new Uri(gameZipLink), gameZip, _onlineVersion);
+            HttpResponseMessage response = await httpClient.GetAsync(new Uri(gameZipLink));
+            response.EnsureSuccessStatusCode();
 
-            webClient.DownloadProgressChanged += (s, e) =>
+            using (Stream contentStream = await response.Content.ReadAsStreamAsync())
             {
-                //DownloadProgressBar.Value = e.ProgressPercentage;
-            };
-            webClient.DownloadFileCompleted += (s, e) =>
-            {
-                DownloadProgressBorder.IsActive = false;
-                //DownloadProgressBar.Visibility = Visibility.Hidden;
-                // any other code to process the file
-            };
-        }
-        catch (Exception)
-        {
-            Status = LauncherStatus.failed;
-        }
-    }//instalacja plików gry
-    private void DownloadGameCompletedCallback(object sender, AsyncCompletedEventArgs e) //zwracanie, że gra jest sciagnieta
-    {
-        try
-        {
-            string onlineVersion = ((SGSVersion.Version)e.UserState).ToString();
+                using FileStream fileStream = new(gameZip, FileMode.Create, FileAccess.Write, FileShare.None);
+                await contentStream.CopyToAsync(fileStream);
+            }
+
             ZipFile.ExtractToDirectory(gameZip, rootPath, true);
-            //File.Delete(gameZip);
+            File.Delete(gameZip);
 
-            File.WriteAllText(versionFile, onlineVersion);
+            File.WriteAllText(versionFile, _onlineVersion.ToString());
 
             Status = LauncherStatus.ready;
             App.GetService<IAppNotificationService>().Show(string.Format("ShadowSquadNotificationPayload".GetLocalized(), AppContext.BaseDirectory));
-
         }
         catch (Exception ex)
         {
+            MessageBox.Show(ex.Message);
             Status = LauncherStatus.failed;
         }
+
+
     }
-    private void playClickButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+
+    #region Buttons
+    private void PlayClickButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
         if (File.Exists(gameExe))
         {
             try
             {
-                ProcessStartInfo startInfo = new ProcessStartInfo(gameExe);
-                startInfo.WorkingDirectory = Path.Combine(rootPath, "ShadowSquad");
+                ProcessStartInfo startInfo = new(gameExe)
+                {
+                    WorkingDirectory = Path.Combine(rootPath, "ShadowSquad")
+                };
                 Process.Start(startInfo);
-                //System.Windows.Application.Current.Shutdown();
                 CoreApplication.Exit();
             }
             catch (Exception ex)
             {
-                //MessageBox.Show($"Error: {ex}");
-                CoreApplication.Exit();
-                //System.Windows.Application.Current.Shutdown();
+                MessageBox.Show(ex.Message);
             }
         }
         else
         {
             try
             {
-                SGSVersion.Version localVersion = new SGSVersion.Version(File.ReadAllText(versionFile));
-
-                WebClient webClient = new WebClient();
-                SGSVersion.Version onlineVersion = new SGSVersion.Version(webClient.DownloadString(gameVersionLink));
-
-                if (onlineVersion.IsDifferentThan(localVersion))
-                {
-                    checkForUpdates();
-                }
-                else if (File.Exists(gameExe) && Status == LauncherStatus.ready)
-                {
-                    //MessageBox.Show("Posiadasz aktualną wersję gry", "SGSClient", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-                else if (Status == LauncherStatus.failed)
-                {
-                    checkForUpdates();
-                }
-                else
-                {
-                    checkForUpdates();
-                }
+                CheckForUpdates();
             }
             catch (Exception ex)
             {
-                checkForUpdates();
+                MessageBox.Show(ex.Message);
             }
-
         }
     }
-    private void uninstallClickButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    private void UninstallClickButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
         if (Directory.Exists(gamepath))
         {
@@ -262,13 +220,18 @@ public sealed partial class ShadowSquadPage : Page
             File.Delete(versionFile);
             File.Delete(gameZip);
 
-            //USTAWIENIE PRZYCISKÓW DO STANU POCZĄTKOWEGO
-            PlayButton.Content = "Zainstaluj";
-            UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+            Status = LauncherStatus.readyNoGame;
         }
         else
         {
+            // Handle else case...
         }
     }
+    private void UpdateClickButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+        CheckForUpdates();
+    }
+    #endregion
+
 
 }

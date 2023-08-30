@@ -1,272 +1,232 @@
-﻿using SGSClient.Controllers;
+﻿using SGSClient.Contracts.Services;
+using SGSClient.Controllers;
+using SGSClient.Helpers;
 using SGSClient.ViewModels;
 using Microsoft.UI.Xaml.Controls;
-using System.Net;
-using System.ComponentModel;
 using System.IO.Compression;
 using System.Diagnostics;
+using System.Windows;
 using Windows.ApplicationModel.Core;
-using static System.Net.WebRequestMethods;
-using File = System.IO.File;
 using Windows.Storage;
-using SGSClient.Contracts.Services;
-using SGSClient.Helpers;
+using File = System.IO.File;
 
-namespace SGSClient.Views;
-
-public sealed partial class StarmanSystemPage : Page
+namespace SGSClient.Views
 {
-    private readonly string rootPath; //określenie folderu klienta sgs
-    private readonly string gamepath; //okreslenie folderu z gra
-    private readonly string versionFile; //okreslenie pliku zawierającego wersję gry
-    private readonly string gameZip; //okreslenie zipu gry
-    private readonly string gameExe; //okreslenie pliku exe gry
-    private LauncherStatus _status; //status plików gry
-
-    private readonly string gameZipLink = "https://onedrive.live.com/download?resid=6B420D3CABAB13DF%211267090&authkey=!AIk0jGD3hcqPmfc";
-    private readonly string gameVersionLink = "https://onedrive.live.com/download?resid=6B420D3CABAB13DF%211267079&authkey=!AJfEZ0iOs89ywNc";
-    WebClient webClient = new WebClient();
-    internal LauncherStatus Status //co robic wedlug statusu gry
+    public sealed partial class StarmanSystemPage : Page
     {
-        get => _status; //okresl status
-        set
+        private readonly string rootPath;
+        private readonly string gamepath;
+        private readonly string versionFile;
+        private readonly string gameZip;
+        private readonly string gameExe;
+        private LauncherStatus _status;
+
+        private readonly string gameZipLink = "https://dl.dropboxusercontent.com/scl/fi/p3r9wpyil3ljclzegv2ew/StarmanSystem.zip?rlkey=8ppgui484j6mmorhe819hpmzp&dl=0";
+        private readonly string gameVersionLink = "https://dl.dropboxusercontent.com/scl/fi/jf16cyhocybswk6g4wso7/VersionStarman.txt?rlkey=anplte1vfqma6q5ddqgpb4zfx&dl=0";
+
+        private readonly HttpClient httpClient = new();
+
+        internal LauncherStatus Status
         {
-            _status = value; //ustaw status
-            switch (_status)
+            get => _status;
+            set
             {
-                case LauncherStatus.ready: //jesli gra jest aktualna / gotowa do uruchomienia
-                    //UpdateButton.Content = "Sprawdź aktualizację";
-                    PlayButton.Content = "Graj";
-                    PlayButton.IsEnabled = true;
-                    DownloadProgressBorder.IsActive = false;
-                    //DownloadProgressBar.Visibility = Visibility.Hidden;
-                    UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-                    break;
-                case LauncherStatus.failed: //jesli gra nie zostala dobrze pobrana
-                    //PlayButton.IsEnabled = false;
-                    //UpdateButton.IsEnabled = true;
-                    //UpdateButton.Content = "Spróbuj ponownie";
-                    //if (File.Exists(gameExe))
-                    //{
-                    //    PlayButton.Content = "Graj";
-                    //    UpdateButton.Content = "Sprawdź aktualizację";
-                    //    PlayButton.IsEnabled = true;
-                    //}
-                    //else
-                    //{
-                    //    PlayButton.IsEnabled = false;
-                    //}
-                    //UpdateButton.IsEnabled = true;
-                    UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-                    DownloadProgressBorder.IsActive = false;
-                    //DownloadProgressBar.Visibility = Visibility.Hidden;
-                    break;
-                case LauncherStatus.downloadingGame: //jesli gra jest pobierana z serwera
-                    //PlayButton.Content = "Graj";
-                    //UpdateButton.Content = "Pobieranie gry";
-                    //PlayButton.IsEnabled = false;
-                    //UpdateButton.IsEnabled = false;
-                    UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                    DownloadProgressBorder.IsActive = true;
-                    //DownloadProgressBar.Visibility = Visibility.Visible;
-                    break;
-                case LauncherStatus.downloadingUpdate: //jesli jest pobierany update gry
-                    //PlayButton.Content = "Graj";
-                    //UpdateButton.Content = "Aktualizowanie";
-                    //PlayButton.IsEnabled = false;
-                    //UpdateButton.IsEnabled = false;
-                    //UninstallButton.Visibility = Visibility.Hidden;
-                    DownloadProgressBorder.IsActive = true;
-                    //DownloadProgressBar.Visibility = Visibility.Visible;
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-    public StarmanSystemViewModel ViewModel
-    {
-        get;
-    }
-
-    public StarmanSystemPage()
-    {
-        ViewModel = App.GetService<StarmanSystemViewModel>();
-        InitializeComponent();
-
-        string location = Path.Combine(ApplicationData.Current.LocalFolder.Path, "LocalState");
-        rootPath = Path.GetDirectoryName(location);
-
-        versionFile = Path.Combine(rootPath, "versionStarmanSystem.txt");
-        gameZip = Path.Combine(rootPath, "StarmanSystem.zip");
-        gameExe = Path.Combine(rootPath, "StarmanSystem", "StarmanSystem.exe");
-        gamepath = Path.Combine(rootPath, "StarmanSystem");
-
-        DownloadProgressBorder.IsActive = false;
-        UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-        isUpdated();
-    }
-    private void isUpdated()
-    {
-        if (File.Exists(gameExe))
-        {
-            PlayButton.Content = "Graj";
-            UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-        }
-        else
-        {
-            PlayButton.Content = "Zainstaluj";
-            UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-        }
-    }
-    private void checkForUpdates()
-    {
-        if (File.Exists(versionFile))
-        {
-            SGSVersion.Version localVersion = new SGSVersion.Version(File.ReadAllText(versionFile));
-            SGSVersion.Version onlineVersion = new SGSVersion.Version(webClient.DownloadString(gameZipLink)); //PLIK WERSJA GRY
-            try
-            {
-                if (onlineVersion.IsDifferentThan(localVersion))
+                _status = value;
+                switch (_status)
                 {
-                    InstallGameFiles(true, onlineVersion);
-                }
-                else
-                {
-                    Status = LauncherStatus.ready;
+                    case LauncherStatus.pageLauched:
+                        PlayButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                        CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                        UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                        DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+                        break;
+                    case LauncherStatus.readyNoGame:
+                        PlayButton.Content = "Zainstaluj";
+                        PlayButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+                        DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                        UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                        CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                        break;
+                    case LauncherStatus.ready:
+                        PlayButton.Content = "Graj";
+                        PlayButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+                        DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                        UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+                        DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                        File.Delete(gameZip); //delete file zip (free memory is important)
+                        break;
+                    case LauncherStatus.failed:
+                        UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+                        DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                        break;
+                    case LauncherStatus.downloadingGame:
+                        PlayButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                        UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                        DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+                        break;
+                    case LauncherStatus.downloadingUpdate:
+                        PlayButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                        UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                        DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+                        break;
+                    default:
+                        break;
                 }
             }
-            catch (Exception)
-            {
-                Status = LauncherStatus.failed;
-            }
         }
-        else
+
+        public StarmanSystemViewModel ViewModel { get; }
+        public StarmanSystemPage()
         {
-            InstallGameFiles(false, SGSVersion.Version.zero);
+            ViewModel = App.GetService<StarmanSystemViewModel>();
+            InitializeComponent();
+
+            string location = Path.Combine(ApplicationData.Current.LocalFolder.Path, "LocalState");
+            rootPath = Path.GetDirectoryName(location) ?? string.Empty;
+
+            versionFile = Path.Combine(rootPath, "versionStarmanSystem.txt");
+            gameZip = Path.Combine(rootPath, "StarmanSystem.zip");
+            gameExe = Path.Combine(rootPath, "StarmanSystem", "StarmanSystem.exe");
+            gamepath = Path.Combine(rootPath, "StarmanSystem");
+
+            Status = LauncherStatus.pageLauched;
+            IsUpdated();
         }
-    }
-    private void InstallGameFiles(bool _isUpdate, SGSVersion.Version _onlineVersion)
-    {
-        try
+        private async void IsUpdated()
         {
-            if (_isUpdate)
+            if (File.Exists(gameExe))
             {
-                Status = LauncherStatus.downloadingUpdate;
+                SGSVersion.Version localVersion = new(File.ReadAllText(versionFile));
+                SGSVersion.Version onlineVersion = new(await httpClient.GetStringAsync(gameVersionLink));
+
+                if (!onlineVersion.IsDifferentThan(localVersion))
+                {
+                    CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                }
+                Status = LauncherStatus.ready;
             }
             else
             {
-                Status = LauncherStatus.downloadingGame;
-                _onlineVersion = new SGSVersion.Version(webClient.DownloadString(gameVersionLink)); //PLIK WERSJA GRY
+                Status = LauncherStatus.readyNoGame;
             }
-
-            webClient.DownloadFileCompleted += new AsyncCompletedEventHandler(DownloadGameCompletedCallback);
-            webClient.DownloadFileAsync(new Uri(gameZipLink), gameZip, _onlineVersion);
-
-            webClient.DownloadProgressChanged += (s, e) =>
+        }
+        private async void CheckForUpdates()
+        {
+            if (File.Exists(versionFile))
             {
-                //DownloadProgressBar.Value = e.ProgressPercentage;
-            };
-            webClient.DownloadFileCompleted += (s, e) =>
+                SGSVersion.Version localVersion = new(File.ReadAllText(versionFile));
+                SGSVersion.Version onlineVersion = new(await httpClient.GetStringAsync(gameVersionLink));
+                try
+                {
+                    if (onlineVersion.IsDifferentThan(localVersion))
+                    {
+                        Status = LauncherStatus.downloadingUpdate;
+                        InstallGameFiles(true, onlineVersion);
+                    }
+                    else
+                    {
+                        Status = LauncherStatus.ready;
+                    }
+                }
+                catch (Exception)
+                {
+                    Status = LauncherStatus.failed;
+                }
+            }
+            else
             {
-                DownloadProgressBorder.IsActive = false;
-                //DownloadProgressBar.Visibility = Visibility.Hidden;
-                // any other code to process the file
-            };
+                InstallGameFiles(false, SGSVersion.Version.zero);
+            }
         }
-        catch (Exception)
-        {
-            Status = LauncherStatus.failed;
-        }
-    }//instalacja plików gry
-    private void DownloadGameCompletedCallback(object sender, AsyncCompletedEventArgs e) //zwracanie, że gra jest sciagnieta
-    {
-        try
-        {
-            string onlineVersion = ((SGSVersion.Version)e.UserState).ToString();
-            ZipFile.ExtractToDirectory(gameZip, rootPath, true);
-            //File.Delete(gameZip);
-
-            File.WriteAllText(versionFile, onlineVersion);
-
-            Status = LauncherStatus.ready;
-            App.GetService<IAppNotificationService>().Show(string.Format("StarmanSystemNotificationPayload".GetLocalized(), AppContext.BaseDirectory));
-
-        }
-        catch (Exception ex)
-        {
-            Status = LauncherStatus.failed;
-        }
-    }
-    private void playClickButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
-    {
-        if (File.Exists(gameExe))
+        private async void InstallGameFiles(bool _isUpdate, SGSVersion.Version _onlineVersion)
         {
             try
             {
-                ProcessStartInfo startInfo = new ProcessStartInfo(gameExe);
-                startInfo.WorkingDirectory = Path.Combine(rootPath, "StarmanSystem");
-                Process.Start(startInfo);
-                //System.Windows.Application.Current.Shutdown();
-                CoreApplication.Exit();
-            }
-            catch (Exception ex)
-            {
-                //MessageBox.Show($"Error: {ex}");
-                CoreApplication.Exit();
-                //System.Windows.Application.Current.Shutdown();
-            }
-        }
-        else
-        {
-            try
-            {
-                SGSVersion.Version localVersion = new SGSVersion.Version(File.ReadAllText(versionFile));
-
-                WebClient webClient = new WebClient();
-                SGSVersion.Version onlineVersion = new SGSVersion.Version(webClient.DownloadString(gameVersionLink));
-
-                if (onlineVersion.IsDifferentThan(localVersion))
+                if (_isUpdate)
                 {
-                    checkForUpdates();
-                }
-                else if (File.Exists(gameExe) && Status == LauncherStatus.ready)
-                {
-                    //MessageBox.Show("Posiadasz aktualną wersję gry", "SGSClient", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-                else if (Status == LauncherStatus.failed)
-                {
-                    checkForUpdates();
+                    Status = LauncherStatus.downloadingUpdate;
                 }
                 else
                 {
-                    checkForUpdates();
+                    Status = LauncherStatus.downloadingGame;
+                    _onlineVersion = new SGSVersion.Version(await httpClient.GetStringAsync(gameVersionLink));
                 }
+
+                HttpResponseMessage response = await httpClient.GetAsync(new Uri(gameZipLink));
+                response.EnsureSuccessStatusCode();
+
+                using (Stream contentStream = await response.Content.ReadAsStreamAsync())
+                {
+                    using FileStream fileStream = new(gameZip, FileMode.Create, FileAccess.Write, FileShare.None);
+                    await contentStream.CopyToAsync(fileStream);
+                }
+
+                ZipFile.ExtractToDirectory(gameZip, rootPath, true);
+                File.Delete(gameZip);
+
+                File.WriteAllText(versionFile, _onlineVersion.ToString());
+
+                Status = LauncherStatus.ready;
+                App.GetService<IAppNotificationService>().Show(string.Format("StarmanSystemNotificationPayload".GetLocalized(), AppContext.BaseDirectory));
             }
             catch (Exception ex)
             {
-                checkForUpdates();
+                MessageBox.Show(ex.Message);
+                Status = LauncherStatus.failed;
             }
-
         }
-    }
-    private void uninstallClickButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
-    {
-        if (Directory.Exists(gamepath))
+
+        #region Buttons
+        private void PlayClickButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
-            uninstallFlyout.Hide();
-            Directory.Delete(gamepath, true);
-            File.Delete(versionFile);
-            File.Delete(gameZip);
-
-            //USTAWIENIE PRZYCISKÓW DO STANU POCZĄTKOWEGO
-            PlayButton.Content = "Zainstaluj";
-            UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+            if (File.Exists(gameExe))
+            {
+                try
+                {
+                    ProcessStartInfo startInfo = new(gameExe)
+                    {
+                        WorkingDirectory = Path.Combine(rootPath, "StarmanSystem")
+                    };
+                    Process.Start(startInfo);
+                    CoreApplication.Exit();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+            else
+            {
+                try
+                {
+                    CheckForUpdates();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
         }
-        else
+        private void UninstallClickButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
-        }
-    }
+            if (Directory.Exists(gamepath))
+            {
+                uninstallFlyout.Hide();
+                Directory.Delete(gamepath, true);
+                File.Delete(versionFile);
+                File.Delete(gameZip);
 
+                Status = LauncherStatus.readyNoGame;
+            }
+            else
+            {
+                // Handle else case...
+            }
+        }
+        private void UpdateClickButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+        {
+            CheckForUpdates();
+        }
+        #endregion
+    }
 }
