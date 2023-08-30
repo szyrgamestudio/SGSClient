@@ -22,87 +22,130 @@
             BorderBrush="{ThemeResource ControlElevationBorderBrush}"
             BorderThickness="0.5"
             CornerRadius="5">
-            <Grid>
+            <Grid HorizontalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="40" />
-                    <RowDefinition Height="30" />
-                    <RowDefinition Height="90" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <Border Grid.Row="0" Padding="0,20,0,0">
-                    <Image
-                        Grid.Row="0"
-                        Width="150"
-                        Height="150"
-                        HorizontalAlignment="Center"
-                        Source="/Assets/Games/TurboNinja2D/TurboNinja2D_Logo.png" />
-                </Border>
+                <Grid Grid.Row="0">
+                    <Grid.RowDefinitions>
+                        <!--  0 - Ikona Gry  -->
+                        <RowDefinition Height="Auto" />
+                        <!--  1 - Nazwa Gry  -->
+                        <RowDefinition Height="Auto" />
+                        <!--  2 - Autor  -->
+                        <RowDefinition Height="40px" />
+                        <!--  3 - ProgressBar  -->
+                        <RowDefinition Height="Auto" />
+                        <!--  4 - Przycisk Graj  -->
+                        <RowDefinition Height="Auto" />
+                        <!--  5 - Przycisk aktualizuj  -->
+                        <RowDefinition Height="Auto" />
+                        <!--  6 - Przycisk Odinstaluj  -->
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
 
-                <TextBlock
-                    Grid.Row="1"
-                    HorizontalAlignment="Center"
-                    FontSize="36"
-                    Style="{StaticResource TitleTextBlockStyle}"
-                    Text="Turbo Ninja 2D" />
-                <TextBlock
-                    Grid.Row="2"
-                    Padding="0,10,0,0"
-                    HorizontalAlignment="Center"
-                    FontSize="11"
-                    Style="{StaticResource BodyStrongTextBlockStyle}">
-                    <Hyperlink NavigateUri="http://massyn.dev/">
-                        DEVMASSYN
-                    </Hyperlink>
-                </TextBlock>
-                <Border Grid.Row="3">
-                    <RatingControl
-                        AutomationProperties.Name="Simple RatingControl"
-                        IsClearEnabled="False"
-                        IsReadOnly="True"
-                        PlaceholderValue="4" />
-                </Border>
-                <StackPanel
-                    Grid.Row="4"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center">
-                    <Button
-                        x:Name="PlayButton"
-                        Width="100"
-                        Click="playClickButton"
-                        ClickMode="Press"
-                        Content="Zainstaluj"
-                        Style="{StaticResource AccentButtonStyle}" />
-                    <Button
-                        x:Name="UninstallButton"
-                        Width="100"
-                        Margin="0,5,0,0"
-                        Content="Odinstaluj">
-                        <Button.Flyout>
-                            <Flyout x:Name="uninstallFlyout">
-                                <StackPanel>
-                                    <TextBlock
-                                        Margin="0,0,0,12"
-                                        Style="{ThemeResource BaseTextBlockStyle}"
-                                        Text="Ta aplikacja i powiązane z nią informacje zostaną odinstalowane." />
-                                    <Button Click="uninstallClickButton" Content="Odinstaluj" />
-                                </StackPanel>
-                            </Flyout>
-                        </Button.Flyout>
-                    </Button>
-                </StackPanel>
-                <StackPanel
-                    Grid.Row="5"
-                    Margin="0,5,0,0"
-                    HorizontalAlignment="Center">
-                    <ProgressRing
+                    <!--  0 - Ikona Gry  -->
+                    <Border Grid.Row="0" Padding="0,20,0,0">
+                        <Image
+                            Grid.Row="0"
+                            Width="150"
+                            Height="150"
+                            HorizontalAlignment="Center"
+                            Source="/Assets/Games/TurboNinja2D/TurboNinja2D_Logo.png" />
+                    </Border>
+
+                    <!--  1 - Nazwa Gry  -->
+                    <TextBlock
+                        Grid.Row="1"
+                        HorizontalAlignment="Center"
+                        FontSize="30"
+                        Style="{StaticResource TitleTextBlockStyle}"
+                        Text="Turbo Ninja 2D" />
+
+                    <!--  2 - Autor  -->
+                    <TextBlock
+                        Grid.Row="2"
+                        Padding="0,10,0,0"
+                        HorizontalAlignment="Center"
+                        FontSize="11"
+                        Style="{StaticResource BodyStrongTextBlockStyle}">
+                        <Hyperlink NavigateUri="https://www.youtube.com/@DEVMASSYN">
+                            DEVMASSYN
+                        </Hyperlink>
+                    </TextBlock>
+
+                    <!--  3 - ProgressBar  -->
+                    <ProgressBar
                         x:Name="DownloadProgressBorder"
-                        Width="100"
-                        Height="100"
-                        Background="LightGray"
-                        IsActive="True" />
-                </StackPanel>
+                        Grid.Row="3"
+                        Width="130"
+                        Margin="15"
+                        IsIndeterminate="True"
+                        ShowError="False"
+                        ShowPaused="False" />
+
+                    <!--  4 - Przycisk Graj  -->
+                    <StackPanel
+                        Grid.Row="4"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                        <Button
+                            x:Name="PlayButton"
+                            Width="100"
+                            Click="playClickButton"
+                            ClickMode="Press"
+                            Content="Zainstaluj"
+                            Style="{StaticResource AccentButtonStyle}" />
+                    </StackPanel>
+
+                    <!--  5 - Przycisk aktualizuj  -->
+                    <StackPanel
+                        Grid.Row="5"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                        <Button
+                            x:Name="CheckUpdateButton"
+                            Width="100"
+                            Margin="0,5,0,0"
+                            Click="updateClickButton"
+                            Content="Aktualizuj"
+                            Style="{StaticResource AccentButtonStyle}" />
+                    </StackPanel>
+
+                    <!--  6 - Przycisk odinstaluj  -->
+                    <StackPanel
+                        Grid.Row="6"
+                        Margin="0,10,0,0"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Bottom">
+
+                        <Button
+                            x:Name="UninstallButton"
+                            Width="100"
+                            Content="Odinstaluj">
+                            <Button.Flyout>
+                                <Flyout x:Name="uninstallFlyout">
+                                    <StackPanel>
+                                        <TextBlock
+                                            Margin="0,0,0,12"
+                                            Style="{ThemeResource BaseTextBlockStyle}"
+                                            Text="Ta aplikacja i powiązane z nią informacje zostaną odinstalowane." />
+                                        <Button
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Click="uninstallClickButton"
+                                            Content="Odinstaluj" />
+                                    </StackPanel>
+                                </Flyout>
+                            </Button.Flyout>
+                        </Button>
+
+                    </StackPanel>
+                </Grid>
             </Grid>
         </StackPanel>
         <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Visible">
@@ -157,8 +200,10 @@
                         HorizontalAlignment="Stretch"
                         Fill="{ThemeResource ControlElevationBorderBrush}" />
                     <TextBlock
-                        Margin="15"
+                        Margin="5"
+                        Padding="5"
                         HorizontalAlignment="Left"
+                        FontSize="14"
                         Style="{ThemeResource CaptionTextBlockStyle}">
                         Witaj w Turbo Ninja 2D!<LineBreak />
                         Twoim zadaniem w tej grze jest zostać potężnym ninją,<LineBreak />
@@ -188,7 +233,7 @@
                         Padding="5"
                         FontSize="14"
                         Style="{ThemeResource CaptionTextBlockStyle}">
-                        • Procesor: Intel Core 2 Quad CPU Q6600 @ 2.40GHz (4 CPUs) / AMD Phenom 9850 Quad-Core Processor (4 CPUs) @ 2.5GHz;<LineBreak />
+                        • CPU: Intel Core 2 Quad CPU Q6600 @ 2.40GHz (4 CPUs) / AMD Phenom 9850 Quad-Core Processor (4 CPUs) @ 2.5GHz;<LineBreak />
                         • Pamięć RAM: 4 GB lub więcej;<LineBreak />
                         • HDD: 1 GB wolnego miejsca na dysku twardym;<LineBreak />
                         • Karta graficzna: zgodna z DirectX 9 i OpenGL 4.1;<LineBreak />

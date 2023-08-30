@@ -1,14 +1,14 @@
-﻿using SGSClient.Controllers;
+﻿using SGSClient.Contracts.Services;
+using SGSClient.Controllers;
+using SGSClient.Helpers;
 using SGSClient.ViewModels;
 using Microsoft.UI.Xaml.Controls;
 using System.IO.Compression;
 using System.Diagnostics;
-using Windows.ApplicationModel.Core;
-using File = System.IO.File;
-using Windows.Storage;
 using System.Windows;
-using SGSClient.Contracts.Services;
-using SGSClient.Helpers;
+using Windows.ApplicationModel.Core;
+using Windows.Storage;
+using File = System.IO.File;
 
 namespace SGSClient.Views
 {

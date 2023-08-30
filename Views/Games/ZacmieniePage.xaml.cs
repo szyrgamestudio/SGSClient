@@ -1,272 +1,232 @@
-﻿using SGSClient.Controllers;
+﻿using SGSClient.Contracts.Services;
+using SGSClient.Controllers;
+using SGSClient.Helpers;
 using SGSClient.ViewModels;
 using Microsoft.UI.Xaml.Controls;
-using System.Net;
-using System.ComponentModel;
 using System.IO.Compression;
 using System.Diagnostics;
+using System.Windows;
 using Windows.ApplicationModel.Core;
-using static System.Net.WebRequestMethods;
-using File = System.IO.File;
 using Windows.Storage;
-using SGSClient.Contracts.Services;
-using SGSClient.Helpers;
+using File = System.IO.File;
 
-namespace SGSClient.Views;
-
-public sealed partial class ZacmieniePage : Page
+namespace SGSClient.Views
 {
-    private readonly string rootPath; //określenie folderu klienta sgs
-    private readonly string gamepath; //okreslenie folderu z gra
-    private readonly string versionFile; //okreslenie pliku zawierającego wersję gry
-    private readonly string gameZip; //okreslenie zipu gry
-    private readonly string gameExe; //okreslenie pliku exe gry
-    private LauncherStatus _status; //status plików gry
-
-    private readonly string gameZipLink = "https://onedrive.live.com/download?cid=6B420D3CABAB13DF&resid=6B420D3CABAB13DF%211263542&authkey=ANexOotXKOPwTJ8";
-    private readonly string gameVersionLink = "https://onedrive.live.com/download?cid=6B420D3CABAB13DF&resid=6B420D3CABAB13DF%211263541&authkey=ABYg-p65DSzLpTU";
-
-    WebClient webClient = new WebClient();
-    internal LauncherStatus Status //co robic wedlug statusu gry
+    public sealed partial class ZacmieniePage : Page
     {
-        get => _status; //okresl status
-        set
+        private readonly string rootPath;
+        private readonly string gamepath;
+        private readonly string versionFile;
+        private readonly string gameZip;
+        private readonly string gameExe;
+        private LauncherStatus _status;
+
+        private readonly string gameZipLink = "https://onedrive.live.com/download?cid=6B420D3CABAB13DF&resid=6B420D3CABAB13DF%211263542&authkey=ANexOotXKOPwTJ8";
+        private readonly string gameVersionLink = "https://onedrive.live.com/download?cid=6B420D3CABAB13DF&resid=6B420D3CABAB13DF%211263541&authkey=ABYg-p65DSzLpTU";
+
+        private HttpClient httpClient = new HttpClient();
+
+        internal LauncherStatus Status
         {
-            _status = value; //ustaw status
-            switch (_status)
+            get => _status;
+            set
             {
-                case LauncherStatus.ready: //jesli gra jest aktualna / gotowa do uruchomienia
-                    //UpdateButton.Content = "Sprawdź aktualizację";
-                    PlayButton.Content = "Graj";
-                    PlayButton.IsEnabled = true;
-                    DownloadProgressBorder.IsActive = false;
-                    //DownloadProgressBar.Visibility = Visibility.Hidden;
-                    UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-                    break;
-                case LauncherStatus.failed: //jesli gra nie zostala dobrze pobrana
-                    //PlayButton.IsEnabled = false;
-                    //UpdateButton.IsEnabled = true;
-                    //UpdateButton.Content = "Spróbuj ponownie";
-                    //if (File.Exists(gameExe))
-                    //{
-                    //    PlayButton.Content = "Graj";
-                    //    UpdateButton.Content = "Sprawdź aktualizację";
-                    //    PlayButton.IsEnabled = true;
-                    //}
-                    //else
-                    //{
-                    //    PlayButton.IsEnabled = false;
-                    //}
-                    //UpdateButton.IsEnabled = true;
-                    UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-                    DownloadProgressBorder.IsActive = false;
-                    //DownloadProgressBar.Visibility = Visibility.Hidden;
-                    break;
-                case LauncherStatus.downloadingGame: //jesli gra jest pobierana z serwera
-                    //PlayButton.Content = "Graj";
-                    //UpdateButton.Content = "Pobieranie gry";
-                    //PlayButton.IsEnabled = false;
-                    //UpdateButton.IsEnabled = false;
-                    UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                    DownloadProgressBorder.IsActive = true;
-                    //DownloadProgressBar.Visibility = Visibility.Visible;
-                    break;
-                case LauncherStatus.downloadingUpdate: //jesli jest pobierany update gry
-                    //PlayButton.Content = "Graj";
-                    //UpdateButton.Content = "Aktualizowanie";
-                    //PlayButton.IsEnabled = false;
-                    //UpdateButton.IsEnabled = false;
-                    //UninstallButton.Visibility = Visibility.Hidden;
-                    DownloadProgressBorder.IsActive = true;
-                    //DownloadProgressBar.Visibility = Visibility.Visible;
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-    public ZacmienieViewModel ViewModel
-    {
-        get;
-    }
-    public ZacmieniePage()
-    {
-        ViewModel = App.GetService<ZacmienieViewModel>();
-        InitializeComponent();
-
-        string location = Path.Combine(ApplicationData.Current.LocalFolder.Path, "LocalState");
-        rootPath = Path.GetDirectoryName(location);
-
-        versionFile = Path.Combine(rootPath, "versionZACMIENIE.txt");
-        gameZip = Path.Combine(rootPath, "Zacmienie.zip");
-        gameExe = Path.Combine(rootPath, "Zacmienie", "Zacmienie.exe");
-        gamepath = Path.Combine(rootPath, "Zacmienie");
-
-        DownloadProgressBorder.IsActive = false;
-        UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-
-        isUpdated();
-    }
-    private void isUpdated()
-    {
-        if (File.Exists(gameExe))
-        {
-            PlayButton.Content = "Graj";
-            UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-        }
-        else
-        {
-            PlayButton.Content = "Zainstaluj";
-            UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-        }
-    }
-    private void checkForUpdates()
-    {
-        if (File.Exists(versionFile))
-        {
-            SGSVersion.Version localVersion = new SGSVersion.Version(File.ReadAllText(versionFile));
-            SGSVersion.Version onlineVersion = new SGSVersion.Version(webClient.DownloadString(gameZipLink)); //PLIK WERSJA GRY
-            try
-            {
-                if (onlineVersion.IsDifferentThan(localVersion))
+                _status = value;
+                switch (_status)
                 {
-                    InstallGameFiles(true, onlineVersion);
-                }
-                else
-                {
-                    Status = LauncherStatus.ready;
+                    case LauncherStatus.pageLauched:
+                        PlayButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                        CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                        UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                        DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+                        break;
+                    case LauncherStatus.readyNoGame:
+                        PlayButton.Content = "Zainstaluj";
+                        PlayButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+                        DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                        UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                        CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                        break;
+                    case LauncherStatus.ready:
+                        PlayButton.Content = "Graj";
+                        PlayButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+                        DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                        UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+                        DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                        File.Delete(gameZip); //delete file zip (free memory is important)
+                        break;
+                    case LauncherStatus.failed:
+                        UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+                        DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                        break;
+                    case LauncherStatus.downloadingGame:
+                        PlayButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                        UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                        DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+                        break;
+                    case LauncherStatus.downloadingUpdate:
+                        PlayButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                        UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                        DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+                        break;
+                    default:
+                        break;
                 }
             }
-            catch (Exception)
-            {
-                Status = LauncherStatus.failed;
-            }
         }
-        else
+
+        public ZacmienieViewModel ViewModel { get; }
+        public ZacmieniePage()
         {
-            InstallGameFiles(false, SGSVersion.Version.zero);
+            ViewModel = App.GetService<ZacmienieViewModel>();
+            InitializeComponent();
+
+            string location = Path.Combine(ApplicationData.Current.LocalFolder.Path, "LocalState");
+            rootPath = Path.GetDirectoryName(location) ?? string.Empty;
+
+            versionFile = Path.Combine(rootPath, "versionZACMIENIE.txt");
+            gameZip = Path.Combine(rootPath, "Zacmienie.zip");
+            gameExe = Path.Combine(rootPath, "Zacmienie", "Zacmienie.exe");
+            gamepath = Path.Combine(rootPath, "Zacmienie");
+
+            Status = LauncherStatus.pageLauched;
+            isUpdated();
         }
-    }
-    private void InstallGameFiles(bool _isUpdate, SGSVersion.Version _onlineVersion)
-    {
-        try
+        private async void isUpdated()
         {
-            if (_isUpdate)
+            if (File.Exists(gameExe))
             {
-                Status = LauncherStatus.downloadingUpdate;
+                SGSVersion.Version localVersion = new SGSVersion.Version(File.ReadAllText(versionFile));
+                SGSVersion.Version onlineVersion = new SGSVersion.Version(await httpClient.GetStringAsync(gameVersionLink));
+
+                if (!onlineVersion.IsDifferentThan(localVersion))
+                {
+                    CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                }
+                Status = LauncherStatus.ready;
             }
             else
             {
-                Status = LauncherStatus.downloadingGame;
-                _onlineVersion = new SGSVersion.Version(webClient.DownloadString(gameVersionLink)); //PLIK WERSJA GRY
-            }
-
-            webClient.DownloadFileCompleted += new AsyncCompletedEventHandler(DownloadGameCompletedCallback);
-            webClient.DownloadFileAsync(new Uri(gameZipLink), gameZip, _onlineVersion);
-
-            webClient.DownloadProgressChanged += (s, e) =>
-            {
-                //DownloadProgressBar.Value = e.ProgressPercentage;
-            };
-            webClient.DownloadFileCompleted += (s, e) =>
-            {
-                DownloadProgressBorder.IsActive = false;
-                //DownloadProgressBar.Visibility = Visibility.Hidden;
-                // any other code to process the file
-            };
-        }
-        catch (Exception)
-        {
-            Status = LauncherStatus.failed;
-        }
-    }//instalacja plików gry
-    private void DownloadGameCompletedCallback(object sender, AsyncCompletedEventArgs e) //zwracanie, że gra jest sciagnieta
-    {
-        try
-        {
-            string onlineVersion = ((SGSVersion.Version)e.UserState).ToString();
-            ZipFile.ExtractToDirectory(gameZip, rootPath, true);
-            //File.Delete(gameZip);
-
-            File.WriteAllText(versionFile, onlineVersion);
-
-            Status = LauncherStatus.ready;
-            App.GetService<IAppNotificationService>().Show(string.Format("ZacmienieNotificationPayload".GetLocalized(), AppContext.BaseDirectory));
-
-        }
-        catch (Exception ex)
-        {
-            Status = LauncherStatus.failed;
-        }
-    }
-    private void playClickButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
-    {
-        if (File.Exists(gameExe))
-        {
-            try
-            {
-                ProcessStartInfo startInfo = new ProcessStartInfo(gameExe);
-                startInfo.WorkingDirectory = Path.Combine(rootPath, "Zacmienie");
-                Process.Start(startInfo);
-                //System.Windows.Application.Current.Shutdown();
-                CoreApplication.Exit();
-            }
-            catch (Exception ex)
-            {
-                //MessageBox.Show($"Error: {ex}");
-                CoreApplication.Exit();
-                //System.Windows.Application.Current.Shutdown();
+                Status = LauncherStatus.readyNoGame;
             }
         }
-        else
+        private async void checkForUpdates()
         {
-            try
+            if (File.Exists(versionFile))
             {
                 SGSVersion.Version localVersion = new SGSVersion.Version(File.ReadAllText(versionFile));
-
-                WebClient webClient = new WebClient();
-                SGSVersion.Version onlineVersion = new SGSVersion.Version(webClient.DownloadString(gameVersionLink));
-
-                if (onlineVersion.IsDifferentThan(localVersion))
+                SGSVersion.Version onlineVersion = new SGSVersion.Version(await httpClient.GetStringAsync(gameVersionLink));
+                try
                 {
-                    checkForUpdates();
+                    if (onlineVersion.IsDifferentThan(localVersion))
+                    {
+                        Status = LauncherStatus.downloadingUpdate;
+                        InstallGameFiles(true, onlineVersion);
+                    }
+                    else
+                    {
+                        Status = LauncherStatus.ready;
+                    }
                 }
-                else if (File.Exists(gameExe) && Status == LauncherStatus.ready)
+                catch (Exception)
                 {
-                    //MessageBox.Show("Posiadasz aktualną wersję gry", "SGSClient", MessageBoxButton.OK, MessageBoxImage.Information);
+                    Status = LauncherStatus.failed;
                 }
-                else if (Status == LauncherStatus.failed)
+            }
+            else
+            {
+                InstallGameFiles(false, SGSVersion.Version.zero);
+            }
+        }
+        private async void InstallGameFiles(bool _isUpdate, SGSVersion.Version _onlineVersion)
+        {
+            try
+            {
+                if (_isUpdate)
                 {
-                    checkForUpdates();
+                    Status = LauncherStatus.downloadingUpdate;
                 }
                 else
                 {
-                    checkForUpdates();
+                    Status = LauncherStatus.downloadingGame;
+                    _onlineVersion = new SGSVersion.Version(await httpClient.GetStringAsync(gameVersionLink));
                 }
+
+                HttpResponseMessage response = await httpClient.GetAsync(new Uri(gameZipLink));
+                response.EnsureSuccessStatusCode();
+
+                using (Stream contentStream = await response.Content.ReadAsStreamAsync())
+                {
+                    using (FileStream fileStream = new FileStream(gameZip, FileMode.Create, FileAccess.Write, FileShare.None))
+                    {
+                        await contentStream.CopyToAsync(fileStream);
+                    }
+                }
+
+                ZipFile.ExtractToDirectory(gameZip, rootPath, true);
+                File.Delete(gameZip);
+
+                File.WriteAllText(versionFile, _onlineVersion.ToString());
+
+                Status = LauncherStatus.ready;
+                App.GetService<IAppNotificationService>().Show(string.Format("ZacmienieNotificationPayload".GetLocalized(), AppContext.BaseDirectory));
             }
             catch (Exception ex)
             {
-                checkForUpdates();
+                MessageBox.Show(ex.Message);
+                Status = LauncherStatus.failed;
             }
-
         }
-    }
-    private void uninstallClickButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
-    {
-        if (Directory.Exists(gamepath))
+
+        #region Buttons
+        private void playClickButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
-            uninstallFlyout.Hide();
-            Directory.Delete(gamepath, true);
-            File.Delete(versionFile);
-            File.Delete(gameZip);
-
-            //USTAWIENIE PRZYCISKÓW DO STANU POCZĄTKOWEGO
-            PlayButton.Content = "Zainstaluj";
-            UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+            if (File.Exists(gameExe))
+            {
+                try
+                {
+                    ProcessStartInfo startInfo = new ProcessStartInfo(gameExe);
+                    startInfo.WorkingDirectory = Path.Combine(rootPath, "Klikacz24H");
+                    Process.Start(startInfo);
+                    CoreApplication.Exit();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+            else
+            {
+                try
+                {
+                    checkForUpdates();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
         }
-        else
+        private void uninstallClickButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
-        }
-    }
+            if (Directory.Exists(gamepath))
+            {
+                uninstallFlyout.Hide();
+                Directory.Delete(gamepath, true);
+                File.Delete(versionFile);
+                File.Delete(gameZip);
 
+                Status = LauncherStatus.readyNoGame;
+            }
+            else
+            {
+                // Handle else case...
+            }
+        }
+        private void updateClickButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+        {
+            checkForUpdates();
+        }
+        #endregion
+    }
 }
