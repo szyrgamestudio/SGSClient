@@ -13,63 +13,142 @@
       <ColumnDefinition Width="Auto"/>
       <ColumnDefinition Width="*"/>
     </Grid.ColumnDefinitions>
-    <StackPanel Grid.Column="0"
-                Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
-                BorderBrush="{ThemeResource ControlElevationBorderBrush}"
-                BorderThickness="0.5"
-                CornerRadius="5"
-                Margin="5"
-                Width="300"
-                Height="Auto">
-      <Grid>
-        <Grid.RowDefinitions>
-          <RowDefinition Height="Auto"/>
-          <RowDefinition Height="40"/>
-          <RowDefinition Height="30"/>
-          <RowDefinition Height="90"/>
-          <RowDefinition Height="Auto"/>
-          <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <Border Grid.Row="0" Padding="0,20,0,0">
-                    <Image Grid.Row="0" Source="/Assets/Games/CastlelineEvil/CastlelineEvil_Logo.png" Width="150" Height="150" HorizontalAlignment="Center"/>
-        </Border>
+        <StackPanel
+            Grid.Column="0"
+            Width="300"
+            Height="Auto"
+            Margin="5"
+            Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}"
+            BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+            BorderThickness="0.5"
+            CornerRadius="5">
+            <Grid HorizontalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <Grid.RowDefinitions>
+                        <!--  0 - Ikona Gry  -->
+                        <RowDefinition Height="Auto" />
+                        <!--  1 - Nazwa Gry  -->
+                        <RowDefinition Height="Auto" />
+                        <!--  2 - Autor  -->
+                        <RowDefinition Height="40px" />
+                        <!--  3 - ProgressBar  -->
+                        <RowDefinition Height="Auto" />
+                        <!--  4 - Przycisk Graj  -->
+                        <RowDefinition Height="Auto" />
+                        <!--  5 - Przycisk aktualizuj  -->
+                        <RowDefinition Height="Auto" />
+                        <!--  6 - Przycisk Odinstaluj  -->
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="1" Style="{StaticResource TitleTextBlockStyle}" Text="Castleline Evil" HorizontalAlignment="Center" FontSize="36">
+                    <!--  0 - Ikona Gry  -->
+                    <Border Grid.Row="0" Padding="0,20,0,0">
+                        <Image
+                            Grid.Row="0"
+                            Width="150"
+                            Height="150"
+                            HorizontalAlignment="Center"
+                            Source="/Assets/Games/CastlelineEvil/CastlelineEvil_Logo.png" />
+                    </Border>
 
-        </TextBlock>
-        <TextBlock Grid.Row="2" Style="{StaticResource BodyStrongTextBlockStyle}" HorizontalAlignment="Center" FontSize="11" Padding="0,10,0,0">
-          <Hyperlink NavigateUri="http://massyn.dev/">
-            DEVMASSYN
-          </Hyperlink>
-        </TextBlock>
-        <Border Grid.Row="3">
-          <RatingControl AutomationProperties.Name="Simple RatingControl" IsClearEnabled="False"
-  IsReadOnly="True" PlaceholderValue="4"/>
-        </Border>
-        <StackPanel Grid.Row="4" HorizontalAlignment="Center" VerticalAlignment="Center">
-          <Button Content="Zainstaluj"
-                  x:Name="PlayButton"
-                  Style="{StaticResource AccentButtonStyle}"
-                  Width="100"
-                  Click="playClickButton"
-                  ClickMode="Press"/>
-          <Button Content="Odinstaluj" x:Name="UninstallButton" Width="100" Margin="0,5,0,0">
-            <Button.Flyout>
-              <Flyout x:Name="uninstallFlyout">
-                <StackPanel>
-                  <TextBlock Style="{ThemeResource BaseTextBlockStyle}" Text="Ta aplikacja i powiązane z nią informacje zostaną odinstalowane." Margin="0,0,0,12" />
-                  <Button Click="uninstallClickButton" Content="Odinstaluj" />
-                </StackPanel>
-              </Flyout>
-            </Button.Flyout>
-          </Button>
+                    <!--  1 - Nazwa Gry  -->
+                    <TextBlock
+                        Grid.Row="1"
+                        HorizontalAlignment="Center"
+                        FontSize="30"
+                        Style="{StaticResource TitleTextBlockStyle}"
+                        Text="Castleline Evil" />
+
+                    <!--  2 - Autor  -->
+                    <TextBlock
+                        Grid.Row="2"
+                        Padding="0,10,0,0"
+                        HorizontalAlignment="Center"
+                        FontSize="11"
+                        Style="{StaticResource BodyStrongTextBlockStyle}">
+                        <Hyperlink NavigateUri="https://www.youtube.com/@DEVMASSYN">
+                            DEVMASSYN
+                        </Hyperlink>
+                    </TextBlock>
+
+                    <!--  3 - ProgressBar  -->
+                    <ProgressBar
+                        x:Name="DownloadProgressBorder"
+                        Grid.Row="3"
+                        Width="130"
+                        Margin="15"
+                        IsIndeterminate="True"
+                        ShowError="False"
+                        ShowPaused="False" />
+
+                    <!--  4 - Przycisk Graj  -->
+                    <StackPanel
+                        Grid.Row="4"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                        <Button
+                            x:Name="PlayButton"
+                            Width="100"
+                            Click="PlayClickButton"
+                            ClickMode="Press"
+                            Content="Zainstaluj"
+                            Style="{StaticResource AccentButtonStyle}" />
+                    </StackPanel>
+
+                    <!--  5 - Przycisk aktualizuj  -->
+                    <StackPanel
+                        Grid.Row="5"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                        <Button
+                            x:Name="CheckUpdateButton"
+                            Width="100"
+                            Margin="0,5,0,0"
+                            Click="UpdateClickButton"
+                            Content="Aktualizuj"
+                            Style="{StaticResource AccentButtonStyle}" />
+                    </StackPanel>
+
+                    <!--  6 - Przycisk odinstaluj  -->
+                    <StackPanel
+                        Grid.Row="6"
+                        Margin="0,10,0,0"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Bottom">
+
+                        <Button
+                            x:Name="UninstallButton"
+                            Width="100"
+                            Content="Odinstaluj">
+                            <Button.Flyout>
+                                <Flyout x:Name="uninstallFlyout">
+                                    <StackPanel>
+                                        <TextBlock
+                                            Margin="0,0,0,12"
+                                            Style="{ThemeResource BaseTextBlockStyle}"
+                                            Text="Ta aplikacja i powiązane z nią informacje zostaną odinstalowane." />
+                                        <Button
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Click="UninstallClickButton"
+                                            Content="Odinstaluj" />
+                                    </StackPanel>
+                                </Flyout>
+                            </Button.Flyout>
+                        </Button>
+
+                    </StackPanel>
+                </Grid>
+            </Grid>
         </StackPanel>
-        <StackPanel Grid.Row="5" HorizontalAlignment="Center" Margin="0,5,0,0">
-          <ProgressRing x:Name="DownloadProgressBorder" IsActive="True" Background="LightGray" Height="100" Width="100"/>
-        </StackPanel>
-      </Grid>
-    </StackPanel>
-    <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Visible">
+        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Visible">
       <Grid>
         <Grid.RowDefinitions>
           <RowDefinition Height="300"/>

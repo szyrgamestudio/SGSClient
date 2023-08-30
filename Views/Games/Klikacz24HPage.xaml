@@ -96,7 +96,7 @@
                         <Button
                             x:Name="PlayButton"
                             Width="100"
-                            Click="playClickButton"
+                            Click="PlayClickButton"
                             ClickMode="Press"
                             Content="Zainstaluj"
                             Style="{StaticResource AccentButtonStyle}" />
@@ -111,7 +111,7 @@
                             x:Name="CheckUpdateButton"
                             Width="100"
                             Margin="0,5,0,0"
-                            Click="updateClickButton"
+                            Click="UpdateClickButton"
                             Content="Aktualizuj"
                             Style="{StaticResource AccentButtonStyle}" />
                     </StackPanel>
@@ -137,7 +137,7 @@
                                         <Button
                                             HorizontalAlignment="Center"
                                             VerticalAlignment="Center"
-                                            Click="uninstallClickButton"
+                                            Click="UninstallClickButton"
                                             Content="Odinstaluj" />
                                     </StackPanel>
                                 </Flyout>

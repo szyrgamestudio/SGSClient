@@ -24,7 +24,7 @@ namespace SGSClient.Views
         private readonly string gameZipLink = "https://onedrive.live.com/download?resid=6B420D3CABAB13DF%211265133&authkey=!AI9RR6Ly3P6NwRY";
         private readonly string gameVersionLink = "https://onedrive.live.com/download?resid=6B420D3CABAB13DF%211265134&authkey=!ABGVvWkxhwhuxJY";
 
-        private HttpClient httpClient = new HttpClient();
+        private readonly HttpClient httpClient = new();
 
         internal LauncherStatus Status
         {
@@ -90,14 +90,14 @@ namespace SGSClient.Views
             gamepath = Path.Combine(rootPath, "Klikacz24H");
 
             Status = LauncherStatus.pageLauched;
-            isUpdated();
+            IsUpdated();
         }
-        private async void isUpdated()
+        private async void IsUpdated()
         {
             if (File.Exists(gameExe))
             {
-                SGSVersion.Version localVersion = new SGSVersion.Version(File.ReadAllText(versionFile));
-                SGSVersion.Version onlineVersion = new SGSVersion.Version(await httpClient.GetStringAsync(gameVersionLink));
+                SGSVersion.Version localVersion = new(File.ReadAllText(versionFile));
+                SGSVersion.Version onlineVersion = new(await httpClient.GetStringAsync(gameVersionLink));
 
                 if (!onlineVersion.IsDifferentThan(localVersion))
                 {
@@ -110,12 +110,12 @@ namespace SGSClient.Views
                 Status = LauncherStatus.readyNoGame;
             }
         }
-        private async void checkForUpdates()
+        private async void CheckForUpdates()
         {
             if (File.Exists(versionFile))
             {
-                SGSVersion.Version localVersion = new SGSVersion.Version(File.ReadAllText(versionFile));
-                SGSVersion.Version onlineVersion = new SGSVersion.Version(await httpClient.GetStringAsync(gameVersionLink));
+                SGSVersion.Version localVersion = new(File.ReadAllText(versionFile));
+                SGSVersion.Version onlineVersion = new(await httpClient.GetStringAsync(gameVersionLink));
                 try
                 {
                     if (onlineVersion.IsDifferentThan(localVersion))
@@ -157,10 +157,8 @@ namespace SGSClient.Views
 
                 using (Stream contentStream = await response.Content.ReadAsStreamAsync())
                 {
-                    using (FileStream fileStream = new FileStream(gameZip, FileMode.Create, FileAccess.Write, FileShare.None))
-                    {
-                        await contentStream.CopyToAsync(fileStream);
-                    }
+                    using FileStream fileStream = new(gameZip, FileMode.Create, FileAccess.Write, FileShare.None);
+                    await contentStream.CopyToAsync(fileStream);
                 }
 
                 ZipFile.ExtractToDirectory(gameZip, rootPath, true);
@@ -179,14 +177,16 @@ namespace SGSClient.Views
         }
 
         #region Buttons
-        private void playClickButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+        private void PlayClickButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
             if (File.Exists(gameExe))
             {
                 try
                 {
-                    ProcessStartInfo startInfo = new ProcessStartInfo(gameExe);
-                    startInfo.WorkingDirectory = Path.Combine(rootPath, "Klikacz24H");
+                    ProcessStartInfo startInfo = new(gameExe)
+                    {
+                        WorkingDirectory = Path.Combine(rootPath, "Klikacz24H")
+                    };
                     Process.Start(startInfo);
                     CoreApplication.Exit();
                 }
@@ -199,7 +199,7 @@ namespace SGSClient.Views
             {
                 try
                 {
-                    checkForUpdates();
+                    CheckForUpdates();
                 }
                 catch (Exception ex)
                 {
@@ -207,7 +207,7 @@ namespace SGSClient.Views
                 }
             }
         }
-        private void uninstallClickButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+        private void UninstallClickButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
             if (Directory.Exists(gamepath))
             {
@@ -223,9 +223,9 @@ namespace SGSClient.Views
                 // Handle else case...
             }
         }
-        private void updateClickButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+        private void UpdateClickButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
-            checkForUpdates();
+            CheckForUpdates();
         }
         #endregion
     }
