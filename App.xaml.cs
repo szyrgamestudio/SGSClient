@@ -89,7 +89,7 @@ public partial class App : Application
             services.AddTransient<SciezkaBohateraViewModel>();
             services.AddTransient<SciezkaBohateraPage>();
             services.AddTransient<StaffOfHellViewModel>();
-            services.AddTransient<StaffOfHellPage>();
+            //services.AddTransient<StaffOfHellPage>();
             services.AddTransient<TurboNinja2DViewModel>();
             services.AddTransient<TurboNinja2DPage>();
             services.AddTransient<CastlelineEvilViewModel>();

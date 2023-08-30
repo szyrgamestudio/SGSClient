@@ -231,7 +231,7 @@
                         Padding="5"
                         FontSize="14"
                         Style="{ThemeResource CaptionTextBlockStyle}">
-                        • Procesor: Intel Core i3-4340;<LineBreak />
+                        • CPU: Intel Core i3-4340;<LineBreak />
                         • Pamięć RAM: 4 GB lub więcej;<LineBreak />
                         • HDD: 1 GB wolnego miejsca na dysku twardym;<LineBreak />
                         • Karta graficzna: zgodna z DirectX 9 i OpenGL 4.1;<LineBreak />

@@ -51,7 +51,6 @@ namespace SGSClient.Views
 
             Status = LauncherStatus.pageLauched;
             IsUpdated();
-
         }
         private async void IsUpdated()
         {

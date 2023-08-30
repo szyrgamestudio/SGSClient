@@ -231,7 +231,7 @@
                         Padding="5"
                         FontSize="14"
                         Style="{ThemeResource CaptionTextBlockStyle}">
-                        • Procesor: Pentium 200 Mhz lub szybszy;<LineBreak />
+                        • CPU: Pentium 200 Mhz lub szybszy;<LineBreak />
                         • Pamięć RAM: 256 MB lub więcej;<LineBreak />
                         • HDD: 10 MB wolnego miejsca na dysku twardym;<LineBreak />
                         • Karta graficzna: zgodna z DirectX 9 i OpenGL 4.1;<LineBreak />

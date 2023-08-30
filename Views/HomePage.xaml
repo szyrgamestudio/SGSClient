@@ -252,7 +252,8 @@
                                         HorizontalContentAlignment="Stretch"
                                         VerticalContentAlignment="Stretch"
                                         AutomationProperties.LabeledBy="{Binding ElementName=TitleText}"
-                                        NavigateUri="http://www.microsoft.com"
+                                        NavigateUri="https://github.com/szyrgamestudio/SGSClient/issues"
+                                        ToolTipService.ToolTip="Alternatywnie, możesz zgłosić wystąpienie błędu, przechodząc na serwer DEVSZYR i tam napisać na właściwym kanale."
                                         CornerRadius="{StaticResource OverlayCornerRadius}">
                                         <Grid
                                             Background="{ThemeResource ControlFillColorDefaultBrush}"

@@ -202,7 +202,7 @@ Zefast, rok 1999.
           <TextBlock Text="Wymagania systemowe" FontSize="20" Padding="5" Margin="5" Style="{ThemeResource BodyStrongTextBlockStyle}"/>
           <Rectangle HorizontalAlignment="Stretch" Fill="{ThemeResource ControlElevationBorderBrush}" Height="1"/>
           <TextBlock FontSize="14" Padding="5" Margin="5" Style="{ThemeResource CaptionTextBlockStyle}">
-            • Procesor: Intel Core 2 Quad CPU Q6600 @ 2.40GHz (4 CPUs) / AMD Phenom 9850 Quad-Core Processor (4 CPUs) @ 2.5GHz;
+            • CPU: Intel Core 2 Quad CPU Q6600 @ 2.40GHz (4 CPUs) / AMD Phenom 9850 Quad-Core Processor (4 CPUs) @ 2.5GHz;
             <LineBreak/>• Pamięć RAM: 4 GB lub więcej;
             <LineBreak/>• HDD: 1 GB wolnego miejsca na dysku twardym;
             <LineBreak/>• Karta graficzna: zgodna z DirectX 9 i OpenGL 4.1;

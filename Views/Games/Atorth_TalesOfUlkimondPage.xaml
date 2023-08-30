@@ -232,7 +232,7 @@
                         Padding="5"
                         FontSize="14"
                         Style="{ThemeResource CaptionTextBlockStyle}">
-                        • Procesor: Intel Core 2 Duo/AMD Athlon (lub lepszy);<LineBreak />
+                        • CPU: Intel Core 2 Duo/AMD Athlon (lub lepszy);<LineBreak />
                         • Pamięć RAM: 2 GB lub więcej;<LineBreak />
                         • HDD: 1 GB wolnego miejsca na dysku twardym;<LineBreak />
                         • Karta graficzna: zgodna z DirectX 9 i OpenGL 4.1;<LineBreak />

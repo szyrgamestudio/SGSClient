@@ -48,7 +48,7 @@ public sealed partial class GamesPage : Page
 
     private void ButtonStaffOfHell_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
-        Frame.Navigate(typeof(StaffOfHellPage), null, new DrillInNavigationTransitionInfo());
+        //Frame.Navigate(typeof(StaffOfHellPage), null, new DrillInNavigationTransitionInfo());
     }
 
     private void ButtonKlikacz24H_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
