@@ -1,16 +1,12 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using CommunityToolkit.WinUI.UI.Animations;
 using SGSClient.ViewModels;
 using Microsoft.UI.Xaml.Media.Animation;
-using Microsoft.UI.Xaml.Navigation;
-using Windows.Storage;
 
 namespace SGSClient.Views;
-
 public sealed partial class HomePage : Page
 {
-    private bool isFirstRun = true;
+    //private readonly bool isFirstRun = true;
     public HomeViewModel ViewModel
     {
         get;
@@ -23,7 +19,7 @@ public sealed partial class HomePage : Page
     }
 
 
-        private void scroller_ViewChanging(object sender, ScrollViewerViewChangingEventArgs e)
+    private void Scroller_ViewChanging(object sender, ScrollViewerViewChangingEventArgs e)
     {
         if (e.FinalView.HorizontalOffset < 1)
         {
@@ -51,7 +47,7 @@ public sealed partial class HomePage : Page
     {
         scroller.ChangeView(scroller.HorizontalOffset + scroller.ViewportWidth, null, null);
     }
-    private void scroller_SizeChanged(object sender, SizeChangedEventArgs e)
+    private void Scroller_SizeChanged(object sender, SizeChangedEventArgs e)
     {
         UpdateScrollButtonsVisibility();
     }

@@ -51,9 +51,9 @@
                         Grid.Row="1"
                         HorizontalScrollBarVisibility="Hidden"
                         HorizontalScrollMode="Enabled"
-                        SizeChanged="scroller_SizeChanged"
+                        SizeChanged="Scroller_SizeChanged"
                         VerticalScrollMode="Disabled"
-                        ViewChanging="scroller_ViewChanging">
+                        ViewChanging="Scroller_ViewChanging">
                         <Grid x:Name="ContentGrid" Margin="36,0,36,0">
                             <StackPanel Orientation="Horizontal" Spacing="12">
                                 <Grid
@@ -205,7 +205,7 @@
                                                     FontSize="18"
                                                     Foreground="{ThemeResource TextFillColorPrimaryBrush}"
                                                     Style="{StaticResource BodyTextBlockStyle}"
-                                                    Text="Dodaj grę." />
+                                                    Text="Dodaj grę" />
                                                 <TextBlock
                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                     Style="{StaticResource CaptionTextBlockStyle}"

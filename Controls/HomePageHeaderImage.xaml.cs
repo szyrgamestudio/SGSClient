@@ -19,14 +19,14 @@ namespace SGSClient.Controls
     public sealed partial class HomePageHeaderImage : UserControl
     {
         private Compositor _compositor;
-        private CompositionLinearGradientBrush _imageGridBottomGradientBrush;
-        private CompositionEffectBrush _imageGridEffectBrush;
-        private ExpressionAnimation _imageGridSizeAnimation;
-        private ExpressionAnimation _bottomGradientStartPointAnimation;
-        private SpriteVisual _imageGridSpriteVisual;
-        private CompositionSurfaceBrush _imageGridSurfaceBrush;
-        private Visual _imageGridVisual;
-        private CompositionVisualSurface _imageGridVisualSurface;
+        private CompositionLinearGradientBrush? _imageGridBottomGradientBrush;
+        private CompositionEffectBrush? _imageGridEffectBrush;
+        private ExpressionAnimation? _imageGridSizeAnimation;
+        private ExpressionAnimation? _bottomGradientStartPointAnimation;
+        private SpriteVisual? _imageGridSpriteVisual;
+        private CompositionSurfaceBrush? _imageGridSurfaceBrush;
+        private Visual? _imageGridVisual;
+        private CompositionVisualSurface? _imageGridVisualSurface;
         private const string GradientSizeKey = "GradientSize";
         public HomePageHeaderImage()
         {
