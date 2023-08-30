@@ -32,46 +32,7 @@ public sealed partial class ShadowSquadPage : Page
         set
         {
             _status = value;
-            switch (_status)
-            {
-                case LauncherStatus.pageLauched:
-                    PlayButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                    CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                    UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                    DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-                    break;
-                case LauncherStatus.readyNoGame:
-                    PlayButton.Content = "Zainstaluj";
-                    PlayButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-                    DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                    UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                    CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                    break;
-                case LauncherStatus.ready:
-                    PlayButton.Content = "Graj";
-                    PlayButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-                    DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                    UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-                    DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                    File.Delete(gameZip); //delete file zip (free memory is important)
-                    break;
-                case LauncherStatus.failed:
-                    UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-                    DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                    break;
-                case LauncherStatus.downloadingGame:
-                    PlayButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                    UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                    DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-                    break;
-                case LauncherStatus.downloadingUpdate:
-                    PlayButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                    UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                    DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-                    break;
-                default:
-                    break;
-            }
+            LauncherStatusHelper.UpdateStatus(PlayButton, CheckUpdateButton, UninstallButton, DownloadProgressBorder, _status, gameZip);
         }
     }
 
@@ -101,11 +62,11 @@ public sealed partial class ShadowSquadPage : Page
             SGSVersion.Version localVersion = new(File.ReadAllText(versionFile));
             SGSVersion.Version onlineVersion = new(await httpClient.GetStringAsync(gameVersionLink));
 
-            if (!onlineVersion.IsDifferentThan(localVersion))
-            {
-                CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-            }
             Status = LauncherStatus.ready;
+            if (onlineVersion.IsDifferentThan(localVersion))
+            {
+                CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+            }
         }
         else
         {
