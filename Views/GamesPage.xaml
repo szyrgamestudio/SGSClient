@@ -389,7 +389,7 @@
                                     Source="/Assets/Games/SciezkaBohatera/Logo.png" />
                                 <TextBlock
                                     Grid.Row="0"
-                                    FontSize="16"
+                                    FontSize="15"
                                     FontWeight="Bold"
                                     Text="Ścieżka Bohatera" />
                                 <TextBlock
