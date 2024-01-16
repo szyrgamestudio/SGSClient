@@ -9,22 +9,27 @@ using System.Windows;
 using Windows.ApplicationModel.Core;
 using Windows.Storage;
 using File = System.IO.File;
+using Microsoft.UI.Xaml.Navigation;
 
 namespace SGSClient.Views
 {
     public sealed partial class ZacmieniePage : Page
     {
-        private readonly string rootPath;
-        private readonly string gamepath;
-        private readonly string versionFile;
-        private readonly string gameZip;
-        private readonly string gameExe;
+        private string? rootPath;
+        private string? gamepath;
+        private string? versionFile;
+        private string? gameZip;
+        private string? gameExe;
         private LauncherStatus _status;
 
-        private readonly string gameZipLink = "https://onedrive.live.com/download?cid=6B420D3CABAB13DF&resid=6B420D3CABAB13DF%211263542&authkey=ANexOotXKOPwTJ8";
-        private readonly string gameVersionLink = "https://onedrive.live.com/download?cid=6B420D3CABAB13DF&resid=6B420D3CABAB13DF%211263541&authkey=ABYg-p65DSzLpTU";
+        /*From appConfig.xml*/
+        private string? gameIdentifier;
+        private string? gameZipLink;
+        private string? gameVersionLink;
+        private string? gamePayloadName;
 
         private readonly HttpClient httpClient = new();
+        ConfigurationManager configManager = new ConfigurationManager("C:\\Users\\mafelt\\source\\repos\\SGSClient\\Config\\appconfig.xml");
 
         internal LauncherStatus Status
         {
@@ -32,32 +37,45 @@ namespace SGSClient.Views
             set
             {
                 _status = value;
-                LauncherStatusHelper.UpdateStatus(PlayButton, CheckUpdateButton, UninstallButton, DownloadProgressBorder, _status, gameZip);
+                LauncherStatusHelper.UpdateStatus(PlayButton, CheckUpdateButton, UninstallButton, DownloadProgressBorder, _status, gameZip ?? "");
             }
         }
 
         public ZacmienieViewModel ViewModel { get; }
-        public ZacmieniePage()
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            ViewModel = App.GetService<ZacmienieViewModel>();
-            InitializeComponent();
+            if (e.Parameter is string parameterString && !string.IsNullOrWhiteSpace(parameterString))
+            {
+                gameIdentifier = parameterString;
+
+                gameZipLink = configManager.GetGameZipLink(gameIdentifier);
+                gameVersionLink = configManager.GetGameVersionLink(gameIdentifier);
+                gamePayloadName = configManager.GetGamePayloadName(gameIdentifier);
+            }
+
+            base.OnNavigatedTo(e);
 
             string location = Path.Combine(ApplicationData.Current.LocalFolder.Path, "LocalState");
             rootPath = Path.GetDirectoryName(location) ?? string.Empty;
 
-            versionFile = Path.Combine(rootPath, "versionZACMIENIE.txt");
-            gameZip = Path.Combine(rootPath, "Zacmienie.zip");
-            gameExe = Path.Combine(rootPath, "Zacmienie", "Zacmienie.exe");
-            gamepath = Path.Combine(rootPath, "Zacmienie");
-
-            Status = LauncherStatus.pageLauched;
+            versionFile = Path.Combine(rootPath, "versionZACMIENIE.txt"); //docelowo lokalny xml, gdzie trzymać bedziemy jaką wersje gry mamy
+            gameZip = Path.Combine(rootPath, $"{gameIdentifier}.zip");
+            gameExe = Path.Combine(rootPath, gameIdentifier ?? "", $"{gameIdentifier}.exe");
+            gamepath = Path.Combine(rootPath, gameIdentifier ?? "");
             IsUpdated();
+        }
+        public ZacmieniePage()
+        {
+            ViewModel = App.GetService<ZacmienieViewModel>();
+            InitializeComponent();
+            Status = LauncherStatus.pageLauched;
         }
         private async void IsUpdated()
         {
             if (File.Exists(gameExe))
             {
-                SGSVersion.Version localVersion = new(File.ReadAllText(versionFile));
+                SGSVersion.Version localVersion = new(File.ReadAllText(versionFile ?? ""));
                 SGSVersion.Version onlineVersion = new(await httpClient.GetStringAsync(gameVersionLink));
 
                 Status = LauncherStatus.ready;
@@ -113,22 +131,53 @@ namespace SGSClient.Views
                     _onlineVersion = new SGSVersion.Version(await httpClient.GetStringAsync(gameVersionLink));
                 }
 
-                HttpResponseMessage response = await httpClient.GetAsync(new Uri(gameZipLink));
+                HttpResponseMessage response = await httpClient.GetAsync(new Uri(gameZipLink ?? ""));
                 response.EnsureSuccessStatusCode();
 
                 using (Stream contentStream = await response.Content.ReadAsStreamAsync())
                 {
-                    using FileStream fileStream = new(gameZip, FileMode.Create, FileAccess.Write, FileShare.None);
-                    await contentStream.CopyToAsync(fileStream);
+                    if (!string.IsNullOrEmpty(gameZip) && !string.IsNullOrEmpty(rootPath))
+                    {
+                        using FileStream fileStream = new(gameZip, FileMode.Create, FileAccess.Write, FileShare.None);
+                        await contentStream.CopyToAsync(fileStream);
+                    }
+                    else
+                    {
+                        // Obsługa przypadku, gdy gameZip lub rootPath jest null
+                        Status = LauncherStatus.failed;
+                        return;
+                    }
                 }
 
-                ZipFile.ExtractToDirectory(gameZip, rootPath, true);
-                File.Delete(gameZip);
+                if (!string.IsNullOrEmpty(gameZip) && !string.IsNullOrEmpty(rootPath))
+                {
+                    ZipFile.ExtractToDirectory(gameZip, rootPath, true);
+                    File.Delete(gameZip);
+                }
+                else
+                {
+                    // Obsługa przypadku, gdy gameZip lub rootPath jest null
+                    Status = LauncherStatus.failed;
+                    return;
+                }
 
-                File.WriteAllText(versionFile, _onlineVersion.ToString());
+                if (!string.IsNullOrEmpty(versionFile))
+                {
+                    File.WriteAllText(versionFile, _onlineVersion.ToString());
+                }
+                else
+                {
+                    // Obsługa przypadku, gdy versionFile jest null
+                    Status = LauncherStatus.failed;
+                    return;
+                }
 
                 Status = LauncherStatus.ready;
-                App.GetService<IAppNotificationService>().Show(string.Format("ZacmienieNotificationPayload".GetLocalized(), AppContext.BaseDirectory));
+                if (gamePayloadName != null)
+                {
+                    string localizedPayloadName = gamePayloadName.GetLocalized();
+                    App.GetService<IAppNotificationService>().Show(string.Format(localizedPayloadName, AppContext.BaseDirectory));
+                }
             }
             catch (Exception ex)
             {
@@ -136,7 +185,6 @@ namespace SGSClient.Views
                 Status = LauncherStatus.failed;
             }
         }
-
         #region Buttons
         private void PlayClickButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
@@ -146,7 +194,7 @@ namespace SGSClient.Views
                 {
                     ProcessStartInfo startInfo = new(gameExe)
                     {
-                        WorkingDirectory = Path.Combine(rootPath, "Zacmienie")
+                        WorkingDirectory = Path.Combine(rootPath ?? "")
                     };
                     Process.Start(startInfo);
                     CoreApplication.Exit();
@@ -174,8 +222,8 @@ namespace SGSClient.Views
             {
                 uninstallFlyout.Hide();
                 Directory.Delete(gamepath, true);
-                File.Delete(versionFile);
-                File.Delete(gameZip);
+                File.Delete(versionFile ?? "");
+                File.Delete(gameZip ?? "");
 
                 Status = LauncherStatus.readyNoGame;
             }

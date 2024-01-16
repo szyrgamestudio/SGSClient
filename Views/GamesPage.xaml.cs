@@ -41,9 +41,14 @@ public sealed partial class GamesPage : Page
         Frame.Navigate(typeof(SciezkaBohateraPage), null, new DrillInNavigationTransitionInfo());
     }
 
+    //private void ButtonZacmienie_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    //{
+    //    Frame.Navigate(typeof(ZacmieniePage), null, new DrillInNavigationTransitionInfo());
+    //}
     private void ButtonZacmienie_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
-        Frame.Navigate(typeof(ZacmieniePage), null, new DrillInNavigationTransitionInfo());
+        //Przekazujemy identyfikator gry "Zacmienie" do strony DoddaniPage
+        Frame.Navigate(typeof(ZacmieniePage), "Zacmienie", new DrillInNavigationTransitionInfo());
     }
 
     private void ButtonStaffOfHell_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
@@ -70,4 +75,5 @@ public sealed partial class GamesPage : Page
     {
         Frame.Navigate(typeof(BlackWhiteJumpPage), null, new DrillInNavigationTransitionInfo());
     }
+
 }

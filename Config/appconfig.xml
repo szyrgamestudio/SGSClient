@@ -1,0 +1,11 @@
+﻿<Configuration>
+  <GameLinks>
+    <Game name="Zacmienie">
+      <GameName>Zacmienie</GameName>
+      <GameVersion>1.0.0</GameVersion>
+      <GamePayloadName>ZacmienieNotificationPayload</GamePayloadName>
+      <GameZipLink>https://onedrive.live.com/download?cid=6B420D3CABAB13DF&amp;resid=6B420D3CABAB13DF%211263542&amp;authkey=ANexOotXKOPwTJ8</GameZipLink>
+      <GameVersionLink>https://onedrive.live.com/download?cid=6B420D3CABAB13DF&amp;resid=6B420D3CABAB13DF%211263541&amp;authkey=ABYg-p65DSzLpTU</GameVersionLink>
+    </Game>
+  </GameLinks>
+</Configuration>
