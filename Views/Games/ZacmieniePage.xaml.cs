@@ -26,7 +26,12 @@ namespace SGSClient.Views
         private string? gameIdentifier;
         private string? gameZipLink;
         private string? gameVersionLink;
+        private string? gameTitle;
+        private string? gameDeveloper;
         private string? gamePayloadName;
+        private string? gameDescription;
+        private string? hardwareRequirements;
+        private string? otherInformations;
 
         private readonly HttpClient httpClient = new();
         ConfigurationManager configManager = new ConfigurationManager("C:\\Users\\mafelt\\source\\repos\\SGSClient\\Config\\appconfig.xml");
@@ -49,9 +54,15 @@ namespace SGSClient.Views
             {
                 gameIdentifier = parameterString;
 
+                gameTitle = configManager.GetGameTitle(gameIdentifier);
                 gameZipLink = configManager.GetGameZipLink(gameIdentifier);
                 gameVersionLink = configManager.GetGameVersionLink(gameIdentifier);
                 gamePayloadName = configManager.GetGamePayloadName(gameIdentifier);
+                gameDescription = configManager.GetGameDescription(gameIdentifier);
+                gameDeveloper = configManager.GetGameDeveloper(gameIdentifier);
+                hardwareRequirements = configManager.GetHardwareRequirements(gameIdentifier);
+                otherInformations = configManager.GetOtherInformations(gameIdentifier);
+
             }
 
             base.OnNavigatedTo(e);
@@ -63,7 +74,17 @@ namespace SGSClient.Views
             gameZip = Path.Combine(rootPath, $"{gameIdentifier}.zip");
             gameExe = Path.Combine(rootPath, gameIdentifier ?? "", $"{gameIdentifier}.exe");
             gamepath = Path.Combine(rootPath, gameIdentifier ?? "");
+            UpdateUI();
             IsUpdated();
+        }
+
+        private void UpdateUI()
+        {
+            GameNameTextBlock.Text = gameTitle ?? "Brak dostępnych informacji.";
+            GameDeveloperTextBlock.Text = gameDeveloper ?? "Brak dostępnych informacji.";
+            GameDescriptionTextBlock.Text = gameDescription ?? "Brak dostępnych informacji.";
+            HardwareRequirementsTextBlock.Text = hardwareRequirements ?? "Brak dostępnych informacji.";
+            OtherInformationsTextBlock.Text = otherInformations ?? "Brak dostępnych informacji.";
         }
         public ZacmieniePage()
         {

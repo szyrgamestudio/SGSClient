@@ -64,7 +64,8 @@
                         HorizontalAlignment="Center"
                         FontSize="30"
                         Style="{StaticResource TitleTextBlockStyle}"
-                        Text="Zaćmienie" />
+                        x:Name="GameNameTextBlock">
+                    </TextBlock>
 
                     <!--  2 - Autor  -->
                     <TextBlock
@@ -72,10 +73,8 @@
                         Padding="0,10,0,0"
                         HorizontalAlignment="Center"
                         FontSize="11"
-                        Style="{StaticResource BodyStrongTextBlockStyle}">
-                        <Hyperlink NavigateUri="https://www.youtube.com/@casthedev-eu7jc/featured">
-                            CasTheDev
-                        </Hyperlink>
+                        Style="{StaticResource BodyStrongTextBlockStyle}"
+                        x:Name="GameDeveloperTextBlock">
                     </TextBlock>
 
                     <!--  3 - ProgressBar  -->
@@ -207,12 +206,9 @@
                         Padding="5"
                         HorizontalAlignment="Left"
                         FontSize="14"
-                        Style="{ThemeResource CaptionTextBlockStyle}">
-                        Nazywam się Urasim. Od 30 lat walczę dla Egiptu. Jestem wojownikiem i gorliwym sługą faraona i bogów.<LineBreak />
-                        Mój pradziadek miał okazję na własne oczy ujrzećzaćmienie słońca. Widział jak zły wąż Apophis atakuje rydwan boga słońca Ra.<LineBreak />
-                        Bogowie stanęli w obronie słońca, próbując odeprzeć atak ęża. Lecz ludność była oszołomiona strachem.<LineBreak />
-                        Jedynie mój pradziadek miał wystarczająco dużo odwagi by stanąc do walki z Apophisem...<LineBreak /><LineBreak />
-                        Jeśli chcesz zapoznać się z dalszą fabułą, pobierz Zaćmienie już teraz!</TextBlock>
+                        Style="{ThemeResource CaptionTextBlockStyle}"
+                        x:Name="GameDescriptionTextBlock">
+                    </TextBlock>
                 </StackPanel>
                 <StackPanel
                     Grid.Row="2"
@@ -235,12 +231,8 @@
                         Margin="5"
                         Padding="5"
                         FontSize="14"
-                        Style="{ThemeResource CaptionTextBlockStyle}">
-                        • CPU: Intel Core i3-4340;<LineBreak />
-                        • Pamięć RAM: 4 GB lub więcej;<LineBreak />
-                        • HDD: 1 GB wolnego miejsca na dysku twardym;<LineBreak />
-                        • Karta graficzna: zgodna z DirectX 9 i OpenGL 4.1;<LineBreak />
-                        • System operacyjny: Microsoft Windows 7, 8, 8.1 i 10 (32-/64-bit).</TextBlock>
+                        Style="{ThemeResource CaptionTextBlockStyle}"
+                        x:Name="HardwareRequirementsTextBlock"></TextBlock>
 
                 </StackPanel>
                 <StackPanel
@@ -264,8 +256,8 @@
                         Margin="5"
                         Padding="5"
                         FontSize="14"
-                        Style="{ThemeResource CaptionTextBlockStyle}">
-                        • Gra została wydana na potrzeby drugiej edycji konkursu na gre widzow organizowanego na serwerze DISCORD DEVSZYR.
+                        Style="{ThemeResource CaptionTextBlockStyle}"
+                        x:Name="OtherInformationsTextBlock">
                     </TextBlock>
                 </StackPanel>
             </Grid>

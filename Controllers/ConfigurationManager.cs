@@ -1,4 +1,6 @@
-﻿using System.Xml.Linq;
+﻿using System;
+using System.Linq;
+using System.Xml.Linq;
 
 namespace SGSClient.Controllers
 {
@@ -23,7 +25,7 @@ namespace SGSClient.Controllers
         private XElement? GetGameElement(string gameName)
         {
             return _configDocument.Descendants("Game")
-                                  .FirstOrDefault(e => e.Element("GameName")?.Value == gameName);
+                                  .FirstOrDefault(e => e.Attribute("name")?.Value == gameName);
         }
 
         private string GetGameProperty(string gameName, string propertyName)
@@ -41,10 +43,14 @@ namespace SGSClient.Controllers
             }
         }
 
-        public string GetGameName(string gameName) => GetGameProperty(gameName, "GameName");
+        public string GetGameTitle(string gameName) => GetGameProperty(gameName, "GameTitle");
         public string GetGameVersion(string gameName) => GetGameProperty(gameName, "GameVersion");
+        public string GetGameDeveloper(string gameName) => GetGameProperty(gameName, "GameDeveloper");
         public string GetGamePayloadName(string gameName) => GetGameProperty(gameName, "GamePayloadName");
         public string GetGameZipLink(string gameName) => GetGameProperty(gameName, "GameZipLink");
         public string GetGameVersionLink(string gameName) => GetGameProperty(gameName, "GameVersionLink");
+        public string GetGameDescription(string gameName) => GetGameProperty(gameName, "GameDescription");
+        public string GetHardwareRequirements(string gameName) => GetGameProperty(gameName, "HardwareRequirements");
+        public string GetOtherInformations(string gameName) => GetGameProperty(gameName, "OtherInformation");
     }
 }

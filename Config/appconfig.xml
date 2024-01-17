@@ -1,11 +1,24 @@
 ﻿<Configuration>
-  <GameLinks>
+  <Games>
     <Game name="Zacmienie">
-      <GameName>Zacmienie</GameName>
+      <GameTitle>Zaćmienie</GameTitle>
       <GameVersion>1.0.0</GameVersion>
+      <GameDeveloper>CasTheDev</GameDeveloper>
       <GamePayloadName>ZacmienieNotificationPayload</GamePayloadName>
       <GameZipLink>https://onedrive.live.com/download?cid=6B420D3CABAB13DF&amp;resid=6B420D3CABAB13DF%211263542&amp;authkey=ANexOotXKOPwTJ8</GameZipLink>
       <GameVersionLink>https://onedrive.live.com/download?cid=6B420D3CABAB13DF&amp;resid=6B420D3CABAB13DF%211263541&amp;authkey=ABYg-p65DSzLpTU</GameVersionLink>
+      <GameDescription>Nazywam się Urasim. Od 30 lat walczę dla Egiptu. Jestem wojownikiem i gorliwym sługą faraona i bogów.
+        &#xD;&#xA;Mój pradziadek miał okazję na własne oczy ujrzeć zaćmienie słońca. Widział jak zły wąż Apophis atakuje rydwan boga słońca Ra. Bogowie stanęli w obronie słońca, próbując odeprzeć atak węża. Lecz ludność była oszołomiona strachem. Jedynie mój pradziadek miał wystarczająco dużo odwagi by stanąc do walki z Apophisem...
+        &#xD;&#xA;Jeśli chcesz zapoznać się z dalszą fabułą, pobierz Zaćmienie już teraz!
+      </GameDescription>
+      <HardwareRequirements>
+        <Processor>• CPU: Intel Core i3-4340;</Processor>
+        <RAM>&#xD;&#xA;• Pamięć RAM: 4 GB lub więcej;</RAM>
+        <HDD>&#xD;&#xA;• HDD: 1 GB wolnego miejsca na dysku twardym;</HDD>
+        <GraphicsCard>&#xD;&#xA;• Karta graficzna: zgodna z DirectX 9 i OpenGL 4.1;</GraphicsCard>
+        <OS>&#xD;&#xA;• System operacyjny: Microsoft Windows 7, 8, 8.1 i 10 (32-/64-bit)</OS>
+      </HardwareRequirements>
+      <OtherInformation>• Gra została wydana na potrzeby drugiej edycji konkursu na gre widzow organizowanego na serwerze DISCORD DEVSZYR.</OtherInformation>
     </Game>
-  </GameLinks>
+  </Games>
 </Configuration>
