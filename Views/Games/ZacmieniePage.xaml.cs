@@ -10,6 +10,8 @@ using Windows.ApplicationModel.Core;
 using Windows.Storage;
 using File = System.IO.File;
 using Microsoft.UI.Xaml.Navigation;
+using System.Xml.Linq;
+using Microsoft.UI.Xaml.Media.Imaging;
 
 namespace SGSClient.Views
 {
@@ -63,6 +65,7 @@ namespace SGSClient.Views
                 hardwareRequirements = configManager.GetHardwareRequirements(gameIdentifier);
                 otherInformations = configManager.GetOtherInformations(gameIdentifier);
 
+                LoadImagesFromXml(gameIdentifier);
             }
 
             base.OnNavigatedTo(e);
@@ -76,6 +79,36 @@ namespace SGSClient.Views
             gamepath = Path.Combine(rootPath, gameIdentifier ?? "");
             UpdateUI();
             IsUpdated();
+        }
+
+        private void LoadImagesFromXml(string gameName)
+        {
+            XElement? gameElement = configManager.GetGameElement(gameName);
+
+            if (gameElement != null)
+            {
+                FlipView? flipView = FindName("GameGallery") as FlipView;
+
+                if (flipView != null)
+                {
+                    flipView.Items.Clear();
+                    var galleryImagesElement = gameElement.Element("GalleryImages");
+
+                    if (galleryImagesElement != null)
+                    {
+                        var imageElements = galleryImagesElement.Elements("GalleryImage");
+
+                        foreach (var imageElement in imageElements)
+                        {
+                            string imagePath = imageElement.Value;
+                            Uri imageUri = new Uri("ms-appx:///" + imagePath);
+                            Image image = new Image { Source = new BitmapImage(imageUri) };
+
+                            flipView.Items.Add(image);
+                        }
+                    }
+                }
+            }
         }
 
         private void UpdateUI()

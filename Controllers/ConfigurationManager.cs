@@ -22,7 +22,7 @@ namespace SGSClient.Controllers
             }
         }
 
-        private XElement? GetGameElement(string gameName)
+        public XElement? GetGameElement(string gameName)
         {
             return _configDocument.Descendants("Game")
                                   .FirstOrDefault(e => e.Attribute("name")?.Value == gameName);
