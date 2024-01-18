@@ -375,4 +375,7 @@
 &lt;/toast&gt;</value>
     <comment>Zainstalowano Zaćmienie</comment>
   </data>
+  <data name="Shell_GameBase.Content" xml:space="preserve">
+    <value>GameBase</value>
+  </data>
 </root>

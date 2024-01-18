@@ -19,6 +19,9 @@
         <OS>&#xD;&#xA;• System operacyjny: Microsoft Windows 7, 8, 8.1 i 10 (32-/64-bit)</OS>
       </HardwareRequirements>
       <OtherInformation>• Gra została wydana na potrzeby drugiej edycji konkursu na gre widzow organizowanego na serwerze DISCORD DEVSZYR.</OtherInformation>
+      <LogoImages>
+        <LogoImage>Assets/Games/Zacmienie/Zacmienie_Logo.png</LogoImage>
+      </LogoImages>
       <GalleryImages>
         <GalleryImage>Assets/Games/Zacmienie/Gallery_1.png</GalleryImage>
         <GalleryImage>Assets/Games/Zacmienie/Gallery_2.png</GalleryImage>

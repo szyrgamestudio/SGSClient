@@ -29,6 +29,7 @@ public class PageService : IPageService
         Configure<BlackWhiteJumpViewModel, BlackWhiteJumpPage>();
         Configure<StarmanSystemViewModel, StarmanSystemPage>();
         Configure<ShadowSquadViewModel, ShadowSquadPage>();
+        Configure<GameBaseViewModel, GameBasePage>();
     }
 
     public Type GetPageType(string key)

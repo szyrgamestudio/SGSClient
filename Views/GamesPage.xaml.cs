@@ -48,7 +48,7 @@ public sealed partial class GamesPage : Page
     private void ButtonZacmienie_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
         //Przekazujemy identyfikator gry "Zacmienie" do strony DoddaniPage
-        Frame.Navigate(typeof(ZacmieniePage), "Zacmienie", new DrillInNavigationTransitionInfo());
+        Frame.Navigate(typeof(GameBasePage), "Zacmienie", new DrillInNavigationTransitionInfo());
     }
 
     private void ButtonStaffOfHell_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)

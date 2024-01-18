@@ -74,6 +74,8 @@ public partial class App : Application
             services.AddSingleton<IFileService, FileService>();
 
             // Views and ViewModels
+            services.AddTransient<GameBaseViewModel>();
+            services.AddTransient<GameBasePage>();
             services.AddTransient<ShadowSquadViewModel>();
             services.AddTransient<ShadowSquadPage>();
             services.AddTransient<StarmanSystemViewModel>();
