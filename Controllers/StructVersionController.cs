@@ -12,9 +12,7 @@ public class SGSVersion
     {
         internal static Version zero = new Version(0, 0, 0);
 
-        private short major;
-        private short minor;
-        private short subMinor;
+        private short major, minor, subMinor;
 
         internal Version(short _major, short _minor, short _subMinor)
         {
