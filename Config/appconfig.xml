@@ -1,8 +1,35 @@
 ﻿<Configuration>
   <Games>
+    <Game name="TurboNinja2D">
+      <GameTitle>Turbo Ninja 2D</GameTitle>
+      <GameVersion>1.2.0</GameVersion>
+      <GameDeveloper>DEVMASSYN</GameDeveloper>
+      <GamePayloadName>TurboNinja2DNotificationPayload</GamePayloadName>
+      <GameZipLink>https://github.com/devmassyn/Turbo-Ninja-2D/releases/latest/download/TurboNinja2D.zip</GameZipLink>
+      <GameVersionLink>https://github.com/devmassyn/Turbo-Ninja-2D/releases/latest/download/versionTURBONINJA2D.txt</GameVersionLink>>
+      <GameDescription>Witaj w Turbo Ninja 2D!&#xD;&#xA;Twoim zadaniem w tej grze jest zostać potężnym ninją,&#xD;&#xA;a co za tym idzie pokonać wielkiego mistrza ninja Żeralta z Piwii!&#xD;&#xA;Powodzenia!&#xD;&#xA;&#xD;&#xA;#adventure #platformer #fishing #AAA
+      </GameDescription>
+      <HardwareRequirements>
+        <Processor>• CPU: Intel Core 2 Quad CPU Q6600 @ 2.40GHz (4 CPUs) / AMD Phenom 9850 Quad-Core Processor (4 CPUs) @ 2.5GHz;</Processor>
+        <RAM>&#xD;&#xA;• Pamięć RAM: 4 GB lub więcej;</RAM>
+        <HDD>&#xD;&#xA;• HDD: 1 GB wolnego miejsca na dysku twardym;</HDD>
+        <GraphicsCard>&#xD;&#xA;• Karta graficzna: zgodna z DirectX 9 i OpenGL 4.1;</GraphicsCard>
+        <OS>&#xD;&#xA;• System operacyjny: Microsoft Windows 7, 8, 8.1 i 10 (32-/64-bit)</OS>
+      </HardwareRequirements>
+      <OtherInformation></OtherInformation>
+      <LogoImages>
+        <LogoImage>Assets/Games/TurboNinja2D/TurboNinja2D_Logo.png</LogoImage>
+      </LogoImages>
+      <GalleryImages>
+        <GalleryImage>Assets/Games/TurboNinja2D/Gallery_1.png</GalleryImage>
+        <GalleryImage>Assets/Games/TurboNinja2D/Gallery_2.png</GalleryImage>
+        <GalleryImage>Assets/Games/TurboNinja2D/Gallery_3.png</GalleryImage>
+      </GalleryImages>
+    </Game>
+
     <Game name="Zacmienie">
       <GameTitle>Zaćmienie</GameTitle>
-      <GameVersion>1.3.0</GameVersion>
+      <GameVersion>1.2.0</GameVersion>
       <GameDeveloper>CasTheDev</GameDeveloper>
       <GamePayloadName>ZacmienieNotificationPayload</GamePayloadName>
       <GameZipLink>https://onedrive.live.com/download?cid=6B420D3CABAB13DF&amp;resid=6B420D3CABAB13DF%211263542&amp;authkey=ANexOotXKOPwTJ8</GameZipLink>

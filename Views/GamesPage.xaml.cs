@@ -33,7 +33,7 @@ public sealed partial class GamesPage : Page
 
     private void ButtonTurboNinja2D_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
-        Frame.Navigate(typeof(TurboNinja2DPage), null, new DrillInNavigationTransitionInfo());
+        Frame.Navigate(typeof(GameBasePage), "TurboNinja2D", new DrillInNavigationTransitionInfo());
     }
 
     private void ButtonSciezkaBohatera_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
