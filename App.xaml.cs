@@ -86,14 +86,9 @@ public partial class App : Application
             services.AddTransient<Klikacz24HPage>();
             services.AddTransient<UploadGameViewModel>();
             services.AddTransient<UploadGamePage>();
-            services.AddTransient<ZacmienieViewModel>();
-            services.AddTransient<ZacmieniePage>();
             services.AddTransient<SciezkaBohateraViewModel>();
             services.AddTransient<SciezkaBohateraPage>();
             services.AddTransient<StaffOfHellViewModel>();
-            //services.AddTransient<StaffOfHellPage>();
-            services.AddTransient<TurboNinja2DViewModel>();
-            services.AddTransient<TurboNinja2DPage>();
             services.AddTransient<CastlelineEvilViewModel>();
             services.AddTransient<CastlelineEvilPage>();
             services.AddTransient<DoddaniViewModel>();

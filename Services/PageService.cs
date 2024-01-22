@@ -20,10 +20,8 @@ public class PageService : IPageService
         Configure<Atorth_TalesOfUlkimondViewModel, Atorth_TalesOfUlkimondPage>();
         Configure<DoddaniViewModel, DoddaniPage>();
         Configure<CastlelineEvilViewModel, CastlelineEvilPage>();
-        Configure<TurboNinja2DViewModel, TurboNinja2DPage>();
         //Configure<StaffOfHellViewModel, StaffOfHellPage>();
         Configure<SciezkaBohateraViewModel, SciezkaBohateraPage>();
-        Configure<ZacmienieViewModel, ZacmieniePage>();
         Configure<UploadGameViewModel, UploadGamePage>();
         Configure<Klikacz24HViewModel, Klikacz24HPage>();
         Configure<BlackWhiteJumpViewModel, BlackWhiteJumpPage>();

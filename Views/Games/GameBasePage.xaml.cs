@@ -36,7 +36,7 @@ namespace SGSClient.Views
         private string? otherInformations;
 
         private readonly HttpClient httpClient = new();
-        ConfigurationManager configManager = new ConfigurationManager("C:\\Users\\mafelt\\source\\repos\\SGSClient\\Config\\appconfig.xml");
+        ConfigurationManager configManager = new ConfigurationManager("D:\\DEVELOPMENT\\Repozytoria\\SGSClient\\Config\\appconfig.xml");
         internal LauncherStatus Status
         {
             get => _status;
@@ -167,7 +167,17 @@ namespace SGSClient.Views
             GameDeveloperTextBlock.Text = gameDeveloper ?? "Brak dostępnych informacji.";
             GameDescriptionTextBlock.Text = gameDescription ?? "Brak dostępnych informacji.";
             HardwareRequirementsTextBlock.Text = hardwareRequirements ?? "Brak dostępnych informacji.";
-            OtherInformationsTextBlock.Text = otherInformations ?? "Brak dostępnych informacji.";
+            // Ukryj OtherInformationsTextBlock, jeśli otherInformations jest puste
+            if (string.IsNullOrWhiteSpace(otherInformations))
+            {
+                OtherInformationsTextBlock.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                OtherInformationsStackPanel.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+            }
+            else
+            {
+                OtherInformationsTextBlock.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+                OtherInformationsTextBlock.Text = otherInformations;
+            }
         }
         #endregion
 
@@ -182,8 +192,21 @@ namespace SGSClient.Views
         {
             try
             {
+                XDocument versionXml;
+
+                // Sprawdź, czy plik "versions.xml" istnieje
+                if (File.Exists(Path.Combine(rootPath ?? "", "versions.xml")))
+                {
+                    // Jeśli istnieje, załaduj go
+                    versionXml = XDocument.Load(Path.Combine(rootPath ?? "", "versions.xml"));
+                }
+                else
+                {
+                    // Jeśli nie istnieje, utwórz nowy dokument XML z korzeniem "Versions"
+                    versionXml = new XDocument(new XElement("Versions"));
+                }
+
                 // Odczytaj lokalną wersję z pliku "versions.xml"
-                XDocument versionXml = XDocument.Load(Path.Combine(rootPath ?? "", "versions.xml"));
                 XElement? gameVersionElement = versionXml.Root?.Element(gameIdentifier);
 
                 SGSVersion.Version localVersion;
@@ -200,6 +223,10 @@ namespace SGSClient.Views
                     versionXml.Save(Path.Combine(rootPath ?? "", "versions.xml"));
 
                     localVersion = new SGSVersion.Version("0.0.0.0");
+
+                    // Jeśli brak wersji, ustaw Status na readyNoGame
+                    Status = LauncherStatus.readyNoGame;
+                    return;
                 }
 
                 // Pobierz onlineVersion z pliku "appConfig.xml"

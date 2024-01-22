@@ -1,4 +1,5 @@
 ﻿using SGSClient.Helpers;
+
 using Windows.UI.ViewManagement;
 
 namespace SGSClient;

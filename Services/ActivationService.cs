@@ -1,9 +1,9 @@
-﻿using SGSClient.Activation;
+﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+
+using SGSClient.Activation;
 using SGSClient.Contracts.Services;
 using SGSClient.Views;
-
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 
 namespace SGSClient.Services;
 

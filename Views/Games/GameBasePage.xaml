@@ -179,10 +179,6 @@
               Margin="5"
               HorizontalAlignment="Left"
               x:Name="GameGallery">
-            <!--<Image AutomationProperties.Name="Gallery_1" Source="/Assets/Games/Zacmienie/Gallery_1.png" />
-                        <Image AutomationProperties.Name="Gallery_2" Source="/Assets/Games/Zacmienie/Gallery_2.png" />
-                        <Image AutomationProperties.Name="Gallery_3" Source="/Assets/Games/Zacmienie/Gallery_3.png" />
-                        <Image AutomationProperties.Name="Gallery_4" Source="/Assets/Games/Zacmienie/Gallery_4.png" />-->
           </FlipView>
         </StackPanel>
         <StackPanel
@@ -242,13 +238,15 @@
             Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
             BorderBrush="{ThemeResource ControlElevationBorderBrush}"
             BorderThickness="0.5"
-            CornerRadius="5">
+            CornerRadius="5"
+            x:Name="OtherInformationsStackPanel">
           <TextBlock
               Margin="5"
               Padding="5"
               FontSize="20"
               Style="{ThemeResource BodyStrongTextBlockStyle}"
-              Text="Pozostałe informacje" />
+              Text="Pozostałe informacje"
+              />
           <Rectangle
               Height="1"
               HorizontalAlignment="Stretch"
