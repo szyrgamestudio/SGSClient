@@ -227,7 +227,7 @@
   <data name="Shell_UploadGame.Content" xml:space="preserve">
     <value>Formularz przesłania gry</value>
   </data>
-  <data name="AtorthNotificationPayload" xml:space="preserve">
+  <data name="AtorhTalesOfUlkimondNotificationPayload" xml:space="preserve">
     <value>&lt;toast launch="AtorthNotificationPayload"&gt;
     &lt;visual&gt;
         &lt;binding template='ToastGeneric'&gt;

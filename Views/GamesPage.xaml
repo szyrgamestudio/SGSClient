@@ -50,7 +50,7 @@
                                 <Image
                                     Margin="14"
                                     VerticalAlignment="Center"
-                                    Source="/Assets/Games/Atorth/Atorth_Logo.png" />
+                                    Source="/Assets/Games/AtorthTalesOfUlkimond/Atorth_Logo.png" />
                                 <TextBlock
                                     Grid.Row="0"
                                     FontSize="16"

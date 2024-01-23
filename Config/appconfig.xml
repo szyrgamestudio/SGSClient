@@ -1,5 +1,32 @@
 ﻿<Configuration>
   <Games>
+    <Game name="AtorthTalesOfUlkimond">
+      <GameTitle>Atorth: Tales of Ulkimond</GameTitle>
+      <GameVersion>1.0.5</GameVersion>
+      <GameDeveloper>SzyrGameStudio</GameDeveloper>
+      <GamePayloadName>AtorhTalesOfUlkimondNotificationPayload</GamePayloadName>
+      <GameZipLink>https://github.com/szyrgamestudio/ATORTH-Tales-Of-Ulkimond/releases/latest/download/AtorthTalesOfUlkimond.zip</GameZipLink>
+      <GameVersionLink>https://github.com/szyrgamestudio/ATORTH-Tales-Of-Ulkimond/releases/latest/download/versionATH.txt</GameVersionLink>
+      <GameDescription>Od stuleci trwa wojna między czterema rasami.
+        &#xA;Przy granicach miast pobojowiska spływały krwią wielu niewinnych a władcy zmuszali ludność do ciężkiej pracy. Wrogów zabierano do niewoli i wykorzystywano w ciężkich fizycznych pracach. Całym światem zawładnął pieniądz oraz pragnienie władzy.
+        &#xA;Jednak nie zawsze tak było...
+      </GameDescription>
+      <HardwareRequirements>
+        <Processor>• CPU: Intel Core 2 Duo/AMD Athlon (lub lepszy);</Processor>
+        <RAM>&#xD;&#xA;• Pamięć RAM: 2 GB lub więcej;</RAM>
+        <HDD>&#xD;&#xA;• HDD: 1 GB wolnego miejsca na dysku twardym;</HDD>
+        <GraphicsCard>&#xD;&#xA;• Karta graficzna: zgodna z DirectX 9 i OpenGL 4.1;</GraphicsCard>
+        <OS>&#xD;&#xA;• System operacyjny: Microsoft Windows 7, 8, 8.1 i 10 (32-/64-bit)</OS>
+      </HardwareRequirements>
+      <OtherInformation/>
+      <LogoImages>
+        <LogoImage>Assets/Games/AtorthTalesOfUlkimond/Atorth_Logo.png</LogoImage>
+      </LogoImages>
+      <GalleryImages>
+        <GalleryImage>Assets/Games/AtorthTalesOfUlkimond/Gallery_1.png</GalleryImage>
+        <GalleryImage>Assets/Games/AtorthTalesOfUlkimond/Gallery_2.png</GalleryImage>
+      </GalleryImages>
+    </Game>
     <Game name="TurboNinja2D">
       <GameTitle>Turbo Ninja 2D</GameTitle>
       <GameVersion>1.2.0</GameVersion>
@@ -26,7 +53,6 @@
         <GalleryImage>Assets/Games/TurboNinja2D/Gallery_3.png</GalleryImage>
       </GalleryImages>
     </Game>
-
     <Game name="Zacmienie">
       <GameTitle>Zaćmienie</GameTitle>
       <GameVersion>1.2.0</GameVersion>

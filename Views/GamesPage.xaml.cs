@@ -18,7 +18,7 @@ public sealed partial class GamesPage : Page
 
     private void ButtonAtorth_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
-        Frame.Navigate(typeof(Atorth_TalesOfUlkimondPage), null, new DrillInNavigationTransitionInfo());
+        Frame.Navigate(typeof(GameBasePage), "AtorthTalesOfUlkimond", new DrillInNavigationTransitionInfo());
     }
 
     private void ButtonDoddani_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
