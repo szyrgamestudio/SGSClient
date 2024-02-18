@@ -16,17 +16,8 @@ public class PageService : IPageService
     {
         Configure<HomeViewModel, HomePage>();
         Configure<GamesViewModel, GamesPage>();
-        Configure<SettingsViewModel, SettingsPage>();
-        Configure<Atorth_TalesOfUlkimondViewModel, Atorth_TalesOfUlkimondPage>();
-        Configure<DoddaniViewModel, DoddaniPage>();
-        Configure<CastlelineEvilViewModel, CastlelineEvilPage>();
-        //Configure<StaffOfHellViewModel, StaffOfHellPage>();
-        Configure<SciezkaBohateraViewModel, SciezkaBohateraPage>();
         Configure<UploadGameViewModel, UploadGamePage>();
-        Configure<Klikacz24HViewModel, Klikacz24HPage>();
-        Configure<BlackWhiteJumpViewModel, BlackWhiteJumpPage>();
-        Configure<StarmanSystemViewModel, StarmanSystemPage>();
-        Configure<ShadowSquadViewModel, ShadowSquadPage>();
+        Configure<SettingsViewModel, SettingsPage>();
         Configure<GameBaseViewModel, GameBasePage>();
     }
 

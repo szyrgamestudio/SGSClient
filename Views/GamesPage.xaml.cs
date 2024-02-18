@@ -1,19 +1,60 @@
-﻿using Microsoft.UI.Xaml.Controls;
+﻿using Microsoft.UI.Text;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
+using Microsoft.UI.Xaml.Media.Imaging;
+using SGSClient.Controllers;
 using SGSClient.ViewModels;
+using System.Windows.Documents.DocumentStructures;
+using System.Xml;
+using Windows.Gaming.Input;
 namespace SGSClient.Views;
 
 public sealed partial class GamesPage : Page
 {
-    public GamesViewModel ViewModel
-    {
-        get;
-    }
+    private readonly ConfigurationManager configManager;
+
+    public GamesViewModel ViewModel { get; }
 
     public GamesPage()
     {
-        ViewModel = App.GetService<GamesViewModel>();
-        InitializeComponent();
+        this.InitializeComponent();
+        configManager = new ConfigurationManager("D:\\DEVELOPMENT\\Repozytoria\\SGSClient\\Config\\appconfig.xml");
+        LoadGamesFromXml();
+    }
+
+    private void LoadGamesFromXml()
+    {
+        XmlDocument xmlDoc = new XmlDocument();
+        xmlDoc.Load("D:\\DEVELOPMENT\\Repozytoria\\SGSClient\\Config\\appconfig.xml");
+
+        List<GamesViewModel> gamesList = new List<GamesViewModel>();
+
+        foreach (XmlNode node in xmlDoc.SelectNodes("//Game"))
+        {
+            if (node is XmlElement element)
+            {
+                gamesList.Add(new GamesViewModel(element));
+            }
+        }
+
+        GamesItemsControl.ItemsSource = gamesList;
+    }
+    private void ButtonGame_Click(object sender, RoutedEventArgs e)
+    {
+        // Tutaj umieść kod obsługujący kliknięcie przycisku
+        // Możesz używać obiektu sender do uzyskania dostępu do informacji na temat klikniętego przycisku
+
+        // Przykład użycia sender:
+        if (sender is Button clickedButton)
+        {
+            string gameName = clickedButton.Tag?.ToString();
+            if (!string.IsNullOrEmpty(gameName))
+            {
+                Frame.Navigate(typeof(GameBasePage), gameName, new DrillInNavigationTransitionInfo());
+            }
+        }
     }
 
     private void ButtonAtorth_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
@@ -23,57 +64,7 @@ public sealed partial class GamesPage : Page
 
     private void ButtonDoddani_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
-        Frame.Navigate(typeof(DoddaniPage), null, new DrillInNavigationTransitionInfo());
-    }
-
-    private void ButtonCastlelineEvil_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
-    {
-        Frame.Navigate(typeof(CastlelineEvilPage), null, new DrillInNavigationTransitionInfo());
-    }
-
-    private void ButtonTurboNinja2D_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
-    {
-        Frame.Navigate(typeof(GameBasePage), "TurboNinja2D", new DrillInNavigationTransitionInfo());
-    }
-
-    private void ButtonSciezkaBohatera_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
-    {
-        Frame.Navigate(typeof(SciezkaBohateraPage), null, new DrillInNavigationTransitionInfo());
-    }
-
-    //private void ButtonZacmienie_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
-    //{
-    //    Frame.Navigate(typeof(ZacmieniePage), null, new DrillInNavigationTransitionInfo());
-    //}
-    private void ButtonZacmienie_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
-    {
-        //Przekazujemy identyfikator gry "Zacmienie" do strony DoddaniPage
-        Frame.Navigate(typeof(GameBasePage), "Zacmienie", new DrillInNavigationTransitionInfo());
-    }
-
-    private void ButtonStaffOfHell_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
-    {
-        //Frame.Navigate(typeof(StaffOfHellPage), null, new DrillInNavigationTransitionInfo());
-    }
-
-    private void ButtonKlikacz24H_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
-    {
-        Frame.Navigate(typeof(Klikacz24HPage), null, new DrillInNavigationTransitionInfo());
-    }
-
-    private void ButtonShadowSquad_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
-    {
-        Frame.Navigate(typeof(ShadowSquadPage), null, new DrillInNavigationTransitionInfo());
-    }
-
-    private void ButtonStarmanSystem_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
-    {
-        Frame.Navigate(typeof(StarmanSystemPage), null, new DrillInNavigationTransitionInfo());
-    }
-
-    private void ButtonBlackWhiteJump_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
-    {
-        Frame.Navigate(typeof(BlackWhiteJumpPage), null, new DrillInNavigationTransitionInfo());
+         Frame.Navigate(typeof(GameBasePage), "Doddani", new DrillInNavigationTransitionInfo());
     }
 
 }

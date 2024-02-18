@@ -47,6 +47,7 @@ namespace SGSClient.Controllers
         public string GetGameVersion(string gameName) => GetGameProperty(gameName, "GameVersion");
         public string GetGameDeveloper(string gameName) => GetGameProperty(gameName, "GameDeveloper");
         public string GetGamePayloadName(string gameName) => GetGameProperty(gameName, "GamePayloadName");
+        public string GetGameExeName(string gameName) => GetGameProperty(gameName, "GameExe");
         public string GetGameZipLink(string gameName) => GetGameProperty(gameName, "GameZipLink");
         public string GetGameVersionLink(string gameName) => GetGameProperty(gameName, "GameVersionLink");
         public string GetGameDescription(string gameName) => GetGameProperty(gameName, "GameDescription");

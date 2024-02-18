@@ -37,7 +37,12 @@
     <UseWindowsForms>False</UseWindowsForms>
   </PropertyGroup>
   <ItemGroup>
+    <Content Remove="Assets\Games\AtorthTalesOfUlkimond\Logo.png" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="Assets\GalleryHeaderImage.png" />
+    <None Remove="Assets\Games\AtorthTalesOfUlkimond\Atorth_Logo - kopiować.png" />
+    <None Remove="Assets\Games\Zacmienie\Zacmienie_Logo - kopiować.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -99,6 +104,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Assets\Games\AtorthTalesOfUlkimond\Logo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Update="Assets\Games\Klikacz24H\Gallery_1.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -108,17 +119,6 @@
     <Content Update="Assets\Games\Klikacz24H\Logo.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="Views\Games\BlackWhiteJumpPage.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="Views\Games\Klikacz24HPage.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   
   <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">

@@ -76,25 +76,8 @@ public partial class App : Application
             // Views and ViewModels
             services.AddTransient<GameBaseViewModel>();
             services.AddTransient<GameBasePage>();
-            services.AddTransient<ShadowSquadViewModel>();
-            services.AddTransient<ShadowSquadPage>();
-            services.AddTransient<StarmanSystemViewModel>();
-            services.AddTransient<StarmanSystemPage>();
-            services.AddTransient<BlackWhiteJumpViewModel>();
-            services.AddTransient<BlackWhiteJumpPage>();
-            services.AddTransient<Klikacz24HViewModel>();
-            services.AddTransient<Klikacz24HPage>();
             services.AddTransient<UploadGameViewModel>();
             services.AddTransient<UploadGamePage>();
-            services.AddTransient<SciezkaBohateraViewModel>();
-            services.AddTransient<SciezkaBohateraPage>();
-            services.AddTransient<StaffOfHellViewModel>();
-            services.AddTransient<CastlelineEvilViewModel>();
-            services.AddTransient<CastlelineEvilPage>();
-            services.AddTransient<DoddaniViewModel>();
-            services.AddTransient<DoddaniPage>();
-            services.AddTransient<Atorth_TalesOfUlkimondViewModel>();
-            services.AddTransient<Atorth_TalesOfUlkimondPage>();
             services.AddTransient<SettingsViewModel>();
             services.AddTransient<SettingsPage>();
             services.AddTransient<GamesViewModel>();

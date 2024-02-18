@@ -4,6 +4,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:Layout="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
     mc:Ignorable="d">
 
     <Grid>
@@ -23,9 +25,8 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <!--<InfoBar IsOpen="True" Margin="0,40,0,0" IsClosable="False" Severity="Error" Title="Uwaga" Message="Używasz wersję testową SGSClienta. Prosimy o zgłaszanie błedów na adres kontakt@szyrgamestudio.com." />-->
+                    <InfoBar IsOpen="True" Margin="0,40,0,0" IsClosable="False" Severity="Error" Title="Uwaga" Message="Używasz wersję testową SGSClienta. Prosimy o zgłaszanie błedów na adres kontakt@szyrgamestudio.com."/>
 
                     <TextBlock
                         Grid.Row="0"
@@ -82,7 +83,7 @@
                                 <Image
                                     Margin="14"
                                     VerticalAlignment="Center"
-                                    Source="/Assets/Games/Doddani/Doddani_Logo.png" />
+                                    Source="/Assets/Games/Doddani/Logo.png" />
                                 <TextBlock
                                     Grid.Row="0"
                                     FontSize="16"
@@ -114,373 +115,48 @@
                             Grid.Row="0"
                             FontSize="16"
                             FontWeight="Bold"
-                            Text="Pozostałe gry" />
+                            Text="Wszystkie gry" />
                     </Grid>
 
-                    <!--#region PASEK Z GRAMI POZIOMY-->
-                    <Grid Grid.Row="4" Margin="0,12,0,12">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
+                    <ItemsControl x:Name="GamesItemsControl" Grid.Row="4" Margin="0,12,0,12">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <controls:WrapPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Click="ButtonGame_Click" Tag="{Binding GameName}" Margin="0,0,4,4">
+                                    <StackPanel>
+                                        <Image
+                        Width="100"
+                        Height="100"
+                        Margin="14"
+                        VerticalAlignment="Center"
+                        Source="{Binding ImageSource}" />
+                                        <TextBlock
+                        FontSize="16"
+                        FontWeight="Bold"
+                        Text="{Binding GameTitle}" />
+                                        <TextBlock
+                        FontSize="12"
+                        Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                        Text="{Binding GameDeveloper}" />
+                                        <RatingControl
+                        Margin="0,0,0,20"
+                        HorizontalAlignment="Left"
+                        IsReadOnly="True"
+                        PlaceholderValue="5" />
+                                        <TextBlock
+                        FontSize="12"
+                        FontWeight="Bold"
+                        Text="Dostępne" />
+                                    </StackPanel>
+                                </Button>
 
-                        <Button
-                            Grid.Column="0"
-                            Margin="0,0,4,0"
-                            Click="ButtonBlackWhiteJump_Click"
-                            IsEnabled="True">
-                            <StackPanel>
-                                <Image
-                                    Margin="14"
-                                    VerticalAlignment="Center"
-                                    Source="/Assets/Games/BlackWhiteJump/Logo.png" />
-                                <TextBlock
-                                    Grid.Row="0"
-                                    FontSize="14"
-                                    FontWeight="Bold"
-                                    Text="Black White Jump" />
-                                <TextBlock
-                                    Grid.Row="0"
-                                    FontSize="12"
-                                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                                    Text="Dino Jakub" />
-                                <RatingControl
-                                    Margin="0,0,0,40"
-                                    HorizontalAlignment="Left"
-                                    AutomationProperties.Name="RatingControl with placeholder"
-                                    IsReadOnly="True"
-                                    PlaceholderValue="5" />
-                                <TextBlock
-                                    Grid.Row="0"
-                                    FontSize="12"
-                                    FontWeight="Bold"
-                                    Text="Dostępne" />
-                            </StackPanel>
-                        </Button>
-                        <!--  Bialy Kowal  -->
-
-                        <Button
-                            Grid.Column="1"
-                            Margin="0,0,4,0"
-                            Click="ButtonCastlelineEvil_Click">
-                            <StackPanel>
-                                <Image
-                                    Margin="14"
-                                    VerticalAlignment="Center"
-                                    Source="/Assets/Games/CastlelineEvil/CastlelineEvil_Logo.png" />
-                                <TextBlock
-                                    Grid.Row="0"
-                                    FontSize="16"
-                                    FontWeight="Bold"
-                                    Text="CastlelineEvil" />
-                                <TextBlock
-                                    Grid.Row="0"
-                                    FontSize="12"
-                                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                                    Text="DEVMASSYN" />
-                                <RatingControl
-                                    Margin="0,0,0,40"
-                                    HorizontalAlignment="Left"
-                                    AutomationProperties.Name="RatingControl with placeholder"
-                                    IsReadOnly="True"
-                                    PlaceholderValue="5" />
-                                <TextBlock
-                                    Grid.Row="0"
-                                    FontSize="12"
-                                    FontWeight="Bold"
-                                    Text="Dostępne" />
-                            </StackPanel>
-                        </Button>
-
-                        <Button
-                            Grid.Column="2"
-                            Margin="0,0,4,0"
-                            IsEnabled="False">
-                            <StackPanel>
-                                <Image
-                                    Margin="14"
-                                    VerticalAlignment="Center"
-                                    Source="/Assets/Games/DzienPamieci/DzienPamieci_Logo.png" />
-                                <TextBlock
-                                    Grid.Row="0"
-                                    FontSize="16"
-                                    FontWeight="Bold"
-                                    Text="Dzień Pamięci" />
-                                <TextBlock
-                                    Grid.Row="0"
-                                    FontSize="12"
-                                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                                    Text="CASBORG" />
-                                <RatingControl
-                                    Margin="0,0,0,40"
-                                    HorizontalAlignment="Left"
-                                    AutomationProperties.Name="RatingControl with placeholder"
-                                    IsReadOnly="True"
-                                    PlaceholderValue="5" />
-                                <TextBlock
-                                    Grid.Row="0"
-                                    FontSize="12"
-                                    FontWeight="Bold"
-                                    Text="Wkrótce dostępne" />
-                            </StackPanel>
-                        </Button>
-
-                        <Button
-                            Grid.Column="3"
-                            Margin="0,0,4,0"
-                            Click="ButtonKlikacz24H_Click"
-                            IsEnabled="True">
-                            <StackPanel>
-                                <Image
-                                    Margin="14"
-                                    VerticalAlignment="Center"
-                                    Source="/Assets/Games/Klikacz24H/Logo.png" />
-                                <TextBlock
-                                    Grid.Row="0"
-                                    FontSize="16"
-                                    FontWeight="Bold"
-                                    Text="Klikacz24H" />
-                                <TextBlock
-                                    Grid.Row="0"
-                                    FontSize="12"
-                                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                                    Text="SZYRROGI" />
-                                <RatingControl
-                                    Margin="0,0,0,40"
-                                    HorizontalAlignment="Left"
-                                    AutomationProperties.Name="RatingControl with placeholder"
-                                    IsReadOnly="True"
-                                    PlaceholderValue="5" />
-                                <TextBlock
-                                    Grid.Row="0"
-                                    FontSize="12"
-                                    FontWeight="Bold"
-                                    Text="Dostępne" />
-                            </StackPanel>
-                        </Button>
-
-                        <Button
-                            Grid.Column="4"
-                            Margin="0,0,4,0"
-                            Click="ButtonStaffOfHell_Click"
-                            IsEnabled="False">
-                            <StackPanel>
-                                <Image
-                                    Margin="14"
-                                    VerticalAlignment="Center"
-                                    Source="/Assets/Games/StaffOfHell/Logo.png" />
-                                <TextBlock
-                                    Grid.Row="0"
-                                    FontSize="16"
-                                    FontWeight="Bold"
-                                    Text="Staff of Hell" />
-                                <TextBlock
-                                    Grid.Row="0"
-                                    FontSize="12"
-                                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                                    Text="SZYRGAMESTUDIO" />
-                                <RatingControl
-                                    Margin="0,0,0,40"
-                                    HorizontalAlignment="Left"
-                                    AutomationProperties.Name="RatingControl with placeholder"
-                                    IsReadOnly="True"
-                                    PlaceholderValue="5" />
-                                <TextBlock
-                                    Grid.Row="0"
-                                    FontSize="12"
-                                    FontWeight="Bold"
-                                    Text="Niedostępne" />
-                            </StackPanel>
-                        </Button>
-
-                    </Grid>
-                    <!--#endregion-->
-
-                    <!--#region PASEK Z GRAMI POZIOMY-->
-                    <Grid Grid.Row="5" Margin="0,12,0,12">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-
-                        <Button
-                            Grid.Column="0"
-                            Margin="0,0,4,0"
-                            Click="ButtonShadowSquad_Click"
-                            IsEnabled="True">
-                            <StackPanel>
-                                <Image
-                                    Margin="14"
-                                    VerticalAlignment="Center"
-                                    Source="/Assets/Games/ShadowSquad/Logo.png" />
-                                <TextBlock
-                                    Grid.Row="0"
-                                    FontSize="16"
-                                    FontWeight="Bold"
-                                    Text="Shadow Squad" />
-                                <TextBlock
-                                    Grid.Row="0"
-                                    FontSize="12"
-                                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                                    Text="Shadow Inside" />
-                                <RatingControl
-                                    Margin="0,0,0,40"
-                                    HorizontalAlignment="Left"
-                                    AutomationProperties.Name="RatingControl with placeholder"
-                                    IsReadOnly="True"
-                                    PlaceholderValue="5" />
-                                <TextBlock
-                                    Grid.Row="0"
-                                    FontSize="12"
-                                    FontWeight="Bold"
-                                    Text="Dostępne" />
-                            </StackPanel>
-                        </Button>
-                        <Button
-                            Grid.Column="1"
-                            Margin="0,0,4,0"
-                            Click="ButtonStarmanSystem_Click"
-                            IsEnabled="True">
-                            <StackPanel>
-                                <Image
-                                    Margin="14"
-                                    VerticalAlignment="Center"
-                                    Source="/Assets/Games/StarmanSystem/Logo.png" />
-                                <TextBlock
-                                    Grid.Row="0"
-                                    FontSize="16"
-                                    FontWeight="Bold"
-                                    Text="Starman System" />
-                                <TextBlock
-                                    Grid.Row="0"
-                                    FontSize="12"
-                                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                                    Text="Dino Jakub" />
-                                <RatingControl
-                                    Margin="0,0,0,40"
-                                    HorizontalAlignment="Left"
-                                    AutomationProperties.Name="RatingControl with placeholder"
-                                    IsReadOnly="True"
-                                    PlaceholderValue="5" />
-                                <TextBlock
-                                    Grid.Row="0"
-                                    FontSize="12"
-                                    FontWeight="Bold"
-                                    Text="Dostępne" />
-                            </StackPanel>
-                        </Button>
-                        <Button
-                            Grid.Column="2"
-                            Margin="0,0,4,0"
-                            Click="ButtonSciezkaBohatera_Click"
-                            IsEnabled="True">
-                            <StackPanel>
-                                <Image
-                                    Margin="14"
-                                    VerticalAlignment="Center"
-                                    Source="/Assets/Games/SciezkaBohatera/Logo.png" />
-                                <TextBlock
-                                    Grid.Row="0"
-                                    FontSize="15"
-                                    FontWeight="Bold"
-                                    Text="Ścieżka Bohatera" />
-                                <TextBlock
-                                    Grid.Row="0"
-                                    FontSize="12"
-                                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                                    Text="SZYRROGI" />
-                                <RatingControl
-                                    Margin="0,0,0,40"
-                                    HorizontalAlignment="Left"
-                                    AutomationProperties.Name="RatingControl with placeholder"
-                                    IsReadOnly="True"
-                                    PlaceholderValue="5" />
-                                <TextBlock
-                                    Grid.Row="0"
-                                    FontSize="12"
-                                    FontWeight="Bold"
-                                    Text="Dostępne" />
-                            </StackPanel>
-                        </Button>
-
-                        <Button
-                            Grid.Column="3"
-                            Margin="0,0,4,0"
-                            Click="ButtonTurboNinja2D_Click"
-                            IsEnabled="True">
-                            <StackPanel>
-                                <Image
-                                    Margin="14"
-                                    VerticalAlignment="Center"
-                                    Source="/Assets/Games/TurboNinja2D/TurboNinja2D_Logo.png" />
-                                <TextBlock
-                                    Grid.Row="0"
-                                    FontSize="16"
-                                    FontWeight="Bold"
-                                    Text="Turbo Ninja 2D" />
-                                <TextBlock
-                                    Grid.Row="0"
-                                    FontSize="12"
-                                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                                    Text="DEVMASSYN" />
-                                <RatingControl
-                                    Margin="0,0,0,40"
-                                    HorizontalAlignment="Left"
-                                    AutomationProperties.Name="RatingControl with placeholder"
-                                    IsReadOnly="True"
-                                    PlaceholderValue="5" />
-                                <TextBlock
-                                    Grid.Row="0"
-                                    FontSize="12"
-                                    FontWeight="Bold"
-                                    Text="Dostępne" />
-                            </StackPanel>
-                        </Button>
-
-                        <Button
-                            Grid.Column="4"
-                            Margin="0,0,4,0"
-                            Click="ButtonZacmienie_Click"
-                            IsEnabled="True">
-                            <StackPanel>
-                                <Image
-                                    Margin="14"
-                                    VerticalAlignment="Center"
-                                    Source="/Assets/Games/Zacmienie/Zacmienie_Logo.png" />
-                                <TextBlock
-                                    Grid.Row="0"
-                                    FontSize="16"
-                                    FontWeight="Bold"
-                                    Text="Zaćmienie" />
-                                <TextBlock
-                                    Grid.Row="0"
-                                    FontSize="12"
-                                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                                    Text="CASBORG" />
-                                <RatingControl
-                                    Margin="0,0,0,40"
-                                    HorizontalAlignment="Left"
-                                    AutomationProperties.Name="RatingControl with placeholder"
-                                    IsReadOnly="True"
-                                    PlaceholderValue="5" />
-                                <TextBlock
-                                    Grid.Row="0"
-                                    FontSize="12"
-                                    FontWeight="Bold"
-                                    Text="Dostępne" />
-                            </StackPanel>
-                        </Button>
-
-                    </Grid>
-                    <!--#endregion-->
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </Grid>
             </Grid>
         </ScrollViewer>

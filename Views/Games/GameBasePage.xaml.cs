@@ -73,7 +73,7 @@ namespace SGSClient.Views
 
             versionFile = Path.Combine(rootPath, "versions.xml");
             gameZip = Path.Combine(rootPath, $"{gameIdentifier}.zip");
-            gameExe = Path.Combine(rootPath, gameIdentifier ?? "", $"{gameIdentifier}.exe");
+            gameExe = Path.Combine(rootPath, gameIdentifier ?? "", $"{configManager.GetGameExeName(gameIdentifier)}.exe");
             gamepath = Path.Combine(rootPath, gameIdentifier ?? "");
             UpdateUI();
             IsUpdated();
