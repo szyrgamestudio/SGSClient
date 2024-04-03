@@ -17,14 +17,12 @@ namespace SGSClient.Views
 {
     public sealed partial class GameBasePage : Page
     {
+        private LauncherStatus _status;
         private string? rootPath;
         private string? gamepath;
         private string? versionFile;
         private string? gameZip;
         private string? gameExe;
-        private LauncherStatus _status;
-
-        /*From appConfig.xml*/
         private string gameIdentifier;
         private string? gameZipLink;
         private string? gameVersionLink;
@@ -35,8 +33,9 @@ namespace SGSClient.Views
         private string? hardwareRequirements;
         private string? otherInformations;
 
+        private readonly ConfigurationManagerSQL configManagerSQL;
         private readonly HttpClient httpClient = new();
-        ConfigurationManager configManager = new ConfigurationManager("D:\\DEVELOPMENT\\Repozytoria\\SGSClient\\Config\\appconfig.xml");
+
         internal LauncherStatus Status
         {
             get => _status;
@@ -53,17 +52,22 @@ namespace SGSClient.Views
             {
                 gameIdentifier = parameterString;
 
-                gameTitle = configManager.GetGameTitle(gameIdentifier);
-                gameZipLink = configManager.GetGameZipLink(gameIdentifier);
-                gameVersionLink = configManager.GetGameVersionLink(gameIdentifier);
-                gamePayloadName = configManager.GetGamePayloadName(gameIdentifier);
-                gameDescription = configManager.GetGameDescription(gameIdentifier);
-                gameDeveloper = configManager.GetGameDeveloper(gameIdentifier);
-                hardwareRequirements = configManager.GetHardwareRequirements(gameIdentifier);
-                otherInformations = configManager.GetOtherInformations(gameIdentifier);
+                var gameData = configManagerSQL.LoadGamesFromDatabase().Find(g => g.GameSymbol == gameIdentifier);
+                if (gameData != null)
+                {
+                    gameTitle = gameData.GameTitle;
+                    gameZipLink = gameData.GameZipLink;
+                    gameVersionLink = gameData.GameVersionLink;
+                    gamePayloadName = gameData.GamePayloadName;
+                    gameDescription = gameData.GameDescription;
+                    gameDeveloper = gameData.GameDeveloper;
+                    hardwareRequirements = gameData.HardwareRequirements;
+                    otherInformations = gameData.OtherInformations;
+                    gameExe = gameData.GameExeName;
 
-                LoadImagesFromXml(gameIdentifier);
-                LoadLogoFromXml(gameIdentifier);
+                    LoadImagesFromDatabase(gameIdentifier);
+                    LoadLogoFromDatabase(gameIdentifier);
+                }
             }
 
             base.OnNavigatedTo(e);
@@ -71,103 +75,85 @@ namespace SGSClient.Views
             string location = Path.Combine(ApplicationData.Current.LocalFolder.Path, "LocalState");
             rootPath = Path.GetDirectoryName(location) ?? string.Empty;
 
+            #region 
             versionFile = Path.Combine(rootPath, "versions.xml");
             gameZip = Path.Combine(rootPath, $"{gameIdentifier}.zip");
-            gameExe = Path.Combine(rootPath, gameIdentifier ?? "", $"{configManager.GetGameExeName(gameIdentifier)}.exe");
+            gameExe = Path.Combine(rootPath, gameIdentifier ?? "", $"{gameExe}.exe");
             gamepath = Path.Combine(rootPath, gameIdentifier ?? "");
+            #endregion
+
             UpdateUI();
             IsUpdated();
         }
 
-        #region XML Handling
-        private void LoadImagesFromXml(string gameName)
+        #region DB Handling
+        private void LoadImagesFromDatabase(string gameName)
         {
-            XElement? gameElement = configManager.GetGameElement(gameName);
+            var gameImages = configManagerSQL.LoadGalleryImagesFromDatabase(gameName);
 
-            if (gameElement != null)
+            if (gameImages == null || gameImages.Count == 0)
             {
-                FlipView? flipView = FindName("GameGallery") as FlipView;
+                Debug.WriteLine("Brak obrazów galerii w bazie danych dla tej gry.");
+                return;
+            }
 
-                if (flipView != null)
+            var flipView = FindName("GameGallery") as FlipView;
+            if (flipView == null)
+                return;
+
+            flipView.Items.Clear();
+
+            foreach (var imagePath in gameImages)
+            {
+                try
                 {
-                    flipView.Items.Clear();
-                    var galleryImagesElement = gameElement.Element("GalleryImages");
-
-                    if (galleryImagesElement != null)
-                    {
-                        var imageElements = galleryImagesElement.Elements("GalleryImage");
-
-                        foreach (var imageElement in imageElements)
-                        {
-                            string imagePath = imageElement.Value;
-                            Uri imageUri = new Uri("ms-appx:///" + imagePath);
-                            Image image = new Image { Source = new BitmapImage(imageUri) };
-
-                            flipView.Items.Add(image);
-                        }
-                    }
+                    Uri imageUri = new Uri(imagePath);
+                    Image image = new Image { Source = new BitmapImage(imageUri) };
+                    flipView.Items.Add(image);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("Błąd wczytywania obrazu: " + ex.Message);
                 }
             }
         }
-
-        private void LoadLogoFromXml(string gameName)
+        private void LoadLogoFromDatabase(string gameName)
         {
-            XElement? gameElement = configManager.GetGameElement(gameName);
+            var gameData = configManagerSQL.LoadGamesFromDatabase().Find(g => g.GameSymbol == gameName);
 
-            if (gameElement != null)
+            if (gameData == null || string.IsNullOrEmpty(gameData.LogoPath))
             {
+                SetDefaultLogoImage();
+                return;
+            }
+
+            try
+            {
+                Uri logoImageUri = new Uri(gameData.LogoPath);
                 Image? gameLogoImage = FindName("GameLogoImage") as Image;
-
-                if (gameLogoImage != null)
-                {
-                    // Pobierz wszystkie obrazy z elementu XML
-                    var logoImagesElement = gameElement.Element("LogoImages");
-
-                    if (logoImagesElement != null)
-                    {
-                        var logoImageElement = logoImagesElement.Element("LogoImage");
-
-                        if (logoImageElement != null)
-                        {
-                            string logoImagePath = logoImageElement.Value;
-
-                            try
-                            {
-                                // Utwórz bezwzględny identyfikator URI
-                                Uri logoImageUri = new Uri("ms-appx:///" + logoImagePath);
-
-                                // Ustaw źródło obrazu
-                                gameLogoImage.Source = new BitmapImage(logoImageUri);
-                            }
-                            catch (Exception ex)
-                            {
-                                // Błąd wczytywania obrazu - użyj obrazka zastępczego
-                                gameLogoImage.Source = new BitmapImage(new Uri("ms-appx:///Assets/placeholder.png"));
-                                Debug.WriteLine("Błąd wczytywania obrazu: " + ex.Message);
-                            }
-                        }
-                        else
-                        {
-                            // Brak elementu LogoImage w XML - użyj obrazka zastępczego
-                            gameLogoImage.Source = new BitmapImage(new Uri("ms-appx:///Assets/placeholder.png"));
-                        }
-                    }
-                    else
-                    {
-                        // Brak elementu LogoImages w XML - użyj obrazka zastępczego
-                        gameLogoImage.Source = new BitmapImage(new Uri("ms-appx:///Assets/placeholder.png"));
-                    }
-                }
+                gameLogoImage.Source = new BitmapImage(logoImageUri);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Błąd wczytywania obrazu: " + ex.Message);
+                SetDefaultLogoImage();
             }
         }
+        #endregion
 
+        #region UI Handling
+        private void SetDefaultLogoImage()
+        {
+            Image? gameLogoImage = FindName("GameLogoImage") as Image;
+            gameLogoImage.Source = new BitmapImage(new Uri("ms-appx:///Assets/placeholder.png"));
+        }
         private void UpdateUI()
         {
             GameNameTextBlock.Text = gameTitle ?? "Brak dostępnych informacji.";
             GameDeveloperTextBlock.Text = gameDeveloper ?? "Brak dostępnych informacji.";
             GameDescriptionTextBlock.Text = gameDescription ?? "Brak dostępnych informacji.";
             HardwareRequirementsTextBlock.Text = hardwareRequirements ?? "Brak dostępnych informacji.";
-            // Ukryj OtherInformationsTextBlock, jeśli otherInformations jest puste
+
             if (string.IsNullOrWhiteSpace(otherInformations))
             {
                 OtherInformationsTextBlock.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
@@ -183,63 +169,24 @@ namespace SGSClient.Views
 
         public GameBasePage()
         {
+            string ConnectionString = @"Data Source=145.239.80.7;Initial Catalog=SGS_CLIENT;User ID=sa;Password=ajjKcZtam63c#;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+            configManagerSQL = new ConfigurationManagerSQL(ConnectionString);
+
             ViewModel = App.GetService<GameBaseViewModel>();
             InitializeComponent();
             Status = LauncherStatus.pageLauched;
         }
-
-        private async void IsUpdated()
+        private void IsUpdated()
         {
             try
             {
-                XDocument versionXml;
+                SGSVersion.Version localVersion = GetLocalVersion();
+                SGSVersion.Version onlineVersion = GetOnlineVersion();
 
-                // Sprawdź, czy plik "versions.xml" istnieje
-                if (File.Exists(Path.Combine(rootPath ?? "", "versions.xml")))
-                {
-                    // Jeśli istnieje, załaduj go
-                    versionXml = XDocument.Load(Path.Combine(rootPath ?? "", "versions.xml"));
-                }
-                else
-                {
-                    // Jeśli nie istnieje, utwórz nowy dokument XML z korzeniem "Versions"
-                    versionXml = new XDocument(new XElement("Versions"));
-                }
+                Status = (localVersion.ToString() == "0.0.0") ? LauncherStatus.readyNoGame : LauncherStatus.ready;
 
-                // Odczytaj lokalną wersję z pliku "versions.xml"
-                XElement? gameVersionElement = versionXml.Root?.Element(gameIdentifier);
-
-                SGSVersion.Version localVersion;
-
-                if (gameVersionElement != null)
-                {
-                    localVersion = new SGSVersion.Version(gameVersionElement.Value);
-                }
-                else
-                {
-                    // Brak wersji dla konkretnej gry w pliku "versions.xml"
-                    // Utwórz element dla gry
-                    versionXml.Root?.Add(new XElement(gameIdentifier, "0.0.0.0"));
-                    versionXml.Save(Path.Combine(rootPath ?? "", "versions.xml"));
-
-                    localVersion = new SGSVersion.Version("0.0.0.0");
-
-                    // Jeśli brak wersji, ustaw Status na readyNoGame
-                    Status = LauncherStatus.readyNoGame;
-                    return;
-                }
-
-                // Pobierz onlineVersion z pliku "appConfig.xml"
-                XElement? gameElement = configManager.GetGameElement(gameIdentifier);
-                string onlineVersionString = gameElement?.Element("GameVersion")?.Value ?? "0.0.0.0";
-                SGSVersion.Version onlineVersion = new SGSVersion.Version(onlineVersionString);
-
-                Status = LauncherStatus.ready;
-
-                if (onlineVersion.IsDifferentThan(localVersion))
-                {
+                if (onlineVersion.IsDifferentThan(localVersion) && localVersion.ToString() != "0.0.0")
                     CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-                }
             }
             catch (Exception ex)
             {
@@ -247,48 +194,39 @@ namespace SGSClient.Views
                 Status = LauncherStatus.failed;
             }
         }
+        private SGSVersion.Version GetLocalVersion()
+        {
+            XDocument versionXml;
 
-        private async void CheckForUpdates()
+            if (File.Exists(Path.Combine(rootPath ?? "", "versions.xml")) && (versionXml = XDocument.Load(Path.Combine(rootPath ?? "", "versions.xml"))) != null)
+            {
+                XElement? gameVersionElement = versionXml.Root?.Element(gameIdentifier);
+                return gameVersionElement != null ? new SGSVersion.Version(gameVersionElement.Value) : new SGSVersion.Version("0.0.0.0");
+            }
+            else
+            {
+                return new SGSVersion.Version("0.0.0.0");
+            }
+        }
+        private SGSVersion.Version GetOnlineVersion()
         {
             try
             {
-                XDocument versionXml;
-
-                // Sprawdź, czy plik "versions.xml" istnieje
-                if (File.Exists(Path.Combine(rootPath ?? "", "versions.xml")))
-                {
-                    // Jeśli istnieje, załaduj go
-                    versionXml = XDocument.Load(Path.Combine(rootPath ?? "", "versions.xml"));
-                }
-                else
-                {
-                    // Jeśli nie istnieje, utwórz nowy dokument XML z korzeniem "Versions"
-                    versionXml = new XDocument(new XElement("Versions"));
-                }
-
-                // Odczytaj lokalną wersję z pliku "versions.xml"
-                XElement? gameVersionElement = versionXml.Root?.Element(gameIdentifier);
-
-                SGSVersion.Version localVersion;
-
-                if (gameVersionElement != null)
-                {
-                    localVersion = new SGSVersion.Version(gameVersionElement.Value);
-                }
-                else
-                {
-                    // Brak wersji dla konkretnej gry w pliku "versions.xml"
-                    // Utwórz element dla gry
-                    versionXml.Root?.Add(new XElement(gameIdentifier, "0.0.0.0"));
-                    versionXml.Save(Path.Combine(rootPath ?? "", "versions.xml"));
-
-                    localVersion = new SGSVersion.Version("0.0.0.0");
-                }
-
-                // Pobierz onlineVersion z pliku "appConfig.xml"
-                XElement? gameElement = configManager.GetGameElement(gameIdentifier);
-                string onlineVersionString = gameElement?.Element("GameVersion")?.Value ?? "0.0.0.0";
-                SGSVersion.Version onlineVersion = new SGSVersion.Version(onlineVersionString);
+                string onlineVersionString = configManagerSQL.GetGameVersion(gameIdentifier);
+                return new SGSVersion.Version(onlineVersionString);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Błąd podczas pobierania wersji gry z bazy danych: {ex.Message}");
+                throw;
+            }
+        }
+        private void CheckForUpdates()
+        {
+            try
+            {
+                SGSVersion.Version localVersion = GetLocalVersion();
+                SGSVersion.Version onlineVersion = GetOnlineVersion();
 
                 if (onlineVersion.IsDifferentThan(localVersion))
                 {
@@ -306,7 +244,6 @@ namespace SGSClient.Views
                 Status = LauncherStatus.failed;
             }
         }
-
         private async void InstallGameFiles(bool _isUpdate, SGSVersion.Version _onlineVersion)
         {
             try
@@ -333,7 +270,6 @@ namespace SGSClient.Views
                     }
                     else
                     {
-                        // Obsługa przypadku, gdy gameZip lub rootPath jest null
                         Status = LauncherStatus.failed;
                         return;
                     }
@@ -346,29 +282,17 @@ namespace SGSClient.Views
                 }
                 else
                 {
-                    // Obsługa przypadku, gdy gameZip lub rootPath jest null
                     Status = LauncherStatus.failed;
                     return;
                 }
 
-                // Zapisz wersję do wspólnego pliku XML
                 if (!string.IsNullOrEmpty(rootPath))
                 {
                     XDocument versionXml;
 
-                    // Sprawdź, czy istnieje plik XML z wersjami
                     string versionXmlPath = Path.Combine(rootPath, "versions.xml");
-                    if (File.Exists(versionXmlPath))
-                    {
-                        versionXml = XDocument.Load(versionXmlPath);
-                    }
-                    else
-                    {
-                        // Jeśli plik nie istnieje, utwórz nowy
-                        versionXml = new XDocument(new XElement("Versions"));
-                    }
+                    versionXml = File.Exists(versionXmlPath) ? XDocument.Load(versionXmlPath) : new XDocument(new XElement("Versions"));
 
-                    // Dodaj lub zaktualizuj informacje o wersji dla konkretnej gry
                     XElement? gameVersionElement = versionXml.Root?.Element(gameIdentifier);
                     if (gameVersionElement != null)
                     {
@@ -383,7 +307,6 @@ namespace SGSClient.Views
                 }
                 else
                 {
-                    // Obsługa przypadku, gdy rootPath jest null
                     Status = LauncherStatus.failed;
                     return;
                 }
@@ -433,7 +356,6 @@ namespace SGSClient.Views
                 }
             }
         }
-
         private void UninstallClickButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
             if (Directory.Exists(gamepath))
@@ -441,13 +363,9 @@ namespace SGSClient.Views
                 uninstallFlyout.Hide();
                 Directory.Delete(gamepath, true);
 
-                // Usuń wpis dla konkretnej gry z pliku "versions.xml"
-                XDocument versionXml;
-
                 if (File.Exists(Path.Combine(rootPath ?? "", "versions.xml")))
                 {
-                    versionXml = XDocument.Load(Path.Combine(rootPath ?? "", "versions.xml"));
-
+                    XDocument versionXml = XDocument.Load(Path.Combine(rootPath ?? "", "versions.xml"));
                     XElement? gameVersionElement = versionXml.Root?.Element(gameIdentifier);
 
                     if (gameVersionElement != null)
@@ -458,15 +376,9 @@ namespace SGSClient.Views
                 }
 
                 File.Delete(gameZip ?? "");
-
                 Status = LauncherStatus.readyNoGame;
             }
-            else
-            {
-                // Handle else case...
-            }
         }
-
         private void UpdateClickButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
         {
             CheckForUpdates();

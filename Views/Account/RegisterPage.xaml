@@ -1,0 +1,41 @@
+﻿<Page
+    x:Class="SGSClient.Views.RegisterPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+	<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+		<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+			<TextBlock Text="Rejestracja" FontSize="24" Margin="0,0,0,20" />
+
+			<StackPanel Orientation="Vertical" Margin="0,0,0,10">
+				<TextBlock Text="Nazwa użytkownika:" Margin="0,0,0,5" />
+				<TextBox x:Name="UsernameTextBox" Width="200" />
+			</StackPanel>
+
+			<StackPanel Orientation="Vertical" Margin="0,0,0,10">
+				<TextBlock Text="Hasło:" Margin="0,0,0,5" />
+				<PasswordBox x:Name="PasswordBox" Width="200" />
+			</StackPanel>
+
+			<StackPanel Orientation="Vertical" Margin="0,0,0,10">
+				<TextBlock Text="Adres e-mail:" Margin="0,0,0,5" />
+				<TextBox x:Name="EmailTextBox" Width="200" />
+			</StackPanel>
+
+			<StackPanel Orientation="Vertical" Margin="0,0,0,10">
+				<TextBlock Text="Imię:" Margin="0,0,0,5" />
+				<TextBox x:Name="FirstNameTextBox" Width="200" />
+			</StackPanel>
+
+			<StackPanel Orientation="Vertical" Margin="0,0,0,10">
+				<TextBlock Text="Nazwisko:" Margin="0,0,0,5" />
+				<TextBox x:Name="LastNameTextBox" Width="200" />
+			</StackPanel>
+
+			<Button Content="Zarejestruj się" Click="RegisterButton_Click" Width="120" />
+		</StackPanel>
+	</Grid>
+</Page>

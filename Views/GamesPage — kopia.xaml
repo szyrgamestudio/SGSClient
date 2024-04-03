@@ -26,7 +26,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <!--<InfoBar IsOpen="True" Margin="0,40,0,0" IsClosable="False" Severity="Error" Title="Uwaga" Message="Używasz wersję testową SGSClienta. Prosimy o zgłaszanie błedów na adres kontakt@szyrgamestudio.com."/>-->
+                    <InfoBar IsOpen="True" Margin="0,40,0,0" IsClosable="False" Severity="Error" Title="Uwaga" Message="Używasz wersję testową SGSClienta. Prosimy o zgłaszanie błedów na adres kontakt@szyrgamestudio.com."/>
 
                     <TextBlock
                         Grid.Row="0"
@@ -126,14 +126,14 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Button Click="ButtonGame_Click" Tag="{Binding GameSymbol}" Margin="0,0,4,4">
+                                <Button Click="ButtonGame_Click" Tag="{Binding GameName}" Margin="0,0,4,4">
                                     <StackPanel>
                                         <Image
                         Width="100"
                         Height="100"
                         Margin="14"
                         VerticalAlignment="Center"
-                        Source="{Binding LogoPath}" />
+                        Source="{Binding ImageSource}" />
                                         <TextBlock
                         FontSize="16"
                         FontWeight="Bold"

@@ -378,4 +378,10 @@
   <data name="Shell_GameBase.Content" xml:space="preserve">
     <value>GameBase</value>
   </data>
+  <data name="Shell_Login.Content" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="Shell_Register.Content" xml:space="preserve">
+    <value>Register</value>
+  </data>
 </root>

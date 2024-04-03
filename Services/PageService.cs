@@ -19,6 +19,8 @@ public class PageService : IPageService
         Configure<UploadGameViewModel, UploadGamePage>();
         Configure<SettingsViewModel, SettingsPage>();
         Configure<GameBaseViewModel, GameBasePage>();
+        Configure<LoginViewModel, LoginPage>();
+        Configure<RegisterViewModel, RegisterPage>();
     }
 
     public Type GetPageType(string key)

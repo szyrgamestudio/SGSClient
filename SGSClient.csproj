@@ -21,7 +21,7 @@
     <PackageCertificateThumbprint>55CA42F5FEBC8FAA40DB3D5DB909DD2DA3BC002B</PackageCertificateThumbprint>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
-    <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
+    <AppxSymbolPackageEnabled>True</AppxSymbolPackageEnabled>
     <GenerateTestArtifacts>False</GenerateTestArtifacts>
     <AppxBundle>Always</AppxBundle>
     <AppxBundlePlatforms>x64</AppxBundlePlatforms>
@@ -37,12 +37,20 @@
     <UseWindowsForms>False</UseWindowsForms>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Views\GamesPage.xaml — kopia.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Remove="Assets\Games\AtorthTalesOfUlkimond\Logo.png" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Assets\GalleryHeaderImage.png" />
     <None Remove="Assets\Games\AtorthTalesOfUlkimond\Atorth_Logo - kopiować.png" />
     <None Remove="Assets\Games\Zacmienie\Zacmienie_Logo - kopiować.png" />
+    <None Remove="Views\GamesPage — kopia.xaml" />
+    <None Remove="Views\Games\Games.rar" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Remove="Views\GamesPage — kopia.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -63,6 +71,7 @@
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.4.231219000" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.WinUI.Managed" Version="2.0.9" />
     <PackageReference Include="ModernWpf.MessageBox.Mica" Version="0.5.5" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
     <PackageReference Include="WinUIEx" Version="2.3.3" />
   </ItemGroup>
 
@@ -101,6 +110,7 @@
     <Folder Include="Assets\Games\StarmanSystem\" />
     <Folder Include="Assets\Games\SciezkaBohatera\" />
     <Folder Include="Assets\Games\StaffOfHell\" />
+    <Folder Include="Views\Account\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -119,6 +129,13 @@
     <Content Update="Assets\Games\Klikacz24H\Logo.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Views\Account\RegisterPage.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   
   <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">

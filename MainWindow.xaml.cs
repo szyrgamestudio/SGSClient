@@ -1,4 +1,5 @@
-﻿using SGSClient.Helpers;
+﻿using System.Data.SqlClient;
+using SGSClient.Helpers;
 
 using Windows.UI.ViewManagement;
 
@@ -7,7 +8,6 @@ namespace SGSClient;
 public sealed partial class MainWindow : WindowEx
 {
     private Microsoft.UI.Dispatching.DispatcherQueue dispatcherQueue;
-
     private UISettings settings;
 
     public MainWindow()
