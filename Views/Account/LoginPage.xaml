@@ -6,21 +6,48 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-	<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-		<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-			<TextBlock Text="Logowanie" FontSize="24" Margin="0,0,0,20" />
+    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-			<StackPanel Orientation="Vertical" Margin="0,0,0,10">
-				<TextBlock Text="Nazwa użytkownika:" Margin="0,0,0,5" />
-				<TextBox x:Name="UsernameTextBox" Width="200" />
-			</StackPanel>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
-			<StackPanel Orientation="Vertical" Margin="0,0,0,10">
-				<TextBlock Text="Hasło:" Margin="0,0,0,5" />
-				<PasswordBox x:Name="PasswordBox" Width="200" />
-			</StackPanel>
+        <!-- Logo -->
+        <Image Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Source="/Assets/SGSLOGO.png" HorizontalAlignment="Center" VerticalAlignment="Center" Height="50" Width="50"/>
 
-			<Button Content="Zaloguj się" Click="LoginButton_Click" Width="100" />
-		</StackPanel>
-	</Grid>
+        <!-- Nagłówek "Login" -->
+        <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Height="23" Margin="10,10,0,0" Name="LoginHeading" Text="Login:" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="17" FontStretch="ExtraCondensed"/>
+
+        <!-- Etykieta "Email" -->
+        <TextBlock Grid.Row="2" Grid.Column="0" Height="23" Margin="10,0,0,0" Name="textBlock1" Text="Email" VerticalAlignment="Top" />
+        <!-- Pole tekstowe dla adresu e-mail -->
+        <TextBox Grid.Row="2" Grid.Column="1" Height="23" Margin="10,0,10,0" Name="textBoxEmail" VerticalAlignment="Top" Width="180"/>
+
+        <!-- Etykieta "Password" -->
+        <TextBlock Grid.Row="3" Grid.Column="0" Height="23" Margin="10,5,0,0" Name="textBlock2" Text="Password" VerticalAlignment="Top" />
+        <!-- Pole tekstowe dla hasła -->
+        <PasswordBox Grid.Row="3" Grid.Column="1" Height="23" Margin="10,5,10,0" Name="passwordBox1" VerticalAlignment="Top" Width="180"/>
+
+        <!-- Przycisk "Login" -->
+        <Button Grid.Row="4" Grid.Column="1" Content="Login" Height="23" Margin="10,5,10,0" Name="button1" VerticalAlignment="Top" Click="button1_Click" Width="100"/>
+
+        <!-- Komunikat o błędzie -->
+        <TextBlock Grid.Row="5" Grid.Column="1" Height="23" HorizontalAlignment="Left" x:Name="errormessage" Margin="10,5,10,0" Foreground="#FFE5572C" />
+
+        <!-- Nagłówek dodatkowy -->
+        <TextBlock Grid.Row="6" Grid.Column="1" Height="50" Margin="10,5,10,0" Name="textBlockHeading" VerticalAlignment="Top" FontSize="12" FontStyle="Italic" Padding="5">
+            <!--<TextBlock>
+                 <Hyperlink Click="buttonRegister_Click" FontSize="14" FontStyle="Normal">Register</Hyperlink>    
+            </TextBlock>-->
+        </TextBlock>
+    </Grid>
 </Page>
