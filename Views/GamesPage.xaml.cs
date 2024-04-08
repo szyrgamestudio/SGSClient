@@ -1,6 +1,7 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using SGSClient.Controllers;
+using SGSClient.Core.Database;
 using SGSClient.ViewModels;
 using System.Collections.Generic;
 using System.Windows.Documents.DocumentStructures;
@@ -12,8 +13,7 @@ namespace SGSClient.Views
         private readonly ConfigurationManagerSQL configManagerSQL;
 
         public GamesViewModel ViewModel { get; }
-        //private const string ConnectionString = @"Data Source=(localdb)\localDB1;Initial Catalog=SGS_SGSCLIENT;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
-        string ConnectionString = @"Data Source=145.239.80.7;Initial Catalog=SGS_CLIENT;User ID=sa;Password=ajjKcZtam63c#;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+        string ConnectionString = db.con;
 
         public GamesPage()
         {

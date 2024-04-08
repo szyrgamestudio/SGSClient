@@ -1,8 +1,13 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-
+using SGSClient.Core.Database;
 using SGSClient.ViewModels;
+using System.Data;
 using System.Data.SqlClient;
+using System.Net;
+using System.Security.Cryptography;
+using System.Text;
+using Windows.Networking;
 
 namespace SGSClient.Views;
 
@@ -19,47 +24,110 @@ public sealed partial class RegisterPage : Page
         InitializeComponent();
     }
 
-    private async void RegisterButton_Click(object sender, RoutedEventArgs e)
+    private string HashPassword(string password)
     {
-        string username = UsernameTextBox.Text;
-        string password = PasswordBox.Password;
-        string email = EmailTextBox.Text;
-        string firstName = FirstNameTextBox.Text;
-        string lastName = LastNameTextBox.Text;
+        // Generate a random salt
+        byte[] salt;
+        new RNGCryptoServiceProvider().GetBytes(salt = new byte[16]);
 
-        try
+        // Append the salt to the password
+        byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
+        byte[] saltedPassword = new byte[passwordBytes.Length + salt.Length];
+        Buffer.BlockCopy(passwordBytes, 0, saltedPassword, 0, passwordBytes.Length);
+        Buffer.BlockCopy(salt, 0, saltedPassword, passwordBytes.Length, salt.Length);
+
+        // Compute the hash using SHA-256 with salt
+        using (SHA256 sha256Hash = SHA256.Create())
         {
-            // Utwórz połączenie z bazą danych
-            using (SqlConnection connection = new SqlConnection("connection_string"))
+            byte[] hashBytes = sha256Hash.ComputeHash(saltedPassword);
+
+            // Convert the hash bytes to a hexadecimal string
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < hashBytes.Length; i++)
             {
-                // Otwórz połączenie
-                await connection.OpenAsync();
+                builder.Append(hashBytes[i].ToString("x2"));
+            }
 
-                // Utwórz komendę SQL dla procedury rejestracji
-                using (SqlCommand command = new SqlCommand("RegisterUser", connection))
+            // Append the salt to the hashed password
+            builder.Append(Convert.ToBase64String(salt));
+
+            return builder.ToString();
+        }
+    }
+
+    private void buttonRegister_Click(object sender, RoutedEventArgs e)
+    {
+        string email = textBoxEmail.Text;
+        string password = HashPassword(passwordBox1.Password);
+        if (passwordBox1.Password.Length == 0)
+        {
+            errormessage.Text = "Podaj hasło.";
+            //passwordBox1.Focus();
+        }
+        else if (passwordBoxConfirm.Password.Length == 0)
+        {
+            errormessage.Text = "Potwierdź hasło.";
+            //passwordBoxConfirm.Focus();
+        }
+        else if (passwordBox1.Password != passwordBoxConfirm.Password)
+        {
+            errormessage.Text = "Potwierdzenie hasła musi być takie samo jak hasło.";
+            //passwordBoxConfirm.Focus();
+        }
+        else
+        {
+            errormessage.Text = "";
+            //string address = textBoxAddress.Text;
+
+            string constr = db.con;
+            SqlConnection con = new SqlConnection(constr);
+
+            try
+            {
+                con.Open();
+
+                string cmdText = string.Format("SELECT ID FROM [dbo].[Registration] Where Email = '{0}'", email);
+                SqlCommand cmd = new SqlCommand(cmdText, con);
+                object result = cmd.ExecuteScalar();
+
+                if (result != null)
                 {
-                    command.CommandType = System.Data.CommandType.StoredProcedure;
+                    errormessage.Text = "Użytkownik istnieje.";
+                    //passwordBoxConfirm.Focus();
+                }
+                else
+                {
+                    DateTime registrationTime = DateTime.Now;
 
-                    // Dodaj parametry do komendy
-                    command.Parameters.AddWithValue("@Username", username);
-                    command.Parameters.AddWithValue("@Password", password);
-                    command.Parameters.AddWithValue("@Email", email);
-                    command.Parameters.AddWithValue("@FirstName", firstName);
-                    command.Parameters.AddWithValue("@LastName", lastName);
+                    // Wstawienie zaszyfrowanego hasła do bazy danych
+                    SqlCommand cmd1 = new SqlCommand("INSERT INTO [dbo].[Registration] (Email, Password, RegistrationOnTime) VALUES (@Email, @Password, @RegistrationOnTime)", con);
+                    cmd1.Parameters.AddWithValue("@Email", email);
+                    cmd1.Parameters.AddWithValue("@Password", password);
+                    cmd1.Parameters.AddWithValue("@RegistrationOnTime", registrationTime);
+                    cmd1.ExecuteNonQuery();
 
-                    // Wykonaj procedurę rejestracji
-                    await command.ExecuteNonQueryAsync();
-
-                    // Wyświetl komunikat o pomyślnej rejestracji
-                    // Możesz użyć MessageBox.Show() lub innej metody do wyświetlania komunikatów
-                    // MessageBox.Show("Rejestracja zakończona pomyślnie.");
+                    errormessage.Text = "Zarejestrowano pomyślnie.";
+                    Reset();
                 }
             }
+            catch (Exception ex)
+            {
+                //MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                con.Close();
+            }
         }
-        catch (Exception ex)
-        {
-            // Obsłuż błąd rejestracji, np. wyświetlając komunikat o błędzie
-            // MessageBox.Show("Błąd rejestracji: " + ex.Message);
-        }
+    }
+
+    private void Reset()
+    {
+        //textBoxFirstName.Text = "";
+        //textBoxLastName.Text = "";
+        textBoxEmail.Text = "";
+        passwordBox1.Password = "";
+        passwordBoxConfirm.Password = "";
+        //textBoxAddress.Text = "";
     }
 }

@@ -6,36 +6,52 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-	<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-		<StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-			<TextBlock Text="Rejestracja" FontSize="24" Margin="0,0,0,20" />
+    <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-			<StackPanel Orientation="Vertical" Margin="0,0,0,10">
-				<TextBlock Text="Nazwa użytkownika:" Margin="0,0,0,5" />
-				<TextBox x:Name="UsernameTextBox" Width="200" />
-			</StackPanel>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
-			<StackPanel Orientation="Vertical" Margin="0,0,0,10">
-				<TextBlock Text="Hasło:" Margin="0,0,0,5" />
-				<PasswordBox x:Name="PasswordBox" Width="200" />
-			</StackPanel>
+        <!-- Logo -->
+        <Image Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" Source="/Assets/SGSLOGO.png" HorizontalAlignment="Center" VerticalAlignment="Center" Height="60" Width="60" Margin="0,0,10,0"/>
 
-			<StackPanel Orientation="Vertical" Margin="0,0,0,10">
-				<TextBlock Text="Adres e-mail:" Margin="0,0,0,5" />
-				<TextBox x:Name="EmailTextBox" Width="200" />
-			</StackPanel>
+        <!-- Nagłówek "Rejestracja" -->
+        <TextBlock Grid.Row="0" Grid.Column="1" Height="50" Margin="0,10,0,0" Name="RegisterHeading" Text="Utwórz nowe konto" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="24" FontWeight="Bold"/>
 
-			<StackPanel Orientation="Vertical" Margin="0,0,0,10">
-				<TextBlock Text="Imię:" Margin="0,0,0,5" />
-				<TextBox x:Name="FirstNameTextBox" Width="200" />
-			</StackPanel>
+        <!-- Etykieta "Email" -->
+        <TextBlock Grid.Row="1" Grid.Column="1" Height="23" Margin="0,10,0,0" Name="textBlock1" Text="Email" VerticalAlignment="Top" FontSize="16" Foreground="Gray"/>
 
-			<StackPanel Orientation="Vertical" Margin="0,0,0,10">
-				<TextBlock Text="Nazwisko:" Margin="0,0,0,5" />
-				<TextBox x:Name="LastNameTextBox" Width="200" />
-			</StackPanel>
+        <!-- Pole tekstowe dla adresu e-mail -->
+        <TextBox Grid.Row="2" Grid.Column="1" Height="40" Margin="0,5,0,0" Name="textBoxEmail" VerticalAlignment="Top" FontSize="16" Padding="10" BorderThickness="1"/>
 
-			<Button Content="Zarejestruj się" Click="RegisterButton_Click" Width="120" />
-		</StackPanel>
-	</Grid>
+        <!-- Etykieta "Password" -->
+        <TextBlock Grid.Row="3" Grid.Column="1" Height="23" Margin="0,10,0,0" Name="textBlock2" Text="Hasło" VerticalAlignment="Top" FontSize="16" Foreground="Gray"/>
+
+        <!-- Pole tekstowe dla hasła -->
+        <PasswordBox Grid.Row="4" Grid.Column="1" Height="40" Margin="0,5,0,0" Name="passwordBox1" VerticalAlignment="Top" FontSize="16" Padding="10" BorderThickness="1"/>
+
+        <!-- Etykieta "Confirm Password" -->
+        <TextBlock Grid.Row="5" Grid.Column="1" Height="23" Margin="0,10,0,0" Name="textBlock3" Text="Potwierdź hasło" VerticalAlignment="Top" FontSize="16" Foreground="Gray"/>
+
+        <!-- Pole tekstowe do potwierdzenia hasła -->
+        <PasswordBox Grid.Row="6" Grid.Column="1" Height="40" Margin="0,5,0,0" Name="passwordBoxConfirm" VerticalAlignment="Top" FontSize="16" Padding="10" BorderThickness="1"/>
+
+        <!-- Przycisk "Register" -->
+        <Button Grid.Row="7" Grid.Column="1" Content="Zarejestruj się" Height="40" Margin="0,20,0,0" Name="buttonRegister" VerticalAlignment="Top" Click="buttonRegister_Click" FontSize="16" Style="{StaticResource AccentButtonStyle}" BorderThickness="0" Width="160"/>
+
+        <!-- Komunikat o błędzie -->
+        <TextBlock Grid.Row="8" Grid.Column="1" Height="23" HorizontalAlignment="Left" x:Name="errormessage" Margin="0,10,0,0" Foreground="#FF0000" FontSize="14" TextWrapping="Wrap"/>
+    </Grid>
 </Page>

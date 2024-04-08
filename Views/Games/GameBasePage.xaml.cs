@@ -12,6 +12,7 @@ using File = System.IO.File;
 using Microsoft.UI.Xaml.Navigation;
 using System.Xml.Linq;
 using Microsoft.UI.Xaml.Media.Imaging;
+using SGSClient.Core.Database;
 
 namespace SGSClient.Views
 {
@@ -169,7 +170,7 @@ namespace SGSClient.Views
 
         public GameBasePage()
         {
-            string ConnectionString = @"Data Source=145.239.80.7;Initial Catalog=SGS_CLIENT;User ID=sa;Password=ajjKcZtam63c#;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
+            string ConnectionString = db.con;
             configManagerSQL = new ConfigurationManagerSQL(ConnectionString);
 
             ViewModel = App.GetService<GameBaseViewModel>();
