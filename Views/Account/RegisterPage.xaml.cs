@@ -2,12 +2,9 @@
 using Microsoft.UI.Xaml.Controls;
 using SGSClient.Core.Database;
 using SGSClient.ViewModels;
-using System.Data;
 using System.Data.SqlClient;
-using System.Net;
 using System.Security.Cryptography;
 using System.Text;
-using Windows.Networking;
 
 namespace SGSClient.Views;
 

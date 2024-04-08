@@ -9,6 +9,7 @@ using Microsoft.UI.Xaml.Media.Animation;
 using System.Text;
 using System.Security.Cryptography;
 using SGSClient.Core.Database;
+using SGSClient.Core.Authorization;
 
 namespace SGSClient.Views;
 
@@ -48,7 +49,7 @@ public sealed partial class LoginPage : Page
         }
     }
 
-    private void button1_Click(object sender, RoutedEventArgs e)
+    private void buttonLogin_Click(object sender, RoutedEventArgs e)
     {
         if (textBoxEmail.Text.Length == 0)
         {
@@ -107,6 +108,7 @@ public sealed partial class LoginPage : Page
                                 //welcome.TextBlockName.Text = username;
                                 //welcome.Show();
                                 //Close();
+                                AppUser.isLoggedP = true;
                                 Frame.Navigate(typeof(HomePage), new DrillInNavigationTransitionInfo());
 
                             }
