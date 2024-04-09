@@ -1,0 +1,18 @@
+﻿<Page
+    x:Class="SGSClient.Views.MyAccountPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:core="using:SGSClient.Core.Authorization"
+    mc:Ignorable="d">
+
+    <Grid>
+        <!-- Panel użytkownika -->
+        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10">
+            <TextBlock Text="{x:Bind core:AppSession.CurrentUserSession.UserName}" FontSize="16" FontWeight="Bold" />
+            <TextBlock Text="{x:Bind core:AppSession.CurrentUserSession.UserId}" FontSize="14" />
+            <Button Content="Wyloguj się" Click="LogoutButton_Click" />
+        </StackPanel>
+    </Grid>
+</Page>

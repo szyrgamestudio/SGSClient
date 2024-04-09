@@ -21,6 +21,7 @@ public class PageService : IPageService
         Configure<GameBaseViewModel, GameBasePage>();
         Configure<LoginViewModel, LoginPage>();
         Configure<RegisterViewModel, RegisterPage>();
+        Configure<MyAccountViewModel, MyAccountPage>();
     }
 
     public Type GetPageType(string key)

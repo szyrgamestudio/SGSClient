@@ -13,11 +13,13 @@ using Microsoft.UI.Xaml.Navigation;
 using System.Xml.Linq;
 using Microsoft.UI.Xaml.Media.Imaging;
 using SGSClient.Core.Database;
+using SGSClient.Core.Authorization;
 
 namespace SGSClient.Views
 {
     public sealed partial class GameBasePage : Page
     {
+        private string userId = AppSession.CurrentUserSession.UserId;
         private LauncherStatus _status;
         private string? rootPath;
         private string? gamepath;

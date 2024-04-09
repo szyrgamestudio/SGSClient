@@ -10,6 +10,8 @@ using System.Text;
 using System.Security.Cryptography;
 using SGSClient.Core.Database;
 using SGSClient.Core.Authorization;
+using Windows.System;
+using SGSClient.Helpers;
 
 namespace SGSClient.Views;
 
@@ -68,7 +70,7 @@ public sealed partial class LoginPage : Page
         {
             string email = textBoxEmail.Text;
             string password = passwordBox1.Password;
-            string query = "SELECT Password FROM [dbo].[Registration] WHERE Email = @Email";
+            string query = "SELECT Id, Password FROM [dbo].[Registration] WHERE Email = @Email";
 
             using (SqlConnection con = new SqlConnection(db.con))
             {
@@ -85,6 +87,7 @@ public sealed partial class LoginPage : Page
                         if (dataSet.Tables[0].Rows.Count > 0)
                         {
                             string hashedPasswordWithSalt = dataSet.Tables[0].Rows[0]["Password"].ToString();
+                            string userId = dataSet.Tables[0].Rows[0]["id"].ToString();
                             string storedHashedPassword = hashedPasswordWithSalt.Substring(0, 64); // Pobierz tylko skrót hasła (bez soli)
                             string storedSalt = hashedPasswordWithSalt.Substring(64); // Pobierz solę
 
@@ -108,8 +111,11 @@ public sealed partial class LoginPage : Page
                                 //welcome.TextBlockName.Text = username;
                                 //welcome.Show();
                                 //Close();
-                                AppUser.isLoggedP = true;
-                                Frame.Navigate(typeof(HomePage), new DrillInNavigationTransitionInfo());
+                                AppSession.CurrentUserSession.IsLoggedIn = true;
+                                AppSession.CurrentUserSession.UserId = userId;
+                                string avatarUrl = GravatarHelper.GetAvatarUrl(email);
+                                //AppSession.CurrentUserSession.UserName = userName;
+                                Frame.Navigate(typeof(MyAccountPage), new DrillInNavigationTransitionInfo());
 
                             }
                             else
