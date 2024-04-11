@@ -8,11 +8,33 @@
     mc:Ignorable="d">
 
     <Grid>
-        <!-- Panel użytkownika -->
-        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10">
-            <TextBlock Text="{x:Bind core:AppSession.CurrentUserSession.UserName}" FontSize="16" FontWeight="Bold" />
-            <TextBlock Text="{x:Bind core:AppSession.CurrentUserSession.UserId}" FontSize="14" />
-            <Button Content="Wyloguj się" Click="LogoutButton_Click" />
-        </StackPanel>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="150"/>
+            <RowDefinition Height="150"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Text="Nazwa gry:" Grid.Row="0" Grid.Column="0" Margin="5"/>
+        <TextBox Grid.Row="0" Grid.Column="1" Margin="5" x:Name="gameNameTextBox"/>
+
+        <TextBlock Text="Opis gry:" Grid.Row="1" Grid.Column="0" Margin="5"/>
+        <TextBox Grid.Row="1" Grid.Column="1" Margin="5" x:Name="gameDescriptionTextBox" AutomationProperties.Name="multi-line TextBox" TextWrapping="Wrap" AcceptsReturn="True"/>
+
+        <TextBlock Text="Wymagania sprzętowe:" Grid.Row="2" Grid.Column="0" Margin="5"/>
+        <TextBox Grid.Row="2" Grid.Column="1" Margin="5" x:Name="hardwareRequirementsTextBox" AutomationProperties.Name="multi-line TextBox" TextWrapping="Wrap" AcceptsReturn="True"/>
+
+        <TextBlock Text="Silnik gry:" Grid.Row="3" Grid.Column="0" Margin="5"/>
+        <ComboBox Grid.Row="3" Grid.Column="1" Margin="5" x:Name="comboBoxGameEngine"/>
+
+        <TextBlock Text="Rodzaj gry:" Grid.Row="4" Grid.Column="0" Margin="5"/>
+        <ComboBox Grid.Row="4" Grid.Column="1" Margin="5" x:Name="comboBoxGameType"/>
+
+        <Button Content="Dodaj" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" Margin="5" Click="ButtonAdd_Click"/>
     </Grid>
 </Page>
