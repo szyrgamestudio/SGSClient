@@ -37,6 +37,7 @@ select
 from sgsGames g
 inner join sgsDevelopers d on d.Id = g.DeveloperId
 left join sgsGameLogo l on l.GameId = g.Id
+where g.DraftP = 0
 ";
 
             try
