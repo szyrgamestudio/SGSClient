@@ -57,35 +57,20 @@
                     <NavigationViewItem.Icon>
                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE7FC;" />
                     </NavigationViewItem.Icon>
-                    <NavigationViewItem.InfoBadge>
+                    <!--<NavigationViewItem.InfoBadge>
                         <InfoBadge
                             x:Name="infoBadge1"
                             Opacity="100"
                             Style="{StaticResource InformationalIconInfoBadgeStyle}"
                             Value="10" />
-                    </NavigationViewItem.InfoBadge>
+                    </NavigationViewItem.InfoBadge>-->
                 </NavigationViewItem>
-                
-                <NavigationViewItem x:Uid="Shell_UploadGame" helpers:NavigationHelper.NavigateTo="SGSClient.ViewModels.UploadGameViewModel">
+
+                <!--<NavigationViewItem x:Uid="Shell_UploadGame" helpers:NavigationHelper.NavigateTo="SGSClient.ViewModels.UploadGameViewModel">
                     <NavigationViewItem.Icon>
                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xE898;" />
                     </NavigationViewItem.Icon>
-                </NavigationViewItem>
-                <!--<NavigationViewItem x:Uid="Shell_Login" helpers:NavigationHelper.NavigateTo="SGSClient.ViewModels.LoginViewModel">
-                    <NavigationViewItem.Icon>
-                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xe7c3;"/>
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
-                <NavigationViewItem x:Uid="Shell_Register" helpers:NavigationHelper.NavigateTo="SGSClient.ViewModels.RegisterViewModel">
-                    <NavigationViewItem.Icon>
-                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xe7c3;"/>
-                    </NavigationViewItem.Icon>
                 </NavigationViewItem>-->
-                <NavigationViewItem x:Uid="Shell_MyAccount" helpers:NavigationHelper.NavigateTo="SGSClient.ViewModels.MyAccountViewModel">
-                    <NavigationViewItem.Icon>
-                        <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xe7c3;"/>
-                    </NavigationViewItem.Icon>
-                </NavigationViewItem>
             </NavigationView.MenuItems>
             <NavigationView.HeaderTemplate>
                 <DataTemplate>

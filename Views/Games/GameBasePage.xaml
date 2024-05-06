@@ -62,7 +62,7 @@
           <TextBlock
               Grid.Row="1"
               HorizontalAlignment="Center"
-              FontSize="30"
+              FontSize="24"
               Style="{StaticResource TitleTextBlockStyle}"
               x:Name="GameNameTextBlock">
           </TextBlock>
