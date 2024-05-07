@@ -55,6 +55,7 @@ public sealed partial class RegisterPage : Page
     private void buttonRegister_Click(object sender, RoutedEventArgs e)
     {
         string email = textBoxEmail.Text;
+        string username = textBoxAccountName.Text;
         string password = HashPassword(passwordBox1.Password);
         if (passwordBox1.Password.Length == 0)
         {
@@ -97,10 +98,24 @@ public sealed partial class RegisterPage : Page
                     DateTime registrationTime = DateTime.Now;
 
                     // Wstawienie zaszyfrowanego hasła do bazy danych
-                    SqlCommand cmd1 = new SqlCommand("INSERT INTO [dbo].[Registration] (Email, Password, RegistrationOnTime) VALUES (@Email, @Password, @RegistrationOnTime)", con);
+                    SqlCommand cmd1 = new SqlCommand(@"
+insert into sgsDevelopers (Name)
+select
+  @Username
+
+declare @devId int = SCOPE_IDENTITY()
+
+insert into Registration (Email, Password, RegistrationOnTime, DeveloperId)
+select
+  @Email
+, @Password
+, @RegistrationOnTime
+, @devId
+", con);
                     cmd1.Parameters.AddWithValue("@Email", email);
                     cmd1.Parameters.AddWithValue("@Password", password);
                     cmd1.Parameters.AddWithValue("@RegistrationOnTime", registrationTime);
+                    cmd1.Parameters.AddWithValue("@Username", username);
                     cmd1.ExecuteNonQuery();
 
                     errormessage.Text = "Zarejestrowano pomyślnie.";
@@ -122,6 +137,7 @@ public sealed partial class RegisterPage : Page
     {
         //textBoxFirstName.Text = "";
         //textBoxLastName.Text = "";
+        textBoxAccountName.Text = "";
         textBoxEmail.Text = "";
         passwordBox1.Password = "";
         passwordBoxConfirm.Password = "";

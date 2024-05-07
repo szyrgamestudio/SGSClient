@@ -27,6 +27,7 @@ select
 , g.Symbol   [GameSymbol]
 , d.Name     [GameDeveloper]
 , l.LogoPath [LogoPath]
+, t.Name	 [GameType]
 , g.PayloadName
 , g.ExeName
 , g.ZipLink
@@ -37,6 +38,7 @@ select
 from sgsGames g
 inner join sgsDevelopers d on d.Id = g.DeveloperId
 left join sgsGameLogo l on l.GameId = g.Id
+left join sgsGameTypes t on t.Id = g.TypeId
 where g.DraftP = 0
 ";
 
@@ -63,7 +65,8 @@ where g.DraftP = 0
                                 hardwareRequirements: reader["HardwareRequirements"].ToString(),
                                 otherInformations: reader["OtherInformation"].ToString(),
                                 gameDeveloper: reader["GameDeveloper"].ToString(),
-                                logoPath: reader["LogoPath"].ToString()
+                                logoPath: reader["LogoPath"].ToString(),
+                                gameType: reader["GameType"].ToString()
                             );
 
                             gamesList.Add(game);

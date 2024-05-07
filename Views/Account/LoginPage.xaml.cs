@@ -12,6 +12,7 @@ using SGSClient.Core.Database;
 using SGSClient.Core.Authorization;
 using Windows.System;
 using SGSClient.Helpers;
+using Microsoft.UI.Xaml.Navigation;
 
 namespace SGSClient.Views;
 
@@ -26,6 +27,15 @@ public sealed partial class LoginPage : Page
     {
         ViewModel = App.GetService<LoginViewModel>();
         InitializeComponent();
+        Loaded += LoginPage_Loaded; // Dodajemy obsługę zdarzenia Loaded
+    }
+
+    private void LoginPage_Loaded(object sender, RoutedEventArgs e)
+    {
+        if (AppSession.CurrentUserSession.IsLoggedIn == true)
+        {
+            Frame.Navigate(typeof(MyAccountPage), null, new DrillInNavigationTransitionInfo());
+        }
     }
     private string HashPasswordWithSalt(string password, byte[] salt)
     {
@@ -50,7 +60,6 @@ public sealed partial class LoginPage : Page
             return builder.ToString();
         }
     }
-
     private void buttonLogin_Click(object sender, RoutedEventArgs e)
     {
         if (textBoxEmail.Text.Length == 0)
@@ -71,6 +80,11 @@ public sealed partial class LoginPage : Page
             string email = textBoxEmail.Text;
             string password = passwordBox1.Password;
             string query = "SELECT Id, Password FROM [dbo].[Registration] WHERE Email = @Email";
+
+            if (AppSession.CurrentUserSession == null)
+            {
+                AppSession.CurrentUserSession = new UserSession();
+            }
 
             using (SqlConnection con = new SqlConnection(db.con))
             {
@@ -120,12 +134,12 @@ public sealed partial class LoginPage : Page
                             }
                             else
                             {
-                                errormessage.Text = "Sorry! Please enter existing emailid/password.";
+                                errormessage.Text = "Nieprawidłowe hasło.";
                             }
                         }
                         else
                         {
-                            errormessage.Text = "Sorry! Please enter existing emailid/password.";
+                            errormessage.Text = "Nieprawidłowe hasło.";
                         }
                     }
                 }
@@ -134,7 +148,16 @@ public sealed partial class LoginPage : Page
     }
     private void buttonRegister_Click(object sender, RoutedEventArgs e)
     {
+        if (AppSession.CurrentUserSession == null)
+        {
+            AppSession.CurrentUserSession = new UserSession();
+        }
+
         Frame.Navigate(typeof(RegisterPage), new DrillInNavigationTransitionInfo());
+    }
+    private void hyperlinkForgotPassword_Click(object sender, RoutedEventArgs e)
+    {
+        Frame.Navigate(typeof(ForgotPasswordPage), new DrillInNavigationTransitionInfo());
     }
 
 }

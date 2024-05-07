@@ -94,7 +94,7 @@
                                         HorizontalContentAlignment="Stretch"
                                         VerticalContentAlignment="Stretch"
                                         AutomationProperties.LabeledBy="{Binding ElementName=TitleText}"
-                                        Click="UploadButton_Click"
+                                        Click="LoginButton_Click"
                                         CornerRadius="{StaticResource OverlayCornerRadius}">
                                         <Grid
                                             Padding="24"

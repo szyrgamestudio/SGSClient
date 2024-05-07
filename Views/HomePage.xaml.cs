@@ -72,4 +72,8 @@ public sealed partial class HomePage : Page
     {
         Frame.Navigate(typeof(UploadGamePage), null, new DrillInNavigationTransitionInfo());
     }
+    private void LoginButton_Click(object sender, RoutedEventArgs e)
+    {
+        Frame.Navigate(typeof(LoginPage), null, new DrillInNavigationTransitionInfo());
+    }
 }

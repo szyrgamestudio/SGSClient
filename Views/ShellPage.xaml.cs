@@ -34,6 +34,7 @@ public sealed partial class ShellPage : Page
         App.MainWindow.SetTitleBar(AppTitleBar);
         App.MainWindow.Activated += MainWindow_Activated;
         AppTitleBarText.Text = "AppDisplayName".GetLocalized();
+        this.PointerPressed += ShellPage_PointerPressed;
     }
 
     private void OnLoaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
@@ -82,4 +83,23 @@ public sealed partial class ShellPage : Page
 
         args.Handled = result;
     }
+
+    private void ShellPage_PointerPressed(object sender, PointerRoutedEventArgs e)
+    {
+        var properties = e.GetCurrentPoint(this).Properties;
+
+        // Check if the XButton1 (back) or XButton2 (forward) is pressed
+        if (properties.IsXButton1Pressed)
+        {
+            // Handle the back navigation
+            ViewModel.NavigationService.GoBack();
+        }
+        else if (properties.IsXButton2Pressed)
+        {
+            // Handle the forward navigation (if applicable)
+            // You may need to implement a forward navigation method in your ViewModel
+            // ViewModel.NavigationService.GoForward();
+        }
+    }
+
 }

@@ -387,4 +387,13 @@
   <data name="Shell_MyAccount.Content" xml:space="preserve">
     <value>Dodaj grę</value>
   </data>
+  <data name="Shell_ForgotPassword.Content" xml:space="preserve">
+    <value>ForgotPassword</value>
+  </data>
+  <data name="Shell_MyGamesGrid.Content" xml:space="preserve">
+    <value>MyGamesGrid</value>
+  </data>
+  <data name="Shell_MyGames.Content" xml:space="preserve">
+    <value>Moje gry</value>
+  </data>
 </root>
