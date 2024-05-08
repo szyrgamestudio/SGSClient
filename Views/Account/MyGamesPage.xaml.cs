@@ -28,11 +28,11 @@ namespace SGSClient.Views
 
         private void LoadGamesFromDatabase()
         {
-            List<GamesViewModel> gamesList = configManagerSQL.LoadGamesFromDatabase();
+            List<GamesViewModel> gamesList = configManagerSQL.LoadMyGamesFromDatabase();
 
             foreach (var gameViewModel in gamesList)
             {
-                Games.Add(new Game { Title = gameViewModel.GameTitle, Genre = !string.IsNullOrEmpty(gameViewModel.GameType) ? gameViewModel.GameType : "-" });
+                Games.Add(new Game { Title = gameViewModel.GameTitle, Genre = !string.IsNullOrEmpty(gameViewModel.GameType) ? gameViewModel.GameType : "-" , DraftP = gameViewModel.GameType == "0" ? "Oczekuje na wydanie" : "Tak"});
             }
         }
 
@@ -52,6 +52,10 @@ namespace SGSClient.Views
             get; set;
         }
         public string Genre
+        {
+            get; set;
+        }
+        public string DraftP
         {
             get; set;
         }

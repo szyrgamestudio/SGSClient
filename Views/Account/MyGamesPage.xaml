@@ -11,9 +11,7 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <!-- Adjusted height for the first row -->
             <RowDefinition Height="Auto"/>
-            <!-- Adjusted height for the second row -->
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
@@ -35,6 +33,7 @@
             <controls:DataGrid.Columns>
                 <controls:DataGridTextColumn Header="Nazwa gry" Binding="{Binding Title}" Width="*" />
                 <controls:DataGridTextColumn Header="Gatunek" Binding="{Binding Genre}" Width="*" />
+                <controls:DataGridTextColumn Header="Dostępna w sklepie?" Binding="{Binding DraftP}" Width="*" />
                 <controls:DataGridTemplateColumn Width="Auto">
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>

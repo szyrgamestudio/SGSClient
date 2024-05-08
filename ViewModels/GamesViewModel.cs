@@ -20,6 +20,7 @@ namespace SGSClient.ViewModels
         private string _otherInformations;
         private string _logoPath;
         private string _gameType;
+        private string _draftP;
 
         public string GameSymbol
         {
@@ -109,10 +110,15 @@ namespace SGSClient.ViewModels
             get => _gameType;
             set => SetProperty(ref _gameType, value);
         }
+        public string DraftP
+        {
+            get => _draftP;
+            set => SetProperty(ref _draftP, value);
+        }
 
         // Aktualizacja konstruktora
         public GamesViewModel(string gameSymbol, string gameTitle, string gamePayloadName, string gameExeName,
-            string gameZipLink, string gameVersionLink, string gameDescription, string hardwareRequirements, string otherInformations, string gameDeveloper, string logoPath, string gameType)
+            string gameZipLink, string gameVersionLink, string gameDescription, string hardwareRequirements, string otherInformations, string gameDeveloper, string logoPath, string gameType, string draftP)
         {
             GameSymbol = gameSymbol;
             GameTitle = gameTitle;
@@ -126,6 +132,7 @@ namespace SGSClient.ViewModels
             GameDeveloper = gameDeveloper;
             LogoPath = logoPath;
             GameType = gameType;
+            DraftP = draftP;
         }
     }
 }
