@@ -11,8 +11,10 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="150"/>
             <RowDefinition Height="150"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
@@ -36,5 +38,13 @@
         <TextBlock Text="Rodzaj gry:" Grid.Row="4" Grid.Column="0" Margin="5"/>
         <ComboBox Grid.Row="4" Grid.Column="1" Margin="5" x:Name="comboBoxGameType"/>
 
-        <Button Content="Dodaj" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" Margin="5" Click="ButtonAdd_Click"/>
-    </Grid></Page>
+        <!-- Dodanie możliwości wprowadzenia linku do logo gry -->
+        <TextBlock Text="Link do logo gry:" Grid.Row="5" Grid.Column="0" Margin="5"/>
+        <TextBox Grid.Row="5" Grid.Column="1" Margin="5" x:Name="gameLogoLinkTextBox"/>
+
+        <!-- Przycisk do podglądu w przeglądarce -->
+        <Button Content="Podgląd logo" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" Margin="5" Click="PreviewLogoButton_Click"/>
+
+        <Button Content="Dodaj" Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" Margin="5" Click="ButtonAdd_Click"/>
+    </Grid>
+</Page>

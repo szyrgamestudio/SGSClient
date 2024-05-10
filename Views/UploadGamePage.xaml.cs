@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 using System.Windows.Controls;
@@ -25,8 +26,14 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
 
     public class GameTypeItem
     {
-        public int Id { get; set; }
-        public KeyValuePair<int, string> Pair { get; set; }
+        public int Id
+        {
+            get; set;
+        }
+        public KeyValuePair<int, string> Pair
+        {
+            get; set;
+        }
 
         public GameTypeItem(int id, KeyValuePair<int, string> pair)
         {
@@ -41,8 +48,14 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
     }
     public class GameEngineItem
     {
-        public int Id { get; set; }
-        public KeyValuePair<int, string> Pair { get; set; }
+        public int Id
+        {
+            get; set;
+        }
+        public KeyValuePair<int, string> Pair
+        {
+            get; set;
+        }
 
         public GameEngineItem(int id, KeyValuePair<int, string> pair)
         {
@@ -202,11 +215,11 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
 
         string otherInformation = "";
         string symbol = "";
-        string ?gameEngine = comboBoxGameEngine.Text;
+        string? gameEngine = comboBoxGameEngine.Text;
 
         var gameTypePair = (KeyValuePair<int, string>)comboBoxGameType.SelectedItem;
         int selectedKey = gameTypePair.Key;
-        string ?gameType = comboBoxGameType.SelectedValue.ToString();
+        string? gameType = comboBoxGameType.SelectedValue.ToString();
 
         if (gameEngine.Length == 0 || gameType.Length == 0)
         {
@@ -282,6 +295,29 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
         AppSession.CurrentUserSession.UserName = null;
 
         Frame.Navigate(typeof(LoginPage), new DrillInNavigationTransitionInfo());
+    }
+    private void PreviewLogoButton_Click(object sender, RoutedEventArgs e)
+    {
+        string logoLink = gameLogoLinkTextBox.Text;
+
+        if (string.IsNullOrEmpty(logoLink))
+        {
+            Console.WriteLine("Link do logo gry jest pusty. Wprowadź link i spróbuj ponownie.");
+            return;
+        }
+
+        try
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = logoLink,
+                UseShellExecute = true
+            });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Wystąpił błąd podczas otwierania linku do logo gry: " + ex.Message);
+        }
     }
 
 }
