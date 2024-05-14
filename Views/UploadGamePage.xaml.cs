@@ -1,21 +1,12 @@
-﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Data;
+﻿using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
-using System.Reflection.Metadata;
-using System.Runtime.CompilerServices;
-using System.Windows.Controls;
-using System.Windows.Documents;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using SGSClient.Core.Authorization;
 using SGSClient.Core.Database;
 using SGSClient.ViewModels;
-using Windows.UI;
-using Windows.UI.Text;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace SGSClient.Views;
 
@@ -296,21 +287,69 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
 
         Frame.Navigate(typeof(LoginPage), new DrillInNavigationTransitionInfo());
     }
-    private void PreviewLogoButton_Click(object sender, RoutedEventArgs e)
+
+    private int additionalImageCount = 1;
+    private void AddImageButton_Click(object sender, RoutedEventArgs e)
     {
-        string logoLink = gameLogoLinkTextBox.Text;
+        // Tworzenie nowego TextBoxa dla kolejnego zdjęcia
+        StackPanel imageTextBoxPanel = new StackPanel();
+        imageTextBoxPanel.Orientation = Orientation.Horizontal;
 
-        if (string.IsNullOrEmpty(logoLink))
+        TextBox newImageTextBox = new TextBox();
+        newImageTextBox.Name = "ImageTextBox" + (additionalImageCount + 1);
+        newImageTextBox.Margin = new Thickness(5);
+        newImageTextBox.PlaceholderText = "Wstaw link do zdjęcia";
+        newImageTextBox.Width = 400;
+        newImageTextBox.TextWrapping = TextWrapping.Wrap;
+
+        Button removeButton = new Button();
+        removeButton.Content = "Usuń";
+        removeButton.Margin = new Thickness(5);
+        removeButton.Click += RemoveImageButton_Click;
+
+        Button previewButton = new Button();
+        previewButton.Content = "Podgląd";
+        previewButton.Margin = new Thickness(5);
+        previewButton.Click += PreviewImageButton_Click;
+
+        // Dodanie nowego TextBoxa do StackPanelu
+        imageTextBoxPanel.Children.Add(newImageTextBox);
+        imageTextBoxPanel.Children.Add(removeButton);
+        imageTextBoxPanel.Children.Add(previewButton);
+
+        //StackPanel.SetMargin(imageTextBoxPanel, new Thickness(5));
+        MainStackPanel.Children.Insert(MainStackPanel.Children.Count - 1, imageTextBoxPanel); // Dodaj na przedostatniej pozycji
+
+        // Zwiększanie licznika dodatkowych zdjęć
+        additionalImageCount++;
+
+        // Ukrycie przycisku dodawania zdjęcia, jeśli osiągnięto limit
+        if (additionalImageCount >= 10) // Dla przykładu, limit 10 zdjęć
         {
-            Console.WriteLine("Link do logo gry jest pusty. Wprowadź link i spróbuj ponownie.");
-            return;
+            AddImageButton.Visibility = Visibility.Collapsed;
         }
+    }
 
+    private void RemoveImageButton_Click(object sender, RoutedEventArgs e)
+    {
+        Button removeButton = sender as Button;
+        StackPanel parentPanel = removeButton.Parent as StackPanel;
+
+        MainStackPanel.Children.Remove(parentPanel);
+    }
+
+    private void PreviewImageButton_Click(object sender, RoutedEventArgs e)
+    {
+        Button previewButton = sender as Button;
+        StackPanel parentPanel = previewButton.Parent as StackPanel;
+        TextBox imageTextBox = parentPanel.Children.OfType<TextBox>().FirstOrDefault();
+
+        string imageURL = imageTextBox.Text;
         try
         {
             Process.Start(new ProcessStartInfo
             {
-                FileName = logoLink,
+                FileName = imageURL,
                 UseShellExecute = true
             });
         }
@@ -319,5 +358,25 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
             Console.WriteLine("Wystąpił błąd podczas otwierania linku do logo gry: " + ex.Message);
         }
     }
+
+    private void gotoSGSClientWWW_Click(object sender, RoutedEventArgs e)
+    {
+        string URL = "https://sgsclient.massyn.dev/g/M8LTtSqUvKj4AZeA";
+        try
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = URL,
+                UseShellExecute = true
+            });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Wystąpił błąd podczas otwierania linku do logo gry: " + ex.Message);
+        }
+    }
+
+
+
 
 }

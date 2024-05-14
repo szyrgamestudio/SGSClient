@@ -74,7 +74,7 @@
                 </DataTemplate>
             </NavigationView.HeaderTemplate>
             <NavigationView.FooterMenuItems>
-                <NavigationViewItem x:Uid="Shell_UserAccount" helpers:NavigationHelper.NavigateTo="SGSClient.ViewModels.LoginViewModel">
+                <NavigationViewItem x:Uid="Shell_UserAccount" helpers:NavigationHelper.NavigateTo="SGSClient.ViewModels.UploadGameViewModel">
                     <NavigationViewItem.Icon>
                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xEE57;" />
                     </NavigationViewItem.Icon>
