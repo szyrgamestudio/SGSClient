@@ -9,42 +9,18 @@
     mc:Ignorable="d">
 
     <Grid x:Name="ContentArea">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <!-- Lewa kolumna -->
-        <StackPanel Grid.Column="0" Width="300" Height="Auto" Margin="5" Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="0.5" CornerRadius="5">
-            <!-- Nazwa Gry -->
-            <TextBlock HorizontalAlignment="Center" Margin="5" Padding="5" FontSize="20" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Nazwa gry" />
-            <TextBox HorizontalAlignment="Center" FontSize="14" Width="200" Style="{StaticResource TitleTextBlockStyle}" x:Name="gameNameTextBox" PlaceholderText="Wprowadź nazwę gry"></TextBox>
-            <!-- Logo Gry -->
-            <TextBlock HorizontalAlignment="Center" Margin="5" Padding="5" FontSize="20" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Logo gry" />
-            <TextBox HorizontalAlignment="Center" FontSize="14" Width="200" Style="{StaticResource TitleTextBlockStyle}" x:Name="gameLogoTextBox" PlaceholderText="Wprowadź link do loga twojej gry"></TextBox>
-            <!-- Przycisk Dodaj grę -->
-            <StackPanel Margin="0,10,0,10" HorizontalAlignment="Center" VerticalAlignment="Bottom">
-                <Button x:Name="addGameButton" Width="100" Content="Dodaj grę"  Style="{StaticResource AccentButtonStyle}">
-                    <Button.Flyout>
-                        <Flyout x:Name="addGameFlyout">
-                            <StackPanel>
-                                <TextBlock Margin="0,0,0,12" Style="{ThemeResource BaseTextBlockStyle}" Text="Czy na pewno chcesz dodać swoją grę?&#x0a;Pamiętaj, że aby gra znalazła się na liście wszystkich gier,&#x0a;musi zostać zaakceptowana przez administratora." />
-                                <Button HorizontalAlignment="Center" VerticalAlignment="Center" Content="Potwierdź" Style="{StaticResource AccentButtonStyle}"/>
-                            </StackPanel>
-                        </Flyout>
-                    </Button.Flyout>
-                </Button>
-            </StackPanel>
-            <!-- Przycisk Anuluj -->
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Button x:Name="cancelButton" Width="100" ClickMode="Press" Content="Anuluj" Style="{StaticResource AccentButtonStyle}" />
-            </StackPanel>
-        </StackPanel>
-
-        <!-- Prawa kolumna (ScrollViewer) -->
-        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Visible">
+        <ScrollViewer Grid.Row="0" Grid.Column="0" VerticalScrollBarVisibility="Visible">
             <Grid>
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
@@ -63,7 +39,17 @@
                                 <ColumnDefinition Width="*"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
                         </Grid>
-                        <TextBlock Grid.Column="0" Margin="0,5,5,0" Padding="0,5,5,0" HorizontalAlignment="Center" Text="Aktualna wersja gry:"></TextBlock>
+                        <TextBlock Grid.Column="0" Margin="0,5,5,0" Padding="0,5,5,0" HorizontalAlignment="Center" Text="Nazwa gry:*"></TextBlock>
+                        <TextBox Grid.Column="1" x:Name="gameNameTextBox" Margin="75,5,5,5" PlaceholderText="Nazwa mojej gry" Width="400" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="10px"></ColumnDefinition>
+                                <ColumnDefinition Width="*"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                        </Grid>
+                        <TextBlock Grid.Column="0" Margin="0,5,5,0" Padding="0,5,5,0" HorizontalAlignment="Center" Text="Aktualna wersja gry:*"></TextBlock>
                         <TextBox Grid.Column="1" x:Name="versionTextBox" Margin="20,5,5,5" PlaceholderText="1.0.0" Width="400" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
@@ -73,14 +59,33 @@
                                 <ColumnDefinition Width="*"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
                         </Grid>
-                        <TextBlock Grid.Column="0" Margin="0,5,5,0" Padding="0,5,5,0" HorizontalAlignment="Center" Text="Link do pliku ZIP z grą:"></TextBlock>
+                        <TextBlock Grid.Column="0" Margin="0,5,5,0" Padding="0,5,5,0" HorizontalAlignment="Center" Text="Link do pliku ZIP z grą:*"></TextBlock>
                         <TextBox Grid.Column="1" x:Name="linkZIPTextBox" Margin="5" PlaceholderText="Wstaw link do ZIP" Width="400" />
                     </StackPanel>
+                </StackPanel>
 
+                <!-- Logo gry -->
+                <StackPanel Grid.Row="1" Margin="5" Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="0.5" CornerRadius="5">
+                    <TextBlock Margin="5" Padding="5" FontSize="20" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Logo gry" />
+                    <Rectangle Height="1" HorizontalAlignment="Stretch" Fill="{ThemeResource ControlElevationBorderBrush}" />
+
+                    <StackPanel x:Name="ImageTextBox1Panels" Orientation="Horizontal">
+                        <TextBox x:Name="gameLogoTextBox" Margin="5" PlaceholderText="Wprowadź link do loga twojej gry" Width="400" />
+                        <Button Margin="5" Click="PreviewImageButton_Click" ToolTipService.ToolTip="Podgląd">
+                            <Button.Content>
+                                <FontIcon Glyph="&#xE71E;"/>
+                            </Button.Content>
+                        </Button>
+                        <Button x:Name="AddImageButton2j" Margin="5" ToolTipService.ToolTip="Dodaj zdjęcie na hosting SGS" Click="gotoSGSClientWWW_Click">
+                            <Button.Content>
+                                <FontIcon Glyph="&#xE8A7;"/>
+                            </Button.Content>
+                        </Button>
+                    </StackPanel>
                 </StackPanel>
 
                 <!-- Zrzuty ekranu -->
-                <StackPanel Grid.Row="1" Margin="5" Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="0.5" CornerRadius="5" x:Name="MainStackPanel">
+                <StackPanel Grid.Row="2" Margin="5" Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="0.5" CornerRadius="5" x:Name="MainStackPanel">
                     <TextBlock Margin="5" Padding="5" FontSize="20" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Zrzuty ekranu" />
                     <Rectangle Height="1" HorizontalAlignment="Stretch" Fill="{ThemeResource ControlElevationBorderBrush}" />
 
@@ -114,29 +119,42 @@
                 </StackPanel>
 
                 <!-- Opis -->
-                <StackPanel Grid.Row="2" Margin="5" Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="0.5" CornerRadius="5">
+                <StackPanel Grid.Row="3" Margin="5" Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="0.5" CornerRadius="5">
                     <TextBlock Margin="5" Padding="5" FontSize="20" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Opis" />
                     <Rectangle Height="1" HorizontalAlignment="Stretch" Fill="{ThemeResource ControlElevationBorderBrush}" />
                     <TextBox Height="100" PlaceholderText="Tutaj wprowadź opis swojej gry" Margin="5" Padding="5" FontSize="14" Style="{ThemeResource CaptionTextBlockStyle}" x:Name="gameDescriptionTextBox" AutomationProperties.Name="multi-line TextBox" TextWrapping="Wrap" AcceptsReturn="True"></TextBox>
                 </StackPanel>
 
                 <!-- Wymagania systemowe -->
-                <StackPanel Grid.Row="3" Margin="5" Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="0.5" CornerRadius="5">
+                <StackPanel Grid.Row="4" Margin="5" Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="0.5" CornerRadius="5">
                     <TextBlock Margin="5" Padding="5" FontSize="20" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Wymagania systemowe" />
                     <Rectangle Height="1" HorizontalAlignment="Stretch" Fill="{ThemeResource ControlElevationBorderBrush}" />
                     <TextBox Height="100" PlaceholderText="Tutaj wprowadź wymagania sprzętowe swojej gry" Margin="5" Padding="5" FontSize="14" Style="{ThemeResource CaptionTextBlockStyle}" x:Name="hardwareRequirementsTextBox" AutomationProperties.Name="multi-line TextBox" TextWrapping="Wrap" AcceptsReturn="True"></TextBox>
                 </StackPanel>
 
                 <!-- Pozostałe informacje -->
-                <StackPanel Grid.Row="4" Margin="5" Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="0.5" CornerRadius="5" x:Name="OtherInformationsStackPanel">
+                <StackPanel Grid.Row="5" Margin="5" Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="0.5" CornerRadius="5" x:Name="OtherInformationsStackPanel">
                     <TextBlock Margin="5" Padding="5" FontSize="20" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Pozostałe informacje" />
                     <Rectangle Height="1" HorizontalAlignment="Stretch" Fill="{ThemeResource ControlElevationBorderBrush}" />
-                    <!--<TextBlock Margin="5" Padding="5" FontSize="14" Style="{ThemeResource CaptionTextBlockStyle}" x:Name="OtherInformationsTextBlock"></TextBlock>-->
                     <ComboBox Grid.Row="3" Grid.Column="1" Margin="5" x:Name="comboBoxGameEngine" PlaceholderText="Wybierz silnik gry" VerticalAlignment="Center" Width="200"/>
                     <ComboBox Grid.Row="4" Grid.Column="1" Margin="5" x:Name="comboBoxGameType" PlaceholderText="Wybierz rodzaj gry" VerticalAlignment="Center" Width="200"/>
                 </StackPanel>
             </Grid>
         </ScrollViewer>
-    </Grid>
 
+        <!-- Always visible buttons -->
+        <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
+            <Button x:Name="AddGameButton" Content="Dodaj grę" Margin="5" Style="{StaticResource AccentButtonStyle}">
+                <Button.Flyout>
+                    <Flyout x:Name="addGameFlyout">
+                        <StackPanel>
+                            <TextBlock Margin="0,0,0,12" Style="{ThemeResource BaseTextBlockStyle}" Text="Czy na pewno chcesz dodać swoją grę?&#x0a;Pamiętaj, że aby gra znalazła się na liście wszystkich gier,&#x0a;musi zostać zaakceptowana przez administratora." />
+                            <Button HorizontalAlignment="Center" VerticalAlignment="Center" Content="Potwierdź" Style="{StaticResource AccentButtonStyle}" Click="ButtonAdd_Click"/>
+                        </StackPanel>
+                    </Flyout>
+                </Button.Flyout>
+            </Button>
+            <Button x:Name="CancelButton" Content="Anuluj" Margin="5"/>
+        </StackPanel>
+    </Grid>
 </Page>
