@@ -201,10 +201,11 @@ where g.Symbol = @GameSymbol
         public string GetGameVersion(string gameIdentifier)
         {
             string query = @"
-        SELECT VersionLink
-        FROM sgsGames
-        WHERE Symbol = @GameIdentifier
-    ";
+select
+  g.CurrentVersion
+from sgsGames g
+where g.Symbol = @GameIdentifier
+";
 
             try
             {
@@ -220,13 +221,8 @@ where g.Symbol = @GameSymbol
 
                         if (result != null)
                         {
-                            string versionLink = result.ToString();
-
-                            // Pobierz zawartość pliku tekstowego z linku
-                            string versionContent = httpClient.GetStringAsync(versionLink).Result;
-
-                            // Zwróć zawartość pliku jako wersję gry
-                            return versionContent.Trim();
+                            string versionContent = result.ToString();
+                            return versionContent;
                         }
                         else
                         {

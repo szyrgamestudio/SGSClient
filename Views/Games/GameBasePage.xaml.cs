@@ -258,7 +258,7 @@ namespace SGSClient.Views
                 else
                 {
                     Status = LauncherStatus.downloadingGame;
-                    _onlineVersion = new SGSVersion.Version(await httpClient.GetStringAsync(gameVersionLink));
+                    _onlineVersion = GetOnlineVersion();
                 }
 
                 HttpResponseMessage response = await httpClient.GetAsync(new Uri(gameZipLink ?? ""));
