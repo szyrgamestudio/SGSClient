@@ -3,6 +3,7 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using SGSClient.Core.Authorization;
 using SGSClient.Core.Database;
@@ -302,15 +303,33 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
         newImageTextBox.Width = 400;
         newImageTextBox.TextWrapping = TextWrapping.Wrap;
 
+        #region Przycisk "Usuń"
         Button removeButton = new Button();
-        removeButton.Content = "Usuń";
         removeButton.Margin = new Thickness(5);
         removeButton.Click += RemoveImageButton_Click;
 
+        var removeButtonFontIcon = new FontIcon();
+        removeButtonFontIcon.Glyph = "\xE74D";
+        removeButton.Content = removeButtonFontIcon;
+
+        ToolTip removeToolTip = new ToolTip();
+        removeToolTip.Content = "Usuń";
+        ToolTipService.SetToolTip(removeButton, removeToolTip);
+        #endregion
+
+        #region Przycisk "Podgląd"
         Button previewButton = new Button();
-        previewButton.Content = "Podgląd";
         previewButton.Margin = new Thickness(5);
         previewButton.Click += PreviewImageButton_Click;
+
+        var previewButtonFontIcon = new FontIcon();
+        previewButtonFontIcon.Glyph = "\xE71E";
+        previewButton.Content = previewButtonFontIcon;
+
+        ToolTip previewToolTip = new ToolTip();
+        previewToolTip.Content = "Podgląd";
+        ToolTipService.SetToolTip(previewButton, previewToolTip);
+        #endregion
 
         // Dodanie nowego TextBoxa do StackPanelu
         imageTextBoxPanel.Children.Add(newImageTextBox);
