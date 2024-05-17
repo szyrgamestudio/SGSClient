@@ -3,7 +3,6 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using SGSClient.Core.Authorization;
 using SGSClient.Core.Database;
@@ -136,7 +135,8 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
         }
         catch (Exception ex)
         {
-            //MessageBox.Show("Błąd podczas ładowania rodzajów gier: " + ex.Message);
+            Console.WriteLine($"Błąd: {ex.Message}");
+            throw;
         }
     }
     private void GetSelectedGameTypeKey()
@@ -147,10 +147,6 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
             selectedGameTypeId = selectedGameType.Id; // Przypisanie id do zmiennej na zewnątrz metody
             string gameType = selectedGameType.Pair.Value;
         }
-        else
-        {
-            // Obsługa przypadku, gdy nic nie jest wybrane w comboBoxGameType
-        }
     }
     private void GetSelectedGameEngineKey()
     {
@@ -159,10 +155,6 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
             var selectedGameEngine = (GameEngineItem)comboBoxGameEngine.SelectedItem;
             selectedGameEngineId = selectedGameEngine.Id; // Przypisanie id do zmiennej na zewnątrz metody
             string engineName = selectedGameEngine.Pair.Value;
-        }
-        else
-        {
-            // Obsługa przypadku, gdy nic nie jest wybrane w comboBoxGameType
         }
     }
 
@@ -179,7 +171,9 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
     }
     private void ButtonAdd_Click(object sender, RoutedEventArgs e)
     {
-        if (gameNameTextBox.Text.Length == 0 || gameDescriptionTextBox.Text.Length == 0 || hardwareRequirementsTextBox.Text.Length == 0)
+        if (string.IsNullOrEmpty(gameNameTextBox.Text) ||
+            string.IsNullOrEmpty(gameDescriptionTextBox.Text) ||
+            string.IsNullOrEmpty(gameLogoTextBox.Text))
         {
             return;
         }
@@ -187,25 +181,38 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
         GetSelectedGameTypeKey();
         GetSelectedGameEngineKey();
         // Pobranie wartości z formularza
-        string gameName = gameNameTextBox.Text;
-        string payloadName = "";
-        string exeName = "";
-        string zipLink = "";
-        string versionLink = "";
+        var gameName = gameNameTextBox.Text;      //Nazwa gry
+        var currentVersion = versionTextBox.Text; //Aktualna wersja gry
+        var zipLink = linkZIPTextBox.Text;        //Link do pliku ZIP z grą
+        var gameLogo = gameLogoTextBox.Text;      //Link do loga gry
+        var exeName = "";                         //Plik wykonawczy gry
 
-        /*Opis gry*/
+        //Opis gry
         string gameDescription = gameDescriptionTextBox.Text;
         string[] gameDescriptionLines = gameDescription.Split(new string[] { "\r\n", "\n", "\r" }, StringSplitOptions.None);
         SqlParameter gameDescriptionParam = new SqlParameter("@gameDescriptionParam", SqlDbType.NVarChar);
         gameDescriptionParam.Value = string.Join(Environment.NewLine, gameDescriptionLines);
 
-        /*Wymagania sprzętowe*/
+        //Wymagania sprzętowe
         string hardwareRequirements = hardwareRequirementsTextBox.Text;
         string[] hardwareRequirementsLines = hardwareRequirements.Split(new string[] { "\r\n", "\n", "\r" }, StringSplitOptions.None);
         SqlParameter hardwareRequirementsParam = new SqlParameter("@hardwareRequirementsParam", SqlDbType.NVarChar);
         hardwareRequirementsParam.Value = string.Join(Environment.NewLine, hardwareRequirementsLines);
 
-        string otherInformation = "";
+        //Galeria zdjęć
+        List<string> galleryImageUrls = new List<string>();
+        foreach (var child in gameGalleryStackPanel.Children)
+        {
+            if (child is StackPanel stackPanel)
+            {
+                TextBox textBox = stackPanel.Children.OfType<TextBox>().FirstOrDefault();
+                if (textBox != null && !string.IsNullOrWhiteSpace(textBox.Text))
+                {
+                    galleryImageUrls.Add(textBox.Text);
+                }
+            }
+        }
+
         string symbol = "";
         string? gameEngine = comboBoxGameEngine.Text;
 
@@ -243,17 +250,26 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
             SqlCommand command = new SqlCommand(query, connection);
             command.Parameters.AddWithValue("@Name", gameName);
             command.Parameters.AddWithValue("@DeveloperId", AppSession.CurrentUserSession.UserId);
-            command.Parameters.AddWithValue("@PayloadName", payloadName);
+            //command.Parameters.AddWithValue("@PayloadName", payloadName);
             command.Parameters.AddWithValue("@ExeName", exeName);
             command.Parameters.AddWithValue("@ZipLink", zipLink);
-            command.Parameters.AddWithValue("@VersionLink", versionLink);
+            //command.Parameters.AddWithValue("@VersionLink", versionLink);
             command.Parameters.Add(gameDescriptionParam);
             command.Parameters.Add(hardwareRequirementsParam);
-            command.Parameters.AddWithValue("@OtherInformation", otherInformation);
+            //command.Parameters.AddWithValue("@OtherInformation", otherInformation);
             command.Parameters.AddWithValue("@Symbol", symbol);
             command.Parameters.AddWithValue("@GameEngine", gameEngine);
             command.Parameters.AddWithValue("@GameType", gameType);
 
+            /*Iteracja przez każdy obraz wstawiony do galerii zdjęć*/
+            foreach (string imageUrl in galleryImageUrls)
+            {
+                using (SqlCommand command2 = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@ImageUrl", imageUrl);
+                    command.ExecuteNonQuery();
+                }
+            }
 
             try
             {
@@ -279,14 +295,6 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
             }
         }
 
-    }
-    private void LogoutButton_Click(object sender, RoutedEventArgs e)
-    {
-        AppSession.CurrentUserSession.IsLoggedIn = false;
-        AppSession.CurrentUserSession.UserId = null;
-        AppSession.CurrentUserSession.UserName = null;
-
-        Frame.Navigate(typeof(LoginPage), new DrillInNavigationTransitionInfo());
     }
 
     private int additionalImageCount = 1;
@@ -337,7 +345,7 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
         imageTextBoxPanel.Children.Add(previewButton);
 
         //StackPanel.SetMargin(imageTextBoxPanel, new Thickness(5));
-        MainStackPanel.Children.Insert(MainStackPanel.Children.Count - 1, imageTextBoxPanel); // Dodaj na przedostatniej pozycji
+        gameGalleryStackPanel.Children.Insert(gameGalleryStackPanel.Children.Count - 1, imageTextBoxPanel); // Dodaj na przedostatniej pozycji
 
         // Zwiększanie licznika dodatkowych zdjęć
         additionalImageCount++;
@@ -354,7 +362,7 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
         Button removeButton = sender as Button;
         StackPanel parentPanel = removeButton.Parent as StackPanel;
 
-        MainStackPanel.Children.Remove(parentPanel);
+        gameGalleryStackPanel.Children.Remove(parentPanel);
     }
 
     private void PreviewImageButton_Click(object sender, RoutedEventArgs e)
@@ -380,7 +388,7 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
 
     private void gotoSGSClientWWW_Click(object sender, RoutedEventArgs e)
     {
-        string URL = "https://sgsclient.massyn.dev/g/M8LTtSqUvKj4AZeA";
+        var URL = "https://sgsclient.massyn.dev/g/M8LTtSqUvKj4AZeA";
         try
         {
             Process.Start(new ProcessStartInfo
@@ -395,9 +403,14 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
         }
     }
 
+    [Obsolete]
+    private void LogoutButton_Click(object sender, RoutedEventArgs e)
+    {
+        AppSession.CurrentUserSession.IsLoggedIn = false;
+        AppSession.CurrentUserSession.UserId = null;
+        AppSession.CurrentUserSession.UserName = null;
 
-
-
-
+        Frame.Navigate(typeof(LoginPage), new DrillInNavigationTransitionInfo());
+    }
 
 }
