@@ -40,7 +40,17 @@
                             </Grid.ColumnDefinitions>
                         </Grid>
                         <TextBlock Grid.Column="0" Margin="0,5,5,0" Padding="0,5,5,0" HorizontalAlignment="Center" Text="Nazwa gry:*"></TextBlock>
-                        <TextBox Grid.Column="1" x:Name="gameNameTextBox" Margin="75,5,5,5" PlaceholderText="Nazwa mojej gry" Width="400" />
+                        <TextBox Grid.Column="1" x:Name="gameNameTextBox" Margin="125,5,5,5" PlaceholderText="Nazwa mojej gry" Width="400" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="10px"></ColumnDefinition>
+                                <ColumnDefinition Width="*"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                        </Grid>
+                        <TextBlock Grid.Column="0" Margin="0,5,5,0" Padding="0,5,5,0" HorizontalAlignment="Center" Text="Symbol / nazwa folderu gry:*"></TextBlock>
+                        <TextBox Grid.Column="1" x:Name="symbolTextBox" Margin="20,5,5,5" PlaceholderText="SymbolMojejGry" Width="400" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <Grid>
@@ -50,7 +60,7 @@
                             </Grid.ColumnDefinitions>
                         </Grid>
                         <TextBlock Grid.Column="0" Margin="0,5,5,0" Padding="0,5,5,0" HorizontalAlignment="Center" Text="Aktualna wersja gry:*"></TextBlock>
-                        <TextBox Grid.Column="1" x:Name="versionTextBox" Margin="20,5,5,5" PlaceholderText="1.0.0" Width="400" />
+                        <TextBox Grid.Column="1" x:Name="versionTextBox" Margin="70,5,5,5" PlaceholderText="1.0.0" Width="400" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <Grid>
@@ -60,7 +70,17 @@
                             </Grid.ColumnDefinitions>
                         </Grid>
                         <TextBlock Grid.Column="0" Margin="0,5,5,0" Padding="0,5,5,0" HorizontalAlignment="Center" Text="Link do pliku ZIP z grą:*"></TextBlock>
-                        <TextBox Grid.Column="1" x:Name="linkZIPTextBox" Margin="5" PlaceholderText="Wstaw link do ZIP" Width="400" />
+                        <TextBox Grid.Column="1" x:Name="linkZIPTextBox" Margin="55,5,5,5" PlaceholderText="Wstaw link do ZIP" Width="400" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="10px"></ColumnDefinition>
+                                <ColumnDefinition Width="*"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                        </Grid>
+                        <TextBlock Grid.Column="0" Margin="0,5,5,0" Padding="0,5,5,0" HorizontalAlignment="Center" Text="Plik wykonawczy gry:*"></TextBlock>
+                        <TextBox Grid.Column="1" x:Name="gameEXETextBox" Margin="65,5,5,5" PlaceholderText="game.exe" Width="400" />
                     </StackPanel>
                 </StackPanel>
 
@@ -138,6 +158,7 @@
                     <Rectangle Height="1" HorizontalAlignment="Stretch" Fill="{ThemeResource ControlElevationBorderBrush}" />
                     <ComboBox Grid.Row="3" Grid.Column="1" Margin="5" x:Name="comboBoxGameEngine" PlaceholderText="Wybierz silnik gry" VerticalAlignment="Center" Width="200"/>
                     <ComboBox Grid.Row="4" Grid.Column="1" Margin="5" x:Name="comboBoxGameType" PlaceholderText="Wybierz rodzaj gry" VerticalAlignment="Center" Width="200"/>
+                    <TextBox  PlaceholderText="Tutaj wprowadź dodatkowe informacje o grze" Margin="5" Padding="5" FontSize="14" Style="{ThemeResource CaptionTextBlockStyle}" x:Name="otherInfoTextBox" AutomationProperties.Name="multi-line TextBox" TextWrapping="Wrap" AcceptsReturn="True"></TextBox>
                 </StackPanel>
             </Grid>
         </ScrollViewer>

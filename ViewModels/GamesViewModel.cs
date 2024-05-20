@@ -5,6 +5,7 @@ namespace SGSClient.ViewModels
 {
     public class GamesViewModel : ObservableRecipient
     {
+        public string _gameId;
         private string _gameSymbol;
         private string _gameName;
         private string _gameDeveloper;
@@ -22,6 +23,11 @@ namespace SGSClient.ViewModels
         private string _gameType;
         private string _draftP;
 
+        public string GameId
+        {
+            get => _gameId;
+            set => SetProperty(ref _gameId, value);
+        }
         public string GameSymbol
         {
             get => _gameSymbol;
@@ -117,9 +123,10 @@ namespace SGSClient.ViewModels
         }
 
         // Aktualizacja konstruktora
-        public GamesViewModel(string gameSymbol, string gameTitle, string gamePayloadName, string gameExeName,
+        public GamesViewModel(string gameId, string gameSymbol, string gameTitle, string gamePayloadName, string gameExeName,
             string gameZipLink, string gameVersionLink, string gameDescription, string hardwareRequirements, string otherInformations, string gameDeveloper, string logoPath, string gameType, string draftP)
         {
+            GameId = gameId;
             GameSymbol = gameSymbol;
             GameTitle = gameTitle;
             GamePayloadName = gamePayloadName;

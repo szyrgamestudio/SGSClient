@@ -56,7 +56,6 @@
                         </DataTemplate>
                     </controls:DataGridTemplateColumn.CellTemplate>
                 </controls:DataGridTemplateColumn>
-
             </controls:DataGrid.Columns>
         </controls:DataGrid>
     </Grid>

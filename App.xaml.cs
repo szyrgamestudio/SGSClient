@@ -74,6 +74,8 @@ public partial class App : Application
             services.AddSingleton<IFileService, FileService>();
 
             // Views and ViewModels
+            services.AddTransient<EditGameViewModel>();
+            services.AddTransient<EditGamePage>();
             services.AddTransient<MyGamesViewModel>();
             services.AddTransient<MyGamesPage>();
             services.AddTransient<ForgotPasswordViewModel>();

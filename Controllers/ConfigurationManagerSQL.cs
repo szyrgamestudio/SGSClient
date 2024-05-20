@@ -57,6 +57,7 @@ where g.DraftP = 0
                         while (reader.Read())
                         {
                             GamesViewModel game = new GamesViewModel(
+                                gameId: reader["GameId"].ToString(),
                                 gameSymbol: reader["GameSymbol"].ToString(),
                                 gameTitle: reader["Title"].ToString(),
                                 gamePayloadName: reader["PayloadName"].ToString(),
@@ -92,7 +93,7 @@ where g.DraftP = 0
 
             string query = @"
 select  
-  g.Id
+  g.Id       [gameId]
 , g.Title
 , g.Symbol   [GameSymbol]
 , d.Name     [GameDeveloper]
@@ -128,6 +129,7 @@ where r.id = @userId/* and g.DraftP = 0*/
                         while (reader.Read())
                         {
                             GamesViewModel game = new GamesViewModel(
+                                gameId: reader["GameId"].ToString(),
                                 gameSymbol: reader["GameSymbol"].ToString(),
                                 gameTitle: reader["Title"].ToString(),
                                 gamePayloadName: reader["PayloadName"].ToString(),

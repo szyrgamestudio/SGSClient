@@ -6,6 +6,7 @@ using SGSClient.Core.Database;
 using SGSClient.ViewModels;
 using System;
 using System.Collections.ObjectModel;
+using Windows.Gaming.Input;
 
 namespace SGSClient.Views
 {
@@ -32,21 +33,22 @@ namespace SGSClient.Views
 
             foreach (var gameViewModel in gamesList)
             {
-                Games.Add(new Game { Title = gameViewModel.GameTitle, Genre = !string.IsNullOrEmpty(gameViewModel.GameType) ? gameViewModel.GameType : "-" , DraftP = gameViewModel.GameType == "0" ? "Oczekuje na wydanie" : "Tak"});
+                Games.Add(new Game { GameId = gameViewModel.GameId, Title = gameViewModel.GameTitle, Genre = !string.IsNullOrEmpty(gameViewModel.GameType) ? gameViewModel.GameType : "-", DraftP = gameViewModel.GameType == "0" ? "Oczekuje na wydanie" : "Tak" });
             }
         }
 
         private void Action_Click(object sender, RoutedEventArgs e)
         {
-            // Tutaj napisz kod obsługujący kliknięcie przycisku "Akcja"
-            // Możesz użyć sender do identyfikacji, który wiersz został kliknięty
-            // i podejmij odpowiednią akcję
-            Frame.Navigate(typeof(GamesPage), null, new DrillInNavigationTransitionInfo());
+            Frame.Navigate(typeof(EditGamePage), null, new DrillInNavigationTransitionInfo());
         }
     }
 
     public class Game
     {
+        public string GameId
+        {
+            get; set;
+        }
         public string Title
         {
             get; set;

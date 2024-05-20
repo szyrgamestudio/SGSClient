@@ -96,7 +96,7 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
         }
         catch (Exception ex)
         {
-            // Obsługa błędów
+            Console.WriteLine($"Błąd: {ex.Message}");
         }
     }
 
@@ -172,20 +172,23 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
     private void ButtonAdd_Click(object sender, RoutedEventArgs e)
     {
         if (string.IsNullOrEmpty(gameNameTextBox.Text) ||
-            string.IsNullOrEmpty(gameDescriptionTextBox.Text) ||
-            string.IsNullOrEmpty(gameLogoTextBox.Text))
+            string.IsNullOrEmpty(versionTextBox.Text) ||
+            string.IsNullOrEmpty(linkZIPTextBox.Text) ||
+            string.IsNullOrEmpty(gameEXETextBox.Text) ||
+            string.IsNullOrEmpty(gameDescriptionTextBox.Text))
         {
-            return;
+            //return;
         }
 
         GetSelectedGameTypeKey();
         GetSelectedGameEngineKey();
         // Pobranie wartości z formularza
         var gameName = gameNameTextBox.Text;      //Nazwa gry
+        var symbol = symbolTextBox.Text;          //Symbol gry
         var currentVersion = versionTextBox.Text; //Aktualna wersja gry
         var zipLink = linkZIPTextBox.Text;        //Link do pliku ZIP z grą
         var gameLogo = gameLogoTextBox.Text;      //Link do loga gry
-        var exeName = "";                         //Plik wykonawczy gry
+        var exeName = gameEXETextBox.Text;        //Plik wykonawczy gry
 
         //Opis gry
         string gameDescription = gameDescriptionTextBox.Text;
@@ -198,6 +201,12 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
         string[] hardwareRequirementsLines = hardwareRequirements.Split(new string[] { "\r\n", "\n", "\r" }, StringSplitOptions.None);
         SqlParameter hardwareRequirementsParam = new SqlParameter("@hardwareRequirementsParam", SqlDbType.NVarChar);
         hardwareRequirementsParam.Value = string.Join(Environment.NewLine, hardwareRequirementsLines);
+
+        //Pozostałe informacje - pole tekstowe
+        string otherInformations = otherInfoTextBox.Text;
+        string[] otherInformationsLines = otherInformations.Split(new string[] { "\r\n", "\n", "\r" }, StringSplitOptions.None);
+        SqlParameter otherInformationsParam = new SqlParameter("@otherInformationsParam", SqlDbType.NVarChar);
+        otherInformationsParam.Value = string.Join(Environment.NewLine, otherInformationsLines);
 
         //Galeria zdjęć
         List<string> galleryImageUrls = new List<string>();
@@ -213,85 +222,67 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
             }
         }
 
-        string symbol = "";
-        string? gameEngine = comboBoxGameEngine.Text;
 
-        var gameTypePair = (KeyValuePair<int, string>)comboBoxGameType.SelectedItem;
-        int selectedKey = gameTypePair.Key;
-        string? gameType = comboBoxGameType.SelectedValue.ToString();
-
-        if (gameEngine.Length == 0 || gameType.Length == 0)
-        {
-            return; //jawale syf
-        }
+        var gameEngine = selectedGameEngineId == 0 ? (int?)null : selectedGameEngineId;
+        var gameType = selectedGameTypeId == 0 ? (int?)null : selectedGameTypeId;
 
         string connectionString = db.con;
+        string addGameQuery = @"
+    declare @developerId int = (select r.DeveloperId from Registration r where r.Id = @userId)
+    INSERT INTO sgsGames (Title, DeveloperId, PayloadName, ExeName, ZipLink, VersionLink, Description, HardwareRequirements, OtherInformation, Symbol, EngineId, TypeId, DraftP)
+    VALUES (@Name, @developerId, NULL, @ExeName, @ZipLink, @currentVersion, @gameDescriptionParam, @hardwareRequirementsParam, @otherInformationsParam, @Symbol, @GameEngine, @GameType, 1);
+    SELECT SCOPE_IDENTITY();";
+
+        string addImageQuery = "INSERT INTO sgsGameImages (GameId, ImagePath) VALUES (@GameId, @ImageUrl)";
+        string addLogoQuery = "INSERT INTO sgsGameLogos (GameId, LogoPath) VALUES (@GameId, @ImageUrl)";
+
         using (SqlConnection connection = new SqlConnection(connectionString))
         {
-            // Zapytanie SQL do wstawienia danych
-            string query = @"
-        insert into sgsGames (Title, DeveloperId, PayloadName, ExeName, ZipLink, VersionLink, Description, HardwareRequirements, OtherInformation, Symbol, EngineId, TypeId, DraftP)
-        select 
-          @Name
-        , @DeveloperId
-        , @PayloadName
-        , @ExeName
-        , @ZipLink
-        , @VersionLink
-        , @gameDescriptionParam
-        , @hardwareRequirementsParam
-        , @OtherInformation
-        , @Symbol
-        , @GameEngine
-        , @GameType
-        , 1
-        ";
-
-            SqlCommand command = new SqlCommand(query, connection);
+            SqlCommand command = new SqlCommand(addGameQuery, connection);
             command.Parameters.AddWithValue("@Name", gameName);
-            command.Parameters.AddWithValue("@DeveloperId", AppSession.CurrentUserSession.UserId);
-            //command.Parameters.AddWithValue("@PayloadName", payloadName);
+            command.Parameters.AddWithValue("@userId", AppSession.CurrentUserSession.UserId);
             command.Parameters.AddWithValue("@ExeName", exeName);
             command.Parameters.AddWithValue("@ZipLink", zipLink);
-            //command.Parameters.AddWithValue("@VersionLink", versionLink);
+            command.Parameters.AddWithValue("@currentVersion", currentVersion);
             command.Parameters.Add(gameDescriptionParam);
             command.Parameters.Add(hardwareRequirementsParam);
-            //command.Parameters.AddWithValue("@OtherInformation", otherInformation);
+            command.Parameters.Add(otherInformationsParam);
             command.Parameters.AddWithValue("@Symbol", symbol);
             command.Parameters.AddWithValue("@GameEngine", gameEngine);
             command.Parameters.AddWithValue("@GameType", gameType);
 
-            /*Iteracja przez każdy obraz wstawiony do galerii zdjęć*/
-            foreach (string imageUrl in galleryImageUrls)
-            {
-                using (SqlCommand command2 = new SqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@ImageUrl", imageUrl);
-                    command.ExecuteNonQuery();
-                }
-            }
-
             try
             {
-                // Otwarcie połączenia i wykonanie zapytania
                 connection.Open();
-                int rowsAffected = command.ExecuteNonQuery();
-                //int rowsAffected = 1;
+                int gameId = Convert.ToInt32(command.ExecuteScalar());
 
-                // Sprawdzenie czy dane zostały poprawnie dodane
-                if (rowsAffected > 0)
+                foreach (string imageUrl in galleryImageUrls)
                 {
-                    //MessageBox.Show("Gra została pomyślnie dodana do bazy danych.");
-                    // Tutaj możesz dodać dodatkowe czynności po dodaniu gry
+                    SqlCommand imageCommand = new SqlCommand(addImageQuery, connection);
+                    imageCommand.Parameters.AddWithValue("@GameId", gameId);
+                    imageCommand.Parameters.AddWithValue("@ImageUrl", imageUrl);
+                    imageCommand.ExecuteNonQuery();
+                }
+
+                SqlCommand logoCommand = new SqlCommand(addLogoQuery, connection);
+                logoCommand.Parameters.AddWithValue("@GameId", gameId);
+                logoCommand.Parameters.AddWithValue("@ImageUrl", gameLogo);
+                logoCommand.ExecuteNonQuery();
+
+
+                // Informacja o pomyślnym dodaniu
+                if (gameId > 0)
+                {
+                    Frame.Navigate(typeof(MyAccountPage), new DrillInNavigationTransitionInfo());
                 }
                 else
                 {
-                    //MessageBox.Show("Błąd podczas dodawania gry do bazy danych.");
+                    System.Windows.MessageBox.Show("Błąd podczas dodawania gry do bazy danych.");
                 }
             }
             catch (Exception ex)
             {
-                //MessageBox.Show("Błąd: " + ex.Message);
+                System.Windows.MessageBox.Show("Błąd: " + ex.Message);
             }
         }
 
@@ -388,7 +379,7 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
 
     private void gotoSGSClientWWW_Click(object sender, RoutedEventArgs e)
     {
-        var URL = "https://sgsclient.massyn.dev/g/M8LTtSqUvKj4AZeA";
+        var URL = "https://sgsclient.massyn.dev/upload";
         try
         {
             Process.Start(new ProcessStartInfo
