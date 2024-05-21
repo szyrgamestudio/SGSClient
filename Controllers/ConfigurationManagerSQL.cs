@@ -23,7 +23,7 @@ namespace SGSClient.Controllers
 
             string query = @"
 select
-  g.Id
+  g.Id       [GameId]
 , g.Title
 , g.Symbol   [GameSymbol]
 , d.Name     [GameDeveloper]

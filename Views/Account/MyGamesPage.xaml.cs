@@ -39,8 +39,13 @@ namespace SGSClient.Views
 
         private void Action_Click(object sender, RoutedEventArgs e)
         {
-            Frame.Navigate(typeof(EditGamePage), null, new DrillInNavigationTransitionInfo());
+            var button = sender as Button;
+            var game = button?.DataContext as Game;
+
+            if (game != null)
+                Frame.Navigate(typeof(EditGamePage), game.GameId, new DrillInNavigationTransitionInfo());
         }
+
     }
 
     public class Game

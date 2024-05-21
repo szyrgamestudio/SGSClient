@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Media.Imaging;
+using Microsoft.UI.Xaml.Navigation;
 using SGSClient.Core.Authorization;
 using SGSClient.Core.Database;
 using SGSClient.ViewModels;
@@ -17,6 +18,7 @@ namespace SGSClient.Views
         private int selectedGameTypeId;
         private int selectedGameEngineId;
         private int gameId;
+        public string GameId { get; private set; }
 
         public class GameTypeItem
         {
@@ -40,7 +42,19 @@ namespace SGSClient.Views
                 return Pair.Value;
             }
         }
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
 
+            if (e.Parameter is string gameIdParam && int.TryParse(gameIdParam, out int parsedGameId))
+            {
+                gameId = parsedGameId;
+                GameId = gameIdParam;
+
+                // Load game data after gameId has been set
+                LoadGameData();
+            }
+        }
         public class GameEngineItem
         {
             public int Id
@@ -64,15 +78,15 @@ namespace SGSClient.Views
             }
         }
 
-        //public EditGameViewModel ViewModel { get; }
+        public EditGameViewModel ViewModel { get; }
 
         public EditGamePage()
         {
-            //ViewModel = App.GetService<EditGameViewModel>();
+            ViewModel = App.GetService<EditGameViewModel>();
             InitializeComponent();
             LoadGameTypes();
             LoadGameEngines();
-            LoadGameData();
+            //LoadGameData();
         }
 
         private void LoadGameTypes()
@@ -170,8 +184,6 @@ namespace SGSClient.Views
         {
             string connectionString = db.con;
             string query = "SELECT * FROM sgsGames WHERE Id = @GameId";
-            //gameId = (int)Frame.GetNavigationState();
-            gameId = 2;
 
             try
             {
