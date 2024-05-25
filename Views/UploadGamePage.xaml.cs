@@ -177,7 +177,7 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
             string.IsNullOrEmpty(gameEXETextBox.Text) ||
             string.IsNullOrEmpty(gameDescriptionTextBox.Text))
         {
-            //return;
+            return;
         }
 
         GetSelectedGameTypeKey();
@@ -347,7 +347,6 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
             AddImageButton.Visibility = Visibility.Collapsed;
         }
     }
-
     private void RemoveImageButton_Click(object sender, RoutedEventArgs e)
     {
         Button removeButton = sender as Button;
@@ -355,7 +354,6 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
 
         gameGalleryStackPanel.Children.Remove(parentPanel);
     }
-
     private void PreviewImageButton_Click(object sender, RoutedEventArgs e)
     {
         Button previewButton = sender as Button;
@@ -376,7 +374,6 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
             Console.WriteLine("Wystąpił błąd podczas otwierania linku do logo gry: " + ex.Message);
         }
     }
-
     private void gotoSGSClientWWW_Click(object sender, RoutedEventArgs e)
     {
         var URL = "https://sgsclient.massyn.dev/upload";
@@ -392,6 +389,10 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
         {
             Console.WriteLine("Wystąpił błąd podczas otwierania linku do logo gry: " + ex.Message);
         }
+    }
+    private void ButtonCancel_Click(object sender, RoutedEventArgs e)
+    {
+        Frame.Navigate(typeof(LoginPage), new DrillInNavigationTransitionInfo());
     }
 
     [Obsolete]

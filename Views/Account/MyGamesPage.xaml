@@ -48,7 +48,7 @@
                 <controls:DataGridTemplateColumn Width="Auto">
                     <controls:DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button Click="Action_Click" ToolTipService.ToolTip="Podgląd">
+                            <Button Click="Preview_Click" ToolTipService.ToolTip="Podgląd">
                                 <Button.Content>
                                     <FontIcon Glyph="&#xE71E;" FontSize="12" />
                                 </Button.Content>

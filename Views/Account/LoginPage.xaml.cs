@@ -37,7 +37,7 @@ public sealed partial class LoginPage : Page
             Frame.Navigate(typeof(MyAccountPage), null, new DrillInNavigationTransitionInfo());
         }
     }
-    private string HashPasswordWithSalt(string password, byte[] salt)
+    public string HashPasswordWithSalt(string password, byte[] salt)
     {
         // Dołącz sol do hasła
         byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
@@ -101,7 +101,7 @@ public sealed partial class LoginPage : Page
                         if (dataSet.Tables[0].Rows.Count > 0)
                         {
                             string hashedPasswordWithSalt = dataSet.Tables[0].Rows[0]["Password"].ToString();
-                            string userId = dataSet.Tables[0].Rows[0]["id"].ToString();
+                            string userId = dataSet.Tables[0].Rows[0]["Id"].ToString();
                             string storedHashedPassword = hashedPasswordWithSalt.Substring(0, 64); // Pobierz tylko skrót hasła (bez soli)
                             string storedSalt = hashedPasswordWithSalt.Substring(64); // Pobierz solę
 
@@ -112,7 +112,10 @@ public sealed partial class LoginPage : Page
                             if (enteredPasswordHash == storedHashedPassword)
                             {
                                 DateTime loginTime = DateTime.Now;
-                                string updateText = "UPDATE [dbo].[Registration] SET LoginOnTime = @LoginTime WHERE Email = @Email";
+                                string updateText = @"
+UPDATE Registration SET LoginOnTime = @LoginTime WHERE Email = @Email;
+UPDATE Registration SET AccessToken = null WHERE Email = @Email;
+";
                                 using (SqlCommand updateCmdText = new SqlCommand(updateText, con))
                                 {
                                     updateCmdText.Parameters.AddWithValue("@LoginTime", loginTime);
@@ -121,16 +124,14 @@ public sealed partial class LoginPage : Page
                                     updateCmdText.ExecuteNonQuery();
                                 }
 
-                                //string username = dataSet.Tables[0].Rows[0]["FirstName"].ToString() + " " + dataSet.Tables[0].Rows[0]["LastName"].ToString();
-                                //welcome.TextBlockName.Text = username;
-                                //welcome.Show();
-                                //Close();
                                 AppSession.CurrentUserSession.IsLoggedIn = true;
                                 AppSession.CurrentUserSession.UserId = userId;
                                 string avatarUrl = GravatarHelper.GetAvatarUrl(email);
-                                //AppSession.CurrentUserSession.UserName = userName;
-                                Frame.Navigate(typeof(MyAccountPage), new DrillInNavigationTransitionInfo());
 
+                                // Zapisz sesję
+                                SessionManager.SaveSession(AppSession.CurrentUserSession);
+
+                                Frame.Navigate(typeof(MyAccountPage), new DrillInNavigationTransitionInfo());
                             }
                             else
                             {
@@ -144,6 +145,7 @@ public sealed partial class LoginPage : Page
                     }
                 }
             }
+
         }
     }
     private void buttonRegister_Click(object sender, RoutedEventArgs e)

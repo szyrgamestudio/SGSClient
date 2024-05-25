@@ -55,7 +55,7 @@
             <!--About-->
             <TextBlock x:Uid="Settings_About" Style="{StaticResource BodyStrongTextBlockStyle}" />
             <StackPanel>
-                <labs:SettingsExpander Description="© 2023 SzyrGameStudio. All rights reserved." Header="SGSClient">
+                <labs:SettingsExpander Description="© 2024 SzyrGameStudio. All rights reserved." Header="SGSClient">
                     <TextBlock
                         Margin="0,-2,0,0"
                         Foreground="{ThemeResource TextFillColorSecondaryBrush}"

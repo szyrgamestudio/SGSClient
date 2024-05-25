@@ -175,7 +175,7 @@
                     </Flyout>
                 </Button.Flyout>
             </Button>
-            <Button x:Name="CancelButton" Content="Anuluj" Margin="5"/>
+            <Button x:Name="CancelButton" Content="Anuluj" Margin="5" Click="ButtonCancel_Click"/>
         </StackPanel>
     </Grid>
 </Page>

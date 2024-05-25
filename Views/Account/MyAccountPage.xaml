@@ -244,6 +244,7 @@
             </GridView.Header>
         </GridView>
         <!--<InfoBar IsOpen="True" Width="800px" IsClosable="False" Severity="Error" Title="Uwaga" Message="Używasz wersję testową SGSClienta. Prosimy o zgłaszanie błedów na adres kontakt@szyrgamestudio.com." />-->
+        <Button Content="Wyloguj" Click="LogoutButton_Click" />
 
         <VisualStateManager.VisualStateGroups>
             <!--  Visual states reflect the application's window size  -->

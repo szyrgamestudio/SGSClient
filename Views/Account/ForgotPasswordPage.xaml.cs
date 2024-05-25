@@ -4,9 +4,11 @@ using System.Net.Mail;
 using System.Net;
 using System.Text;
 using System.Data.SqlClient;
-using System.Security.Cryptography;
 using SGSClient.Core.Database;
 using SGSClient.ViewModels;
+using SGSClient.Services;
+using System.Data;
+using Microsoft.UI.Xaml.Media.Animation;
 
 namespace SGSClient.Views;
 public sealed partial class ForgotPasswordPage : Page
@@ -35,29 +37,119 @@ public sealed partial class ForgotPasswordPage : Page
     #region Event Handlers
 
     /// <summary>
-    /// Obsługa zdarzenia kliknięcia przycisku "Resetuj hasło".
+    /// Obsługa zdarzenia kliknięcia przycisku "Wyślij kod resetu".
     /// </summary>
-    private void buttonResetPassword_Click(object sender, RoutedEventArgs e)
+    private void buttonSendResetCodePassword_Click(object sender, RoutedEventArgs e)
     {
+        IPasswordHasher passwordHasher = new PasswordHasher();
+
         string email = textBoxEmail.Text;
 
         if (!string.IsNullOrWhiteSpace(email) && IsValidEmail(email))
         {
             // Wygeneruj nowe hasło
             string newPassword = GenerateNewPassword();
-            string securePassword = HashPassword(newPassword);
+            string securePassword = passwordHasher.HashPassword(newPassword);
 
             // Aktualizuj hasło w bazie danych
-            UpdatePasswordInDatabase(email, securePassword);
+            UpdateTokenInDatabase(email, securePassword);
 
             // Wysyłanie e-maila z nowym hasłem
-            SendNewPasswordEmail(email, newPassword);
+            SendAccessTokenEmail(email, newPassword);
         }
         else
         {
-            errorMessage.Text = "Wprowadź poprawny adres e-mail";
+            errorMessage.Message = "Wprowadź poprawny adres e-mail";
+            errorMessage.Visibility = Visibility.Visible;
+            errorMessage.IsOpen = true;
         }
     }
+
+    /// <summary>
+    /// Obsługa zdarzenia kliknięcia przycisku "Resetuj hasło".
+    /// </summary>
+    private void buttonResetPassword_Click(object sender, RoutedEventArgs e)
+    {
+        string email = textBoxEmail.Text;
+        string token = textBoxAccessKey.Text;
+
+        if (!string.IsNullOrWhiteSpace(email) && IsValidEmail(email) && !string.IsNullOrWhiteSpace(token))
+        {
+            // Sprawdź poprawność tokenu (może być za pomocą bazy danych lub innej metody weryfikacji)
+            if (IsTokenValid(email, token))
+            {
+                // Pokaż pola do wprowadzenia nowego hasła
+                labelNewPassword.Visibility = Visibility.Visible;
+                textBoxNewPassword.Visibility = Visibility.Visible;
+                labelRepeatPassword.Visibility = Visibility.Visible;
+                textBoxRepeatPassword.Visibility = Visibility.Visible;
+                buttonSaveNewPassword.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                errorMessage.Message = "Niepoprawny kod resetu.";
+                errorMessage.Visibility = Visibility.Visible;
+                errorMessage.IsOpen = true;
+            }
+        }
+        else
+        {
+            errorMessage.Message = "Wprowadź poprawny adres e-mail / kod resetu.";
+            errorMessage.Visibility = Visibility.Visible;
+            errorMessage.IsOpen = true;
+        }
+    }
+
+    // Sprawdza, czy podany token jest poprawny dla danego e-maila
+    private bool IsTokenValid(string email, string token)
+    {
+        using (SqlConnection con = new SqlConnection(db.con))
+        {
+            string query = "SELECT Id, AccessToken FROM [dbo].[Registration] WHERE Email = @Email";
+            con.Open();
+            using (SqlCommand cmd = new SqlCommand(query, con))
+            {
+                IPasswordHasher passwordHasher = new PasswordHasher();
+
+                cmd.Parameters.AddWithValue("@Email", email);
+
+                using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                {
+                    DataSet dataSet = new DataSet();
+                    adapter.Fill(dataSet);
+
+                    if (dataSet.Tables[0].Rows.Count > 0)
+                    {
+                        string hashedPasswordWithSalt = dataSet.Tables[0].Rows[0]["AccessToken"].ToString();
+                        string userId = dataSet.Tables[0].Rows[0]["id"].ToString();
+                        string storedHashedToken = hashedPasswordWithSalt.Substring(0, 64); // Pobierz tylko skrót hasła (bez soli)
+                        string storedSalt = hashedPasswordWithSalt.Substring(64); // Pobierz solę
+                        string password = textBoxAccessKey.Text;
+
+                        // Wygeneruj skrót hasła na podstawie podanego hasła i przechowywanej soli
+                        string enteredToken = passwordHasher.HashPasswordWithSalt(password, Convert.FromBase64String(storedSalt));
+
+                        // Sprawdź czy obliczony skrót hasła jest zgodny z przechowywanym skrótem
+                        if (enteredToken == storedHashedToken)
+                        {
+                            buttonSendResetCodePassword.IsEnabled = false;
+                            buttonResetPassword.IsEnabled = false;
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+    }
+
     #endregion
     #region Private Methods
 
@@ -67,40 +159,6 @@ public sealed partial class ForgotPasswordPage : Page
     private string GenerateNewPassword()
     {
         return Guid.NewGuid().ToString().Substring(0, 8);
-    }
-
-    /// <summary>
-    /// Szyfruje hasło za pomocą algorytmu SHA-256.
-    /// </summary>
-    private string HashPassword(string password)
-    {
-        // Generate a random salt
-        byte[] salt;
-        new RNGCryptoServiceProvider().GetBytes(salt = new byte[16]);
-
-        // Append the salt to the password
-        byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
-        byte[] saltedPassword = new byte[passwordBytes.Length + salt.Length];
-        Buffer.BlockCopy(passwordBytes, 0, saltedPassword, 0, passwordBytes.Length);
-        Buffer.BlockCopy(salt, 0, saltedPassword, passwordBytes.Length, salt.Length);
-
-        // Compute the hash using SHA-256 with salt
-        using (SHA256 sha256Hash = SHA256.Create())
-        {
-            byte[] hashBytes = sha256Hash.ComputeHash(saltedPassword);
-
-            // Convert the hash bytes to a hexadecimal string
-            StringBuilder builder = new StringBuilder();
-            for (int i = 0; i < hashBytes.Length; i++)
-            {
-                builder.Append(hashBytes[i].ToString("x2"));
-            }
-
-            // Append the salt to the hashed password
-            builder.Append(Convert.ToBase64String(salt));
-
-            return builder.ToString();
-        }
     }
 
     /// <summary>
@@ -145,41 +203,116 @@ public sealed partial class ForgotPasswordPage : Page
             }
         }
     }
+    private void UpdateTokenInDatabase(string email, string accessToken)
+    {
+        // Połączenie do bazy danych
+        using (SqlConnection connection = new SqlConnection(db.con))
+        {
+            try
+            {
+                connection.Open();
+
+                // Zapytanie SQL do aktualizacji hasła dla użytkownika o danym adresie e-mail
+                string query = "update Registration set AccessToken = @AccessToken WHERE Email = @Email";
+
+                // Utwórz nowy obiekt SqlCommand z zapytaniem SQL i połączeniem
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    // Dodaj parametry do zapytania SQL
+                    command.Parameters.AddWithValue("@AccessToken", accessToken);
+                    command.Parameters.AddWithValue("@Email", email);
+
+                    // Wykonaj zapytanie SQL
+                    int rowsAffected = command.ExecuteNonQuery();
+
+                    // Sprawdź, czy hasło zostało zaktualizowane poprawnie
+                    if (rowsAffected > 0)
+                    {
+                        Console.WriteLine($"Token użytkownika {email} został zaktualizowany.");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Nie udało się zaktualizować tokenu dla użytkownika {email}.");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Wystąpił błąd podczas aktualizacji hasła w bazie danych: {ex.Message}");
+            }
+        }
+    }
+    private void buttonSaveNewPassword_Click(object sender, RoutedEventArgs e)
+    {
+        string email = textBoxEmail.Text;
+        string newPassword = textBoxNewPassword.Password;
+        string repeatPassword = textBoxRepeatPassword.Password;
+
+        if (newPassword == repeatPassword)
+        {
+            IPasswordHasher passwordHasher = new PasswordHasher();
+            string securePassword = passwordHasher.HashPassword(newPassword);
+
+            // Aktualizuj hasło w bazie danych
+            UpdatePasswordInDatabase(email, securePassword);
+            Frame.Navigate(typeof(LoginPage), new DrillInNavigationTransitionInfo());
+        }
+        else
+        {
+            errorMessage.Message = "Hasła się nie zgadzają.";
+            errorMessage.Visibility = Visibility.Visible;
+            errorMessage.IsOpen = true;
+        }
+    }
+
     /// <summary>
     /// Wysyła wiadomość e-mail z nowym hasłem.
     /// </summary>
-    private void SendNewPasswordEmail(string email, string newPassword)
+    private void SendAccessTokenEmail(string email, string accessToken)
     {
         // Ustawienia serwera SMTP
-        string smtpServer = "smtp-mail.outlook.com";
+        string smtpServer = "smtppro.zoho.eu";
         int smtpPort = 587;
-        string smtpUsername = "rbarczynski000@outlook.com";
-        string smtpPassword = "m)WJ\"w)CVxiz/.2";
+        string smtpUsername = "sgsclient@massyn.dev";
+        string smtpPassword = "EcM74if.!864Ps!";
 
         // Adres e-mail nadawcy
-        string fromEmail = "rbarczynski000@outlook.com";
+        string fromEmail = "sgsclient@massyn.dev";
 
         // Tworzenie klienta SMTP
         using (SmtpClient smtpClient = new SmtpClient(smtpServer, smtpPort))
         {
-            smtpClient.EnableSsl = true; // Włącz SSL/TLS
-            smtpClient.UseDefaultCredentials = false;
-            smtpClient.Credentials = new NetworkCredential(smtpUsername, smtpPassword);
+            try
+            {
+                smtpClient.EnableSsl = true; // Włącz SSL/TLS
+                smtpClient.UseDefaultCredentials = false;
+                smtpClient.Credentials = new NetworkCredential(smtpUsername, smtpPassword);
 
-            // Tworzenie wiadomości e-mail
-            MailMessage mailMessage = new MailMessage();
-            mailMessage.From = new MailAddress(fromEmail);
-            mailMessage.To.Add(email);
-            mailMessage.Subject = "Nowe hasło";
+                // Tworzenie wiadomości e-mail
+                MailMessage mailMessage = new MailMessage();
+                mailMessage.From = new MailAddress(fromEmail, "SGSClient");
+                mailMessage.To.Add(email);
+                mailMessage.Subject = "Twój nowy token resetu hasła";
 
-            // Treść e-maila
-            StringBuilder body = new StringBuilder();
-            body.AppendLine("Twoje nowe hasło zostało wygenerowane.");
-            body.AppendLine($"Nowe hasło: {newPassword}");
-            mailMessage.Body = body.ToString();
+                // Treść e-maila
+                StringBuilder body = new StringBuilder();
+                body.AppendLine("Cześć,\n");
+                body.AppendLine("Informujemy, że na Twoje żądanie został wygenerowany nowy token resetu hasła.\n");
+                body.AppendLine($"Twój token resetu hasła: {accessToken}\n");
+                body.AppendLine("Jeśli to nie Ty prosiłeś/aś o reset hasła, zignoruj tę wiadomość i daj nam znać, abyśmy mogli zabezpieczyć Twoje konto.\n\n");
+                body.AppendLine("Z poważaniem,");
+                body.AppendLine("SGS");
+                mailMessage.Body = body.ToString();
 
-            // Wysłanie wiadomości e-mail
-            smtpClient.Send(mailMessage);
+                // Wysłanie wiadomości e-mail
+                smtpClient.Send(mailMessage);
+                //Frame.Navigate(typeof(LoginPage), new DrillInNavigationTransitionInfo());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
         }
     }
 
@@ -190,7 +323,7 @@ public sealed partial class ForgotPasswordPage : Page
     {
         try
         {
-            var addr = new System.Net.Mail.MailAddress(email);
+            var addr = new MailAddress(email);
             return addr.Address == email;
         }
         catch

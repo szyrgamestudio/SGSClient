@@ -4,9 +4,7 @@ using Microsoft.UI.Xaml.Media.Animation;
 using SGSClient.Controllers;
 using SGSClient.Core.Database;
 using SGSClient.ViewModels;
-using System;
 using System.Collections.ObjectModel;
-using Windows.Gaming.Input;
 
 namespace SGSClient.Views
 {
@@ -33,7 +31,7 @@ namespace SGSClient.Views
 
             foreach (var gameViewModel in gamesList)
             {
-                Games.Add(new Game { GameId = gameViewModel.GameId, Title = gameViewModel.GameTitle, Genre = !string.IsNullOrEmpty(gameViewModel.GameType) ? gameViewModel.GameType : "-", DraftP = gameViewModel.GameType == "0" ? "Oczekuje na wydanie" : "Tak" });
+                Games.Add(new Game { GameId = gameViewModel.GameId, Title = gameViewModel.GameTitle, Genre = !string.IsNullOrEmpty(gameViewModel.GameType) ? gameViewModel.GameType : "-", DraftP = gameViewModel.GameType == "0" ? "Oczekuje na wydanie" : "Tak", gameSymbol = gameViewModel.GameSymbol });
             }
         }
 
@@ -44,6 +42,15 @@ namespace SGSClient.Views
 
             if (game != null)
                 Frame.Navigate(typeof(EditGamePage), game.GameId, new DrillInNavigationTransitionInfo());
+        }
+
+        private void Preview_Click(object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+            var game = button?.DataContext as Game;
+
+            if (game != null)
+                Frame.Navigate(typeof(GameBasePage), game.gameSymbol, new DrillInNavigationTransitionInfo());
         }
 
     }
@@ -63,6 +70,10 @@ namespace SGSClient.Views
             get; set;
         }
         public string DraftP
+        {
+            get; set;
+        }
+        public string gameSymbol
         {
             get; set;
         }

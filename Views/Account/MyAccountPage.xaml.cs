@@ -168,4 +168,11 @@ where r.Id = @userId";
     {
         Frame.Navigate(typeof(MyGamesPage), null, new DrillInNavigationTransitionInfo());
     }
+
+    private void LogoutButton_Click(object sender, RoutedEventArgs e)
+    {
+        SessionManager.Logout();
+        Frame.Navigate(typeof(LoginPage));
+    }
+
 }

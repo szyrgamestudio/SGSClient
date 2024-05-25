@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml;
 
 using SGSClient.Activation;
 using SGSClient.Contracts.Services;
+using SGSClient.Core.Authorization;
 using SGSClient.Core.Contracts.Services;
 using SGSClient.Core.Services;
 using SGSClient.Helpers;
@@ -122,5 +123,12 @@ public partial class App : Application
         App.GetService<IAppNotificationService>().Show(string.Format("SGSClientWelcomeNotificationPayload".GetLocalized(), AppContext.BaseDirectory));
 
         await App.GetService<IActivationService>().ActivateAsync(args);
+
+        // Ładowanie sesji
+        var session = SessionManager.LoadSession();
+        if (session != null && session.IsLoggedIn)
+        {
+            AppSession.CurrentUserSession = session;
+        }
     }
 }
