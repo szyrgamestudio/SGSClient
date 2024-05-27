@@ -17,7 +17,7 @@ namespace SGSClient.Controllers
             _connectionString = connectionString;
         }
 
-        public List<GamesViewModel> LoadGamesFromDatabase()
+        public List<GamesViewModel> LoadGamesFromDatabase(bool bypassDraftP)
         {
             List<GamesViewModel> gamesList = new List<GamesViewModel>();
 
@@ -41,7 +41,7 @@ from sgsGames g
 inner join sgsDevelopers d on d.Id = g.DeveloperId
 left join sgsGameLogo l on l.GameId = g.Id
 left join sgsGameTypes t on t.Id = g.TypeId
-where g.DraftP = 0
+where g.DraftP = 0 and @bypassDraftP = 0 or @bypassDraftP = 1
 ";
 
             try
@@ -52,6 +52,7 @@ where g.DraftP = 0
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
+                        command.Parameters.AddWithValue("@bypassDraftP", bypassDraftP);
                         SqlDataReader reader = command.ExecuteReader();
 
                         while (reader.Read())

@@ -348,18 +348,20 @@ namespace SGSClient.Views
 
             string connectionString = db.con;
 
-            string updateGameQuery = @"UPDATE sgsGames
-                                       SET Title = @GameName,
-                                           Symbol = @Symbol,
-                                           VersionLink = @Version,
-                                           ZipLink = @ZipLink,
-                                           ExeName = @ExeName,
-                                           Description = @gameDescriptionParam,
-                                           HardwareRequirements = @hardwareRequirementsParam,
-                                           OtherInformation = @otherInfoParam,
-                                           TypeId = @GameTypeId,
-                                           EngineId = @GameEngineId
-                                       WHERE Id = @GameId";
+            string updateGameQuery = @"
+update g set
+  g.Title = @GameName
+, g.Symbol = @Symbol
+, g.VersionLink = @Version
+, g.ZipLink = @ZipLink
+, g.ExeName = @ExeName
+, g.Description = @gameDescriptionParam
+, g.HardwareRequirements = @hardwareRequirementsParam
+, g.OtherInformation = @otherInfoParam
+, g.TypeId = @GameTypeId
+, g.EngineId = @GameEngineId
+from sgsGames g
+where g.Id = @GameId";
 
             try
             {
@@ -397,6 +399,7 @@ namespace SGSClient.Views
             Frame.GoBack(new DrillInNavigationTransitionInfo());
         }
 
+        #region Actions
         private void UpdateGameLogo(int gameId, string gameLogo)
         {
             string connectionString = db.con;
@@ -436,7 +439,6 @@ namespace SGSClient.Views
                 Console.WriteLine($"Error: {ex.Message}");
             }
         }
-
         private void UpdateGameImages(int gameId)
         {
             string connectionString = db.con;
@@ -474,7 +476,9 @@ namespace SGSClient.Views
                 Console.WriteLine($"Error: {ex.Message}");
             }
         }
+        #endregion
 
+        #region Buttons
         private void RemoveImageButton_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button button && button.Parent is StackPanel panel)
@@ -482,7 +486,6 @@ namespace SGSClient.Views
                 gameGalleryStackPanel.Children.Remove(panel);
             }
         }
-
         private void PreviewImageButton_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button button && button.Parent is StackPanel panel && panel.Children[0] is TextBox textBox)
@@ -501,7 +504,6 @@ namespace SGSClient.Views
                 }
             }
         }
-
         private void AddImageButton_Click(object sender, RoutedEventArgs e)
         {
             // Tworzenie nowego TextBoxa dla kolejnego zdjęcia
@@ -560,8 +562,6 @@ namespace SGSClient.Views
                 AddImageButton.Visibility = Visibility.Collapsed;
             }
         }
-
-
         private void gotoSGSClientWWW_Click(object sender, RoutedEventArgs e)
         {
             var URL = "https://sgsclient.massyn.dev/upload";
@@ -578,6 +578,10 @@ namespace SGSClient.Views
                 Console.WriteLine("Wystąpił błąd podczas otwierania linku do logo gry: " + ex.Message);
             }
         }
-
+        private void ButtonCancel_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.Navigate(typeof(MyGamesPage), new DrillInNavigationTransitionInfo());
+        }
+        #endregion
     }
 }

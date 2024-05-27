@@ -55,7 +55,7 @@ namespace SGSClient.Views
             {
                 gameIdentifier = parameterString;
 
-                var gameData = configManagerSQL.LoadGamesFromDatabase().Find(g => g.GameSymbol == gameIdentifier);
+                var gameData = configManagerSQL.LoadGamesFromDatabase(true).Find(g => g.GameSymbol == gameIdentifier);
                 if (gameData != null)
                 {
                     gameTitle = gameData.GameTitle;
@@ -122,7 +122,7 @@ namespace SGSClient.Views
         }
         private void LoadLogoFromDatabase(string gameName)
         {
-            var gameData = configManagerSQL.LoadGamesFromDatabase().Find(g => g.GameSymbol == gameName);
+            var gameData = configManagerSQL.LoadGamesFromDatabase(true).Find(g => g.GameSymbol == gameName);
 
             if (gameData == null || string.IsNullOrEmpty(gameData.LogoPath))
             {

@@ -25,7 +25,7 @@ namespace SGSClient.Views
 
         private void LoadGamesFromDatabase()
         {
-            List<GamesViewModel> gamesList = configManagerSQL.LoadGamesFromDatabase();
+            List<GamesViewModel> gamesList = configManagerSQL.LoadGamesFromDatabase(false);
             GamesItemsControl.ItemsSource = gamesList;
         }
 

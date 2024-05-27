@@ -234,7 +234,7 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
     SELECT SCOPE_IDENTITY();";
 
         string addImageQuery = "INSERT INTO sgsGameImages (GameId, ImagePath) VALUES (@GameId, @ImageUrl)";
-        string addLogoQuery = "INSERT INTO sgsGameLogos (GameId, LogoPath) VALUES (@GameId, @ImageUrl)";
+        string addLogoQuery = "INSERT INTO sgsGameLogo (GameId, LogoPath) VALUES (@GameId, @ImageUrl)";
 
         using (SqlConnection connection = new SqlConnection(connectionString))
         {
@@ -273,7 +273,7 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
                 // Informacja o pomyślnym dodaniu
                 if (gameId > 0)
                 {
-                    Frame.Navigate(typeof(MyAccountPage), new DrillInNavigationTransitionInfo());
+                    Frame.Navigate(typeof(MyGamesPage), new DrillInNavigationTransitionInfo());
                 }
                 else
                 {
@@ -392,7 +392,7 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
     }
     private void ButtonCancel_Click(object sender, RoutedEventArgs e)
     {
-        Frame.Navigate(typeof(LoginPage), new DrillInNavigationTransitionInfo());
+        Frame.Navigate(typeof(MyGamesPage), new DrillInNavigationTransitionInfo());
     }
 
     [Obsolete]
