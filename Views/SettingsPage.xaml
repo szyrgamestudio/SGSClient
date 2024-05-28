@@ -14,47 +14,55 @@
     <Grid>
         <StackPanel
             x:Name="ContentArea">
-            <TextBlock x:Uid="Settings_Personalization" Style="{ThemeResource SubtitleTextBlockStyle}" />
-            <StackPanel Margin="{StaticResource SmallTopBottomMargin}">
-                <TextBlock x:Uid="Settings_Theme" />
-
-                <StackPanel Margin="{StaticResource XSmallTopMargin}">
-                    <RadioButton
+            <!-- App settings Section -->
+            <!--<TextBlock x:Uid="Settings_About" Style="{StaticResource BodyStrongTextBlockStyle}" />-->
+            <StackPanel>
+                <labs:SettingsExpander Description="Wybierz motyw aplikacji do wyświetlenia" Header="Wygląd aplikacji">
+                    <labs:SettingsExpander.Items>
+                        <labs:SettingsCard
+                            HorizontalContentAlignment="Left"
+                            ContentAlignment="Vertical">
+                            <StackPanel Margin="-12,0,0,0" Orientation="Vertical">
+                                <RadioButton
                         x:Uid="Settings_Theme_Light"
                         Command="{x:Bind ViewModel.SwitchThemeCommand}"
                         IsChecked="{x:Bind ViewModel.ElementTheme, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Light, Mode=OneWay}"
                         FontSize="15"
                         GroupName="AppTheme">
-                        <RadioButton.CommandParameter>
-                            <xaml:ElementTheme>Light</xaml:ElementTheme>
-                        </RadioButton.CommandParameter>
-                    </RadioButton>
-                    <RadioButton
+                                    <RadioButton.CommandParameter>
+                                        <xaml:ElementTheme>Light</xaml:ElementTheme>
+                                    </RadioButton.CommandParameter>
+                                </RadioButton>
+                                <RadioButton
                         x:Uid="Settings_Theme_Dark"
                         Command="{x:Bind ViewModel.SwitchThemeCommand}"
                         IsChecked="{x:Bind ViewModel.ElementTheme, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Dark, Mode=OneWay}"
                         FontSize="15"
                         GroupName="AppTheme">
-                        <RadioButton.CommandParameter>
-                            <xaml:ElementTheme>Dark</xaml:ElementTheme>
-                        </RadioButton.CommandParameter>
-                    </RadioButton>
-                    <RadioButton
+                                    <RadioButton.CommandParameter>
+                                        <xaml:ElementTheme>Dark</xaml:ElementTheme>
+                                    </RadioButton.CommandParameter>
+                                </RadioButton>
+                                <RadioButton
                         x:Uid="Settings_Theme_Default"
                         Command="{x:Bind ViewModel.SwitchThemeCommand}"
                         IsChecked="{x:Bind ViewModel.ElementTheme, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Default, Mode=OneWay}"
                         FontSize="15"
                         GroupName="AppTheme">
-                        <RadioButton.CommandParameter>
-                            <xaml:ElementTheme>Default</xaml:ElementTheme>
-                        </RadioButton.CommandParameter>
-                    </RadioButton>
-                </StackPanel>
-            </StackPanel>
+                                    <RadioButton.CommandParameter>
+                                        <xaml:ElementTheme>Default</xaml:ElementTheme>
+                                    </RadioButton.CommandParameter>
+                                </RadioButton>
+                            </StackPanel>
+                        </labs:SettingsCard>
 
-            <!--About-->
-            <TextBlock x:Uid="Settings_About" Style="{StaticResource BodyStrongTextBlockStyle}" />
-            <StackPanel>
+                    </labs:SettingsExpander.Items>
+                </labs:SettingsExpander>
+                <!-- Account Management Section -->
+                <labs:SettingsCard Description="Zarządzaj kontem" Header="Konto" x:Name="accountSettings">
+                    <Button x:Name="accountButton" Content="Wyloguj" Style="{StaticResource AccentButtonStyle}" Click="LogoutButton_Click" />
+                </labs:SettingsCard>
+                <!-- About Section -->
                 <labs:SettingsExpander Description="© 2024 SzyrGameStudio. All rights reserved." Header="SGSClient">
                     <TextBlock
                         Margin="0,-2,0,0"
@@ -71,7 +79,7 @@
                                 <FontIcon Glyph="&#xE8A7;" />
                             </labs:SettingsCard.ActionIcon>
                         </labs:SettingsCard>
-                        <labs:SettingsCard
+                        <!--<labs:SettingsCard
                             HorizontalContentAlignment="Left"
                             ContentAlignment="Vertical"
                             Header="Zależności &amp; referencje">
@@ -82,7 +90,7 @@
                                 <HyperlinkButton Content="Win2D" NavigateUri="https://github.com/Microsoft/Win2D" />
                                 <HyperlinkButton Content="Xaml Behaviors" NavigateUri="https://github.com/Microsoft/XamlBehaviors" />
                             </StackPanel>
-                        </labs:SettingsCard>
+                        </labs:SettingsCard>-->
 
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>

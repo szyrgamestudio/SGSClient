@@ -19,7 +19,10 @@ public sealed partial class MyAccountPage : Page, INotifyPropertyChanged
 
     public string AvatarUrl
     {
-        get { return _avatarUrl; }
+        get
+        {
+            return _avatarUrl;
+        }
         set
         {
             if (_avatarUrl != value)
@@ -32,7 +35,10 @@ public sealed partial class MyAccountPage : Page, INotifyPropertyChanged
 
     public string WelcomeText
     {
-        get { return _welcomeText; }
+        get
+        {
+            return _welcomeText;
+        }
         set
         {
             if (_welcomeText != value)
@@ -168,11 +174,4 @@ where r.Id = @userId";
     {
         Frame.Navigate(typeof(MyGamesPage), null, new DrillInNavigationTransitionInfo());
     }
-
-    private void LogoutButton_Click(object sender, RoutedEventArgs e)
-    {
-        SessionManager.Logout();
-        Frame.Navigate(typeof(LoginPage));
-    }
-
 }

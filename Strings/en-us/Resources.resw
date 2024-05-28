@@ -399,4 +399,7 @@
   <data name="Shell_EditGame.Content" xml:space="preserve">
     <value>EditGame</value>
   </data>
+  <data name="Shell_UserAccount.Content" xml:space="preserve">
+    <value>Moje konto</value>
+  </data>
 </root>

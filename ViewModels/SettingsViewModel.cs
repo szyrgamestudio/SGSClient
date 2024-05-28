@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.ComponentModel;
+using System.Reflection;
 using System.Windows.Input;
 
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -13,7 +14,7 @@ using Windows.ApplicationModel;
 
 namespace SGSClient.ViewModels;
 
-public partial class SettingsViewModel : ObservableRecipient
+public partial class SettingsViewModel : ObservableRecipient, INotifyPropertyChanged
 {
     private readonly IThemeSelectorService _themeSelectorService;
 
