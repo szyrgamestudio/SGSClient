@@ -13,6 +13,7 @@ using SGSClient.Notifications;
 using SGSClient.Services;
 using SGSClient.ViewModels;
 using SGSClient.Views;
+using System.Diagnostics;
 
 namespace SGSClient;
 
@@ -61,7 +62,6 @@ public partial class App : Application
             services.AddTransient<IActivationHandler, AppNotificationActivationHandler>();
 
             // Services
-            services.AddTransient<IWebViewService, WebViewService>();
             services.AddSingleton<IAppNotificationService, AppNotificationService>();
             services.AddSingleton<ILocalSettingsService, LocalSettingsService>();
             services.AddSingleton<IThemeSelectorService, ThemeSelectorService>();
@@ -120,7 +120,7 @@ public partial class App : Application
     {
         base.OnLaunched(args);
 
-        App.GetService<IAppNotificationService>().Show(string.Format("SGSClientWelcomeNotificationPayload".GetLocalized(), AppContext.BaseDirectory));
+        //App.GetService<IAppNotificationService>().Show(string.Format("SGSClientWelcomeNotificationPayload".GetLocalized(), AppContext.BaseDirectory));
 
         await App.GetService<IActivationService>().ActivateAsync(args);
 

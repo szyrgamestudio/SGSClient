@@ -18,7 +18,7 @@
     <RepositoryUrl>https://github.com/szyrgamestudio/SGSClient</RepositoryUrl>
     <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
-    <PackageCertificateThumbprint>55CA42F5FEBC8FAA40DB3D5DB909DD2DA3BC002B</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>6D349B53CF5A6C1142AE235CCF59866BF2559427</PackageCertificateThumbprint>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <AppxSymbolPackageEnabled>True</AppxSymbolPackageEnabled>
@@ -27,8 +27,8 @@
     <AppxBundlePlatforms>x64</AppxBundlePlatforms>
     <AppInstallerUri>d:\s</AppInstallerUri>
     <Version>$(VersionPrefix)</Version>
-    <FileVersion>2.5.0.0</FileVersion>
-    <AssemblyVersion>2.5.0.0</AssemblyVersion>
+    <FileVersion>2.5.3.0</FileVersion>
+    <AssemblyVersion>2.5.3.0</AssemblyVersion>
     <DefaultLanguage>en-US</DefaultLanguage>
     <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
