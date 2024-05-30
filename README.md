@@ -16,11 +16,10 @@ SGSClient oferuje:
 
 Nie zwlekaj, pobierz naszą aplikację już teraz i ciesz się najlepszym doświadczeniem gamingowym na PC!
 
-#### Wersja: v.2.1.0.0 (wrzesień 2023)
+#### Wersja: v.2.5.3.0 (czerwiec 2024)
 ## Twórcy
 - [@devmassyn](https://github.com/devmassyn)
 - [@szyrgamestudio](https://www.github.com/szyrgamestudio)
 
-## 📷 Galeria
 ## Support
 Aby uzyskać pomoc, wyślij wiadomość e-mail na adres:<br>kontakt@szyrgamestudio.com.
