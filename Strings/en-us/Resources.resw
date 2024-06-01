@@ -1,0 +1,405 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppDisplayName" xml:space="preserve">
+    <value>SGSClient</value>
+  </data>
+  <data name="AppDescription" xml:space="preserve">
+    <value>SGSClient</value>
+  </data>
+  <data name="Shell_Home.Content" xml:space="preserve">
+    <value>Strona Główna</value>
+  </data>
+  <data name="Shell_Games.Content" xml:space="preserve">
+    <value>Gry</value>
+  </data>
+  <data name="Settings_Personalization.Text" xml:space="preserve">
+    <value>Personalizacja</value>
+  </data>
+  <data name="Settings_Theme.Text" xml:space="preserve">
+    <value>Motyw</value>
+  </data>
+  <data name="Settings_Theme_Light.Content" xml:space="preserve">
+    <value>Jasny</value>
+  </data>
+  <data name="Settings_Theme_Dark.Content" xml:space="preserve">
+    <value>Ciemny</value>
+  </data>
+  <data name="Settings_Theme_Default.Content" xml:space="preserve">
+    <value>Domyślny</value>
+  </data>
+  <data name="Settings_About.Text" xml:space="preserve">
+    <value>Informacje o aplikacji</value>
+  </data>
+  <data name="Settings_AboutDescription.Text" xml:space="preserve">
+    <value>TODO: Replace with your app description.</value>
+  </data>
+  <data name="SettingsPage_PrivacyTermsLink.Content" xml:space="preserve">
+    <value>Polityka prywatności</value>
+  </data>
+  <data name="SettingsPage_PrivacyTermsLink.NavigateUri" xml:space="preserve">
+    <value>https://massyn.dev/privacypolicy</value>
+  </data>
+  <data name="AppNotificationSamplePayload" xml:space="preserve">
+    <value>&lt;toast launch="action=ToastClick"&gt;
+  &lt;visual&gt;
+    &lt;binding template="ToastGeneric"&gt;
+      &lt;text&gt;App Notification&lt;/text&gt;
+      &lt;text&gt;&lt;/text&gt;
+      &lt;image placement="appLogoOverride" hint-crop="circle" src="{0}Assets/WindowIcon.ico"/&gt;
+    &lt;/binding&gt;
+  &lt;/visual&gt;
+  &lt;actions&gt;
+    &lt;action content="Settings" arguments="action=Settings"/&gt;
+  &lt;/actions&gt;
+&lt;/toast&gt;</value>
+  </data>
+  <data name="Shell_Atorth_TalesOfUlkimond.Content" xml:space="preserve">
+    <value>Atorth: Tales of Ulkimonds</value>
+  </data>
+  <data name="Shell_Doddani.Content" xml:space="preserve">
+    <value>Doddani</value>
+  </data>
+  <data name="Shell_CastlelineEvil.Content" xml:space="preserve">
+    <value>Castleline Evil</value>
+  </data>
+  <data name="Shell_TurboNinja2D.Content" xml:space="preserve">
+    <value>Turbo Ninja 2D</value>
+  </data>
+  <data name="Shell_StaffOfHell.Content" xml:space="preserve">
+    <value>Staff Of Hell</value>
+  </data>
+  <data name="Shell_SciezkaBohatera.Content" xml:space="preserve">
+    <value>Scieżka Bohatera</value>
+  </data>
+  <data name="Shell_Zacmienie.Content" xml:space="preserve">
+    <value>Zaćmienie</value>
+  </data>
+  <data name="WebView_Loading.Text" xml:space="preserve">
+    <value>Ładowanie...</value>
+  </data>
+  <data name="WebView_FailedMessage.Text" xml:space="preserve">
+    <value>Nie udało się załadować strony. Sprawdź połączenie i załaduj ponownie.</value>
+  </data>
+  <data name="BrowserBackButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Kliknij, aby wrócić</value>
+  </data>
+  <data name="BrowserBackButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Kliknij, aby wrócić</value>
+  </data>
+  <data name="BrowserForwardButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Kliknij, aby przejść do przodu</value>
+  </data>
+  <data name="BrowserForwardButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Kliknij, aby przejść do przodu</value>
+  </data>
+  <data name="WebView_Reload.Content" xml:space="preserve">
+    <value>Odśwież</value>
+  </data>
+  <data name="ReloadButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Odśwież</value>
+  </data>
+  <data name="ReloadButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Odśwież</value>
+  </data>
+  <data name="OpenInBrowserButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Otwórz w przeglądarce</value>
+  </data>
+  <data name="OpenInBrowserButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Otwórz w przeglądarce</value>
+  </data>
+  <data name="Shell_UploadGame.Content" xml:space="preserve">
+    <value>Formularz przesłania gry</value>
+  </data>
+  <data name="AtorhTalesOfUlkimondNotificationPayload" xml:space="preserve">
+    <value>&lt;toast launch="AtorthNotificationPayload"&gt;
+    &lt;visual&gt;
+        &lt;binding template='ToastGeneric'&gt;
+            &lt;text&gt;Atorth: Tales of Ulkimond - zainstalowano pomyślnie&lt;/text&gt;
+            &lt;image placement='appLogoOverride' src='ms-appx:///Assets/Games/Atorth/Atorth_Logo.png'/&gt;
+        &lt;/binding&gt;
+    &lt;/visual&gt;
+&lt;/toast&gt;</value>
+    <comment>Zainstalowano Atorth</comment>
+  </data>
+  <data name="DoddaniNotificationPayload" xml:space="preserve">
+    <value>&lt;toast launch="DoddaniNotificationPayload"&gt;
+    &lt;visual&gt;
+        &lt;binding template='ToastGeneric'&gt;
+            &lt;text&gt;Doddani - zainstalowano pomyślnie&lt;/text&gt;
+            &lt;image placement='appLogoOverride' src='ms-appx:///Assets/Games/Doddani/Logo.png'/&gt;
+        &lt;/binding&gt;
+    &lt;/visual&gt;
+&lt;/toast&gt;</value>
+    <comment>Zainstalowano Doddani</comment>
+  </data>
+  <data name="SGSClientWelcomeNotificationPayload" xml:space="preserve">
+    <value>&lt;toast launch="SGSClientWelcomeNotificationPayload"&gt;
+    &lt;visual&gt;
+        &lt;binding template='ToastGeneric'&gt;
+            &lt;text&gt;Witamy w SGSClient 2.5&lt;/text&gt;
+            &lt;text&gt;Kliknij na powiadomienie, aby dowiedzieć się, co nowego względem wcześniejszej wersji klienta.&lt;/text&gt;
+            &lt;image placement='hero' src='ms-appx:///Assets/GalleryHeaderImage.png'/&gt;
+        &lt;/binding&gt;
+    &lt;/visual&gt;
+&lt;/toast&gt;</value>
+    <comment>Witamy w SGSClient - nowa wersja</comment>
+  </data>
+  <data name="StaffOfHellNotificationPayload" xml:space="preserve">
+    <value>&lt;toast launch="StaffOfHellNotificationPayload"&gt;
+    &lt;visual&gt;
+        &lt;binding template='ToastGeneric'&gt;
+            &lt;text&gt;Staff of hell - zainstalowano pomyślnie&lt;/text&gt;
+            &lt;image placement='appLogoOverride' src='ms-appx:///Assets/Games/StaffOfHell/Logo.png'/&gt;
+        &lt;/binding&gt;
+    &lt;/visual&gt;
+&lt;/toast&gt;</value>
+    <comment>Zainstalowano Staff of Hell</comment>
+  </data>
+  <data name="CastlelineEvilNotificationPayload" xml:space="preserve">
+    <value>&lt;toast launch="CastlelineEvilNotificationPayload"&gt;
+    &lt;visual&gt;
+        &lt;binding template='ToastGeneric'&gt;
+            &lt;text&gt;Castleline Evil - zainstalowano pomyślnie&lt;/text&gt;
+            &lt;image placement='appLogoOverride' src='ms-appx:///Assets/Games/CastlelineEvil/Logo.png'/&gt;
+        &lt;/binding&gt;
+    &lt;/visual&gt;
+&lt;/toast&gt;</value>
+    <comment>Zainstalowano Castleline Evil</comment>
+  </data>
+  <data name="SciezkaBohateraNotificationPayload" xml:space="preserve">
+    <value>&lt;toast launch="SciezkaBohateraNotificationPayload"&gt;
+    &lt;visual&gt;
+        &lt;binding template='ToastGeneric'&gt;
+            &lt;text&gt;Ścieżka Bohatera - zainstalowano pomyślnie&lt;/text&gt;
+            &lt;image placement='appLogoOverride' src='ms-appx:///Assets/Games/SciezkaBohatera/Logo.png'/&gt;
+        &lt;/binding&gt;
+    &lt;/visual&gt;
+&lt;/toast&gt;</value>
+    <comment>Zainstalowano Ścieżka Bohatera</comment>
+  </data>
+  <data name="TurboNinja2DNotificationPayload" xml:space="preserve">
+    <value>&lt;toast launch="TurboNinja2DNotificationPayload"&gt;
+    &lt;visual&gt;
+        &lt;binding template='ToastGeneric'&gt;
+            &lt;text&gt;Turbo Ninja 2D - zainstalowano pomyślnie&lt;/text&gt;
+            &lt;image placement='appLogoOverride' src='ms-appx:///Assets/Games/TurboNinja2D/TurboNinja2D_Logo.png'/&gt;
+        &lt;/binding&gt;
+    &lt;/visual&gt;
+&lt;/toast&gt;</value>
+    <comment>Zainstalowano Turbo Ninja 2D</comment>
+  </data>
+  <data name="StarmanSystemNotificationPayload" xml:space="preserve">
+    <value>&lt;toast launch="StarmanSystemNotificationPayload"&gt;
+    &lt;visual&gt;
+        &lt;binding template='ToastGeneric'&gt;
+            &lt;text&gt;Starman System - zainstalowano pomyślnie&lt;/text&gt;
+            &lt;image placement='appLogoOverride' src='ms-appx:///Assets/Games/StarmanSystem/Logo.png'/&gt;
+        &lt;/binding&gt;
+    &lt;/visual&gt;
+&lt;/toast&gt;</value>
+    <comment>Zainstalowano Starman System</comment>
+  </data>
+  <data name="Shell_Klikacz24H.Content" xml:space="preserve">
+    <value>Klikacz24H</value>
+  </data>
+  <data name="Shell_BlackWhiteJump.Content" xml:space="preserve">
+    <value>BlackWhiteJump</value>
+  </data>
+  <data name="Shell_StarmanSystem.Content" xml:space="preserve">
+    <value>StarmanSystem</value>
+  </data>
+  <data name="Shell_ShadowSquad.Content" xml:space="preserve">
+    <value>ShadowSquad</value>
+  </data>
+  <data name="BlackWhiteJumpNotificationPayload" xml:space="preserve">
+    <value>&lt;toast launch="BlackWhiteJumpNotificationPayload"&gt;
+    &lt;visual&gt;
+        &lt;binding template='ToastGeneric'&gt;
+            &lt;text&gt;Black White Jump - zainstalowano pomyślnie&lt;/text&gt;
+            &lt;image placement='appLogoOverride' src='ms-appx:///Assets/Games/BlackWhiteJump/Logo.png'/&gt;
+        &lt;/binding&gt;
+    &lt;/visual&gt;
+&lt;/toast&gt;</value>
+    <comment>BlackWhiteJump</comment>
+  </data>
+  <data name="ShadowSquadNotificationPayload" xml:space="preserve">
+    <value>&lt;toast launch="ShadowSquadNotificationPayload"&gt;
+    &lt;visual&gt;
+        &lt;binding template='ToastGeneric'&gt;
+            &lt;text&gt;Shadow Squad - zainstalowano pomyślnie&lt;/text&gt;
+            &lt;image placement='appLogoOverride' src='ms-appx:///Assets/Games/ShadowSquad/Logo.png'/&gt;
+        &lt;/binding&gt;
+    &lt;/visual&gt;
+&lt;/toast&gt;</value>
+    <comment>ShadowSquad - zainstalowano pomyślnie</comment>
+  </data>
+  <data name="Klikacz24HNotificationPayload" xml:space="preserve">
+    <value>&lt;toast launch="Klikacz24HNotificationPayload"&gt;
+    &lt;visual&gt;
+        &lt;binding template='ToastGeneric'&gt;
+            &lt;text&gt;Klikacz24H- zainstalowano pomyślnie&lt;/text&gt;
+            &lt;image placement='appLogoOverride' src='ms-appx:///Assets/Games/Klikacz24H/Logo.png'/&gt;
+        &lt;/binding&gt;
+    &lt;/visual&gt;
+&lt;/toast&gt;</value>
+    <comment>Zainstalowano Klikacz24H</comment>
+  </data>
+  <data name="String" xml:space="preserve">
+    <value>Zainstalowano Turbo Ninja 2D</value>
+  </data>
+  <data name="ZacmienieNotificationPayload" xml:space="preserve">
+    <value>&lt;toast launch="ZacmienieNotificationPayload"&gt;
+    &lt;visual&gt;
+        &lt;binding template='ToastGeneric'&gt;
+            &lt;text&gt;Zaćmienie- zainstalowano pomyślnie&lt;/text&gt;
+            &lt;image placement='appLogoOverride' src='ms-appx:///Assets/Games/Zacmienie/Zacmienie_Logo.png'/&gt;
+        &lt;/binding&gt;
+    &lt;/visual&gt;
+&lt;/toast&gt;</value>
+    <comment>Zainstalowano Zaćmienie</comment>
+  </data>
+  <data name="Shell_GameBase.Content" xml:space="preserve">
+    <value>GameBase</value>
+  </data>
+  <data name="Shell_Login.Content" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="Shell_Register.Content" xml:space="preserve">
+    <value>Register</value>
+  </data>
+  <data name="Shell_MyAccount.Content" xml:space="preserve">
+    <value>Dodaj grę</value>
+  </data>
+  <data name="Shell_ForgotPassword.Content" xml:space="preserve">
+    <value>ForgotPassword</value>
+  </data>
+  <data name="Shell_MyGamesGrid.Content" xml:space="preserve">
+    <value>MyGamesGrid</value>
+  </data>
+  <data name="Shell_MyGames.Content" xml:space="preserve">
+    <value>Moje gry</value>
+  </data>
+  <data name="Shell_EditGame.Content" xml:space="preserve">
+    <value>EditGame</value>
+  </data>
+  <data name="Shell_UserAccount.Content" xml:space="preserve">
+    <value>Moje konto</value>
+  </data>
+</root>
