@@ -27,8 +27,8 @@
     <AppxBundlePlatforms>x64</AppxBundlePlatforms>
     <AppInstallerUri>d:\s</AppInstallerUri>
     <Version>$(VersionPrefix)</Version>
-    <FileVersion>2.5.4.0</FileVersion>
-    <AssemblyVersion>2.5.4.0</AssemblyVersion>
+    <FileVersion>2.5.5.0</FileVersion>
+    <AssemblyVersion>2.5.5.0</AssemblyVersion>
     <DefaultLanguage>en-US</DefaultLanguage>
     <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
@@ -72,6 +72,7 @@
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240428000" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.WinUI.Managed" Version="2.0.9" />
     <PackageReference Include="ModernWpf.MessageBox.Mica" Version="0.5.5" />
+    <PackageReference Include="SevenZipExtractor" Version="1.0.17" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
     <PackageReference Include="WinUIEx" Version="2.3.4" />
   </ItemGroup>

@@ -14,6 +14,7 @@ using System.Xml.Linq;
 using Microsoft.UI.Xaml.Media.Imaging;
 using SGSClient.Core.Database;
 using SGSClient.Core.Authorization;
+using SevenZipExtractor;
 
 namespace SGSClient.Views
 {
@@ -78,7 +79,7 @@ namespace SGSClient.Views
 
             #region 
             versionFile = Path.Combine(rootPath, "versions.xml");
-            gameZip = Path.Combine(rootPath, $"{gameIdentifier}.zip");
+            gameZip = Path.Combine(rootPath, $"{gameIdentifier}ARCHIVE");
             gameExe = Path.Combine(rootPath, gameIdentifier ?? "", $"{gameExe}.exe");
             gamepath = Path.Combine(rootPath, gameIdentifier ?? "");
             #endregion
@@ -287,7 +288,10 @@ namespace SGSClient.Views
 
                 if (!string.IsNullOrEmpty(gameZip) && !string.IsNullOrEmpty(rootPath))
                 {
-                    ZipFile.ExtractToDirectory(gameZip, rootPath, true);
+                    using (ArchiveFile archiveFile = new ArchiveFile(Path.Combine(rootPath, gameZip)))
+                    {
+                        archiveFile.Extract(rootPath);
+                    }
                     File.Delete(gameZip);
                 }
                 else
