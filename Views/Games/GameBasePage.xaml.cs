@@ -71,6 +71,8 @@ public sealed partial class GameBasePage : Page
 
                 LoadImagesFromDatabase(gameIdentifier);
                 LoadLogoFromDatabase(gameIdentifier);
+
+                ViewModel.LoadComments(gameIdentifier);
             }
         }
 
@@ -189,10 +191,12 @@ public sealed partial class GameBasePage : Page
         var ConnectionString = Db.GetConnectionString();
         configManagerSQL = new ConfigurationManagerSQL(ConnectionString);
 
-        ViewModel = App.GetService<GameBaseViewModel>();
+        ViewModel = new GameBaseViewModel(new ConfigurationManagerSQL(Db.GetConnectionString()));
         InitializeComponent();
+        DataContext = ViewModel;  // Set the DataContext
         Status = LauncherStatus.pageLauched;
     }
+
     private void IsUpdated()
     {
         try

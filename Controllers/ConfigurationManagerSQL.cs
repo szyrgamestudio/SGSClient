@@ -1,4 +1,5 @@
 ﻿using SGSClient.Core.Authorization;
+using SGSClient.Models;
 using SGSClient.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -161,7 +162,6 @@ where r.id = @userId/* and g.DraftP = 0*/
 
             return gamesList;
         }
-
         public List<string> LoadGalleryImagesFromDatabase(string gameSymbol)
         {
             List<string> galleryImages = new List<string>();
@@ -201,6 +201,47 @@ where g.Symbol = @GameSymbol
             }
 
             return galleryImages;
+        }
+        public List<Comment> LoadCommentsFromDatabase(string gameIdentifier)
+        {
+            List<Comment> comments = new List<Comment>();
+            var query = $@"
+select
+  d.Name
+, c.Comment
+from sgsGameComments c
+inner join sgsDevelopers d on d.Id = c.AuthorId
+inner join sgsGames g on g.Id = c.GameId
+--where c.GameId = @GameIdentifier
+where Symbol = '{gameIdentifier}'
+";
+            try
+            {
+                using (var connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@GameIdentifier", gameIdentifier);
+                        using (var reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                comments.Add(new Comment
+                                {
+                                    Author = reader.GetString(0),
+                                    Content = reader.GetString(1)
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return comments;
         }
         public string GetGameVersion(string gameIdentifier)
         {
@@ -243,7 +284,5 @@ where g.Symbol = @GameIdentifier
                 throw;
             }
         }
-
-
     }
 }
