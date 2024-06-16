@@ -283,10 +283,12 @@
         HorizontalAlignment="Stretch"
         Fill="{ThemeResource ControlElevationBorderBrush}" />
                     <ListView
-        Margin="5"
-        Padding="5"
-        x:Name="CommentsListView"
-        ItemsSource="{x:Bind ViewModel.Comments}">
+    Margin="5"
+    Padding="5"
+    x:Name="CommentsListView"
+    ItemsSource="{x:Bind ViewModel.Comments}"
+    IsItemClickEnabled="True"
+    ItemClick="CommentsListView_ItemClick">
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="local:Comment">
                                 <StackPanel>
@@ -300,6 +302,27 @@
 
             </Grid>
         </ScrollViewer>
+        <ContentDialog
+            x:Name="CommentDetailsDialog"
+            Title="Podgląd komentarza"
+            PrimaryButtonText="Aktualizuj"
+            SecondaryButtonText="Usuń"
+            CloseButtonText="Zamknij"
+            PrimaryButtonClick="SaveCommentButton_Click"
+            SecondaryButtonClick="DeleteCommentButton_Click">
+
+            <StackPanel>
+                <TextBlock
+                    x:Name="AuthorTextBox"
+                    Margin="0,0,0,10"/>
+                <TextBox
+                    x:Name="ContentTextBox"
+                    Header="Treść"
+                    AcceptsReturn="True"
+                    TextWrapping="Wrap"
+                    Height="200"/>
+            </StackPanel>
+        </ContentDialog>
     </Grid>
 
 </Page>

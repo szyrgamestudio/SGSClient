@@ -207,7 +207,9 @@ where g.Symbol = @GameSymbol
             List<Comment> comments = new List<Comment>();
             var query = $@"
 select
-  d.Name
+  c.Id
+, d.Id [DeveloperId]
+, d.Name
 , c.Comment
 from sgsGameComments c
 inner join sgsDevelopers d on d.Id = c.AuthorId
@@ -229,8 +231,10 @@ where Symbol = '{gameIdentifier}'
                             {
                                 comments.Add(new Comment
                                 {
-                                    Author = reader.GetString(0),
-                                    Content = reader.GetString(1)
+                                    CommentId = reader.GetInt32(0),
+                                    AuthorId = reader.GetInt32(1),
+                                    Author = reader.GetString(2),
+                                    Content = reader.GetString(3)
                                 });
                             }
                         }
@@ -242,6 +246,53 @@ where Symbol = '{gameIdentifier}'
 
             }
             return comments;
+        }
+        public void UpdateCommentInDatabase(Comment comment)
+        {
+            var query = @"
+update c set
+  c.Comment = @Content
+from sgsGameComments c
+where c.Id = @CommentId";
+            try
+            {
+                using (var connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Content", comment.Content);
+                        command.Parameters.AddWithValue("@CommentId", comment.CommentId);
+                        command.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle exception
+            }
+        }
+        public void DeleteCommentFromDatabase(Comment comment)
+        {
+            var query = @"
+delete from sgsGameComments
+where Id = @CommentId";
+            try
+            {
+                using (var connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@CommentId", comment.CommentId);
+                        command.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle exception
+            }
         }
         public string GetGameVersion(string gameIdentifier)
         {

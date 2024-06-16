@@ -15,6 +15,7 @@ using Microsoft.UI.Xaml.Media.Imaging;
 using SGSClient.Core.Database;
 using SGSClient.Core.Authorization;
 using SevenZipExtractor;
+using SGSClient.Models;
 
 namespace SGSClient.Views;
 
@@ -34,7 +35,7 @@ public sealed partial class GameBasePage : Page
     private string? gameDescription;
     private string? hardwareRequirements;
     private string? otherInformations;
-
+    private Comment _selectedComment;
     private readonly ConfigurationManagerSQL configManagerSQL;
     private readonly HttpClient httpClient = new();
 
@@ -182,6 +183,41 @@ public sealed partial class GameBasePage : Page
         else
         {
             reqStackPanel.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+        }
+    }
+    #endregion
+
+    #region Comments
+    private void CommentsListView_ItemClick(object sender, ItemClickEventArgs e)
+    {
+        string userId = AppSession.CurrentUserSession.UserId;
+        if (e.ClickedItem is Comment comment && (comment.AuthorId.ToString() == userId))
+        {
+            _selectedComment = comment;
+            AuthorTextBox.Text = comment.Author;
+            ContentTextBox.Text = comment.Content;
+            _ = CommentDetailsDialog.ShowAsync();
+        }
+    }
+    private void SaveCommentButton_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+    {
+        if (_selectedComment != null)
+        {
+            _selectedComment.Author = AuthorTextBox.Text;
+            _selectedComment.Content = ContentTextBox.Text;
+            ViewModel.UpdateComment(_selectedComment); // Update comment in the database
+        }
+        CommentDetailsDialog.Hide();
+    }
+
+
+    private void DeleteCommentButton_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+    {
+        if (_selectedComment != null)
+        {
+            ViewModel.DeleteComment(_selectedComment); // Delete comment from the database
+            ViewModel.Comments.Remove(_selectedComment);
+            _selectedComment = null;
         }
     }
     #endregion
