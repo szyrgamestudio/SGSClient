@@ -1,9 +1,7 @@
-﻿using SGSClient.Contracts.Services;
-using SGSClient.Controllers;
+﻿using SGSClient.Controllers;
 using SGSClient.Helpers;
 using SGSClient.ViewModels;
 using Microsoft.UI.Xaml.Controls;
-using System.IO.Compression;
 using System.Diagnostics;
 using System.Windows;
 using Windows.ApplicationModel.Core;
@@ -13,7 +11,6 @@ using Microsoft.UI.Xaml.Navigation;
 using System.Xml.Linq;
 using Microsoft.UI.Xaml.Media.Imaging;
 using SGSClient.Core.Database;
-using SGSClient.Core.Authorization;
 using SevenZipExtractor;
 using SGSClient.Models;
 

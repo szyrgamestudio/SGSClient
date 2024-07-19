@@ -201,6 +201,7 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
             string.IsNullOrEmpty(gameEXETextBox.Text) ||
             string.IsNullOrEmpty(gameDescriptionTextBox.Text))
         {
+            ShowMessageDialog("Błąd", "Nie uzupełniono wszystkich wymaganych pól.");
             return;
         }
 
@@ -261,8 +262,8 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
         string connectionString = Db.GetConnectionString();
         string addGameQuery = @"
     declare @developerId int = (select r.DeveloperId from Registration r where r.Id = @userId)
-    INSERT INTO sgsGames (Title, DeveloperId, PayloadName, ExeName, ZipLink, VersionLink, Description, HardwareRequirements, OtherInformation, Symbol, EngineId, TypeId, DraftP)
-    VALUES (@Name, @developerId, NULL, @ExeName, @ZipLink, @currentVersion, @gameDescriptionParam, @hardwareRequirementsParam, @otherInformationsParam, @Symbol, @GameEngine, @GameType, 1);
+    INSERT INTO sgsGames (Title, DeveloperId, PayloadName, ExeName, ZipLink, VersionLink, CurrentVersion, Description, HardwareRequirements, OtherInformation, Symbol, EngineId, TypeId, DraftP)
+    VALUES (@Name, @developerId, NULL, @ExeName, @ZipLink, @currentVersion, @currentVersion, @gameDescriptionParam, @hardwareRequirementsParam, @otherInformationsParam, @Symbol, @GameEngine, @GameType, 1);
     SELECT SCOPE_IDENTITY();";
 
         string addImageQuery = "INSERT INTO sgsGameImages (GameId, ImagePath) VALUES (@GameId, @ImageUrl)";
