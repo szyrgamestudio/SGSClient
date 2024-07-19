@@ -188,7 +188,7 @@ public sealed partial class GameBasePage : Page
     private void CommentsListView_ItemClick(object sender, ItemClickEventArgs e)
     {
         string userId = AppSession.CurrentUserSession.UserId;
-        if (e.ClickedItem is Comment comment && (comment.AuthorId.ToString() == userId))
+        if (e.ClickedItem is Comment comment && comment.AuthorId.ToString() == userId)
         {
             _selectedComment = comment;
             AuthorTextBox.Text = comment.Author;
@@ -196,25 +196,26 @@ public sealed partial class GameBasePage : Page
             _ = CommentDetailsDialog.ShowAsync();
         }
     }
+
     private void SaveCommentButton_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
     {
         if (_selectedComment != null)
         {
             _selectedComment.Author = AuthorTextBox.Text;
             _selectedComment.Content = ContentTextBox.Text;
-            ViewModel.UpdateComment(_selectedComment); // Update comment in the database
+            ViewModel.UpdateComment(_selectedComment);
+            ViewModel.LoadComments(gameIdentifier); // Refresh comments
         }
         CommentDetailsDialog.Hide();
     }
-
 
     private void DeleteCommentButton_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
     {
         if (_selectedComment != null)
         {
-            ViewModel.DeleteComment(_selectedComment); // Delete comment from the database
-            ViewModel.Comments.Remove(_selectedComment);
+            ViewModel.DeleteComment(_selectedComment);
             _selectedComment = null;
+            ViewModel.LoadComments(gameIdentifier); // Refresh comments
         }
     }
     #endregion

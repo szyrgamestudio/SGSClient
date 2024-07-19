@@ -263,32 +263,11 @@
               x:Name="OtherInformationsTextBlock">
                     </TextBlock>
                 </StackPanel>
-                <StackPanel
-    Grid.Row="4"
-    Margin="5"
-    Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
-    BorderBrush="{ThemeResource ControlElevationBorderBrush}"
-    BorderThickness="0.5"
-    CornerRadius="5"
-    x:Name="CommentsStackPanel">
-                    <TextBlock
-        Margin="5"
-        Padding="5"
-        FontSize="20"
-        Style="{ThemeResource BodyStrongTextBlockStyle}"
-        Text="Komentarze"
-    />
-                    <Rectangle
-        Height="1"
-        HorizontalAlignment="Stretch"
-        Fill="{ThemeResource ControlElevationBorderBrush}" />
-                    <ListView
-    Margin="5"
-    Padding="5"
-    x:Name="CommentsListView"
-    ItemsSource="{x:Bind ViewModel.Comments}"
-    IsItemClickEnabled="True"
-    ItemClick="CommentsListView_ItemClick">
+                <!--Comments-->
+                <StackPanel Grid.Row="4" Margin="5" Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="0.5" CornerRadius="5" x:Name="CommentsStackPanel">
+                    <TextBlock Margin="5" Padding="5" FontSize="20" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Komentarze" />
+                    <Rectangle Height="1" HorizontalAlignment="Stretch" Fill="{ThemeResource ControlElevationBorderBrush}" />
+                    <ListView Margin="5" Padding="5" x:Name="CommentsListView" ItemsSource="{x:Bind ViewModel.Comments}" IsItemClickEnabled="True" ItemClick="CommentsListView_ItemClick">
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="local:Comment">
                                 <StackPanel>

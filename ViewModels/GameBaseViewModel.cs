@@ -2,6 +2,7 @@
 using SGSClient.Models;
 using SGSClient.Core.Database;
 using System.Collections.ObjectModel;
+using System.Linq;
 using SGSClient.Controllers;
 
 namespace SGSClient.ViewModels
@@ -14,10 +15,7 @@ namespace SGSClient.ViewModels
         public ObservableCollection<Comment> Comments
         {
             get => _comments;
-            set
-            {
-                SetProperty(ref _comments, value);
-            }
+            set => SetProperty(ref _comments, value);
         }
 
         public GameBaseViewModel(ConfigurationManagerSQL configManagerSQL)
@@ -28,15 +26,14 @@ namespace SGSClient.ViewModels
 
         public void UpdateComment(Comment updatedComment)
         {
-            // Update comment in the database
             _configManagerSQL.UpdateCommentInDatabase(updatedComment);
 
-            // Update comment in the collection
             var comment = Comments.FirstOrDefault(c => c.CommentId == updatedComment.CommentId);
             if (comment != null)
             {
                 comment.Author = updatedComment.Author;
                 comment.Content = updatedComment.Content;
+                OnPropertyChanged(nameof(Comments)); // Notify the UI that the Comments collection has changed
             }
         }
 
@@ -52,7 +49,6 @@ namespace SGSClient.ViewModels
 
         public void DeleteComment(Comment commentToDelete)
         {
-            // Implement deletion logic
             _configManagerSQL.DeleteCommentFromDatabase(commentToDelete);
             Comments.Remove(commentToDelete);
         }
