@@ -277,6 +277,7 @@
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
+                    <Button Content="Add Comment" Click="AddCommentButton_Click" />
                 </StackPanel>
 
             </Grid>
@@ -302,6 +303,26 @@
                     Height="200"/>
             </StackPanel>
         </ContentDialog>
+        <ContentDialog
+            x:Name="AddCommentDetailsDialog"
+            Title="Dodaj komentarz"
+            PrimaryButtonText="Dodaj"
+            CloseButtonText="Zamknij"
+            PrimaryButtonClick="SaveCommentButton_Click">
+
+            <StackPanel>
+                <TextBlock
+                    x:Name="ACAuthorTextBox"
+                    Margin="0,0,0,10"/>
+                <TextBox
+                    x:Name="ACContentTextBox"
+                    Header="Treść"
+                    AcceptsReturn="True"
+                    TextWrapping="Wrap"
+                    Height="200"/>
+            </StackPanel>
+        </ContentDialog>
+
     </Grid>
 
 </Page>

@@ -196,6 +196,26 @@ public sealed partial class GameBasePage : Page
             _ = CommentDetailsDialog.ShowAsync();
         }
     }
+    private void AddCommentButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+        _selectedComment = null; // Indicates that we are adding a new comment
+        ACAuthorTextBox.Text = string.Empty;
+        ACContentTextBox.Text = string.Empty;
+        AddCommentDetailsDialog.Title = "Dodaj komentarz";
+        _ = AddCommentDetailsDialog.ShowAsync();
+    }
+
+    private void SaveNewCommentButton_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+    {
+        if (_selectedComment != null)
+        {
+            _selectedComment.Author = AuthorTextBox.Text;
+            _selectedComment.Content = ContentTextBox.Text;
+            ViewModel.AddComment(_selectedComment);
+            ViewModel.LoadComments(gameIdentifier); // Refresh comments
+        }
+        CommentDetailsDialog.Hide();
+    }
 
     private void SaveCommentButton_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
     {

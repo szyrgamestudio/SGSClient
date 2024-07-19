@@ -24,6 +24,19 @@ namespace SGSClient.ViewModels
             Comments = new ObservableCollection<Comment>();
         }
 
+        public void AddComment(Comment updatedComment)
+        {
+            _configManagerSQL.UpdateCommentInDatabase(updatedComment);
+
+            var comment = Comments.FirstOrDefault(c => c.CommentId == updatedComment.CommentId);
+            if (comment != null)
+            {
+                comment.Author = updatedComment.Author;
+                comment.Content = updatedComment.Content;
+                OnPropertyChanged(nameof(Comments)); // Notify the UI that the Comments collection has changed
+            }
+        }
+
         public void UpdateComment(Comment updatedComment)
         {
             _configManagerSQL.UpdateCommentInDatabase(updatedComment);
