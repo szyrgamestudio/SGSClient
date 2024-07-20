@@ -18,7 +18,7 @@
     <RepositoryUrl>https://github.com/szyrgamestudio/SGSClient</RepositoryUrl>
     <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
-    <PackageCertificateThumbprint>6D349B53CF5A6C1142AE235CCF59866BF2559427</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>F7BE86A32381E57EB32A6D008C310A95405EB8AF</PackageCertificateThumbprint>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <AppxSymbolPackageEnabled>True</AppxSymbolPackageEnabled>
@@ -27,14 +27,15 @@
     <AppxBundlePlatforms>x64</AppxBundlePlatforms>
     <AppInstallerUri>d:\s</AppInstallerUri>
     <Version>$(VersionPrefix)</Version>
-    <FileVersion>2.5.5.0</FileVersion>
-    <AssemblyVersion>2.5.5.0</AssemblyVersion>
+    <FileVersion>2.5.6.0</FileVersion>
+    <AssemblyVersion>2.5.6.0</AssemblyVersion>
     <DefaultLanguage>en-US</DefaultLanguage>
     <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <IncludeSymbols>True</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <UseWindowsForms>False</UseWindowsForms>
+    <SignAssembly>False</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Views\GamesPage.xaml — kopia.cs" />
