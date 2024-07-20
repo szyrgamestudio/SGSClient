@@ -24,9 +24,9 @@ namespace SGSClient.ViewModels
             Comments = new ObservableCollection<Comment>();
         }
 
-        public void AddComment(Comment updatedComment)
+        public void AddComment(string gameIdentifier, Comment updatedComment)
         {
-            _configManagerSQL.UpdateCommentInDatabase(updatedComment);
+            _configManagerSQL.AddCommentToDatabase(gameIdentifier,updatedComment);
 
             var comment = Comments.FirstOrDefault(c => c.CommentId == updatedComment.CommentId);
             if (comment != null)

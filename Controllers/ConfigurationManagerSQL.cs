@@ -216,6 +216,7 @@ inner join sgsDevelopers d on d.Id = c.AuthorId
 inner join sgsGames g on g.Id = c.GameId
 --where c.GameId = @GameIdentifier
 where Symbol = '{gameIdentifier}'
+order by 1 desc
 ";
             try
             {
@@ -246,6 +247,36 @@ where Symbol = '{gameIdentifier}'
 
             }
             return comments;
+        }
+        public void AddCommentToDatabase(string gameIdentifier, Comment comment)
+        {
+            var query = $@"
+insert into sgsGameComments(GameId, AuthorId, Comment, CreationDateTime, ModificationDateTime)
+select
+  g.Id
+, @userId
+, @Content
+, GETDATE()
+, GETDATE()
+from sgsGames g
+where g.Symbol = '{gameIdentifier}'";
+            try
+            {
+                using (var connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    using (var command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@userId", AppSession.CurrentUserSession.UserId);
+                        command.Parameters.AddWithValue("@Content", comment.Content);
+                        command.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle exception
+            }
         }
         public void UpdateCommentInDatabase(Comment comment)
         {

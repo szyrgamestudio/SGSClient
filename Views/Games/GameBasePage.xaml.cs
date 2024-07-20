@@ -13,6 +13,7 @@ using Microsoft.UI.Xaml.Media.Imaging;
 using SGSClient.Core.Database;
 using SevenZipExtractor;
 using SGSClient.Models;
+using Windows.System;
 
 namespace SGSClient.Views;
 
@@ -181,6 +182,11 @@ public sealed partial class GameBasePage : Page
         {
             reqStackPanel.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
         }
+
+        if(AppSession.CurrentUserSession.UserId == null)
+        {
+            AddCommentButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+        }
     }
     #endregion
 
@@ -205,15 +211,14 @@ public sealed partial class GameBasePage : Page
         _ = AddCommentDetailsDialog.ShowAsync();
     }
 
-    private void SaveNewCommentButton_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+    private void AddCommentButton_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
     {
-        if (_selectedComment != null)
-        {
-            _selectedComment.Author = AuthorTextBox.Text;
-            _selectedComment.Content = ContentTextBox.Text;
-            ViewModel.AddComment(_selectedComment);
-            ViewModel.LoadComments(gameIdentifier); // Refresh comments
-        }
+        Comment comment = new Comment();
+        _selectedComment = comment;
+        _selectedComment.Content = ACContentTextBox.Text;
+        ViewModel.AddComment(gameIdentifier, _selectedComment);
+        ViewModel.LoadComments(gameIdentifier); // Refresh comments
+
         CommentDetailsDialog.Hide();
     }
 

@@ -265,7 +265,14 @@
                 </StackPanel>
                 <!--Comments-->
                 <StackPanel Grid.Row="4" Margin="5" Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="0.5" CornerRadius="5" x:Name="CommentsStackPanel">
-                    <TextBlock Margin="5" Padding="5" FontSize="20" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Komentarze" />
+                    <Grid Margin="5" Padding="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" FontSize="20" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Komentarze" VerticalAlignment="Center" />
+                        <Button x:Name="AddCommentButton" Grid.Column="1" Content="+" Click="AddCommentButton_Click" HorizontalAlignment="Right" Style="{StaticResource AccentButtonStyle}"/>
+                    </Grid>
                     <Rectangle Height="1" HorizontalAlignment="Stretch" Fill="{ThemeResource ControlElevationBorderBrush}" />
                     <ListView Margin="5" Padding="5" x:Name="CommentsListView" ItemsSource="{x:Bind ViewModel.Comments}" IsItemClickEnabled="True" ItemClick="CommentsListView_ItemClick">
                         <ListView.ItemTemplate>
@@ -277,8 +284,8 @@
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
-                    <Button Content="Add Comment" Click="AddCommentButton_Click" />
                 </StackPanel>
+
 
             </Grid>
         </ScrollViewer>
@@ -308,7 +315,7 @@
             Title="Dodaj komentarz"
             PrimaryButtonText="Dodaj"
             CloseButtonText="Zamknij"
-            PrimaryButtonClick="SaveCommentButton_Click">
+            PrimaryButtonClick="AddCommentButton_Click">
 
             <StackPanel>
                 <TextBlock
