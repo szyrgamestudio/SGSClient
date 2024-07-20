@@ -183,7 +183,7 @@ public sealed partial class GameBasePage : Page
             reqStackPanel.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
         }
 
-        if(AppSession.CurrentUserSession.UserId == null)
+        if (AppSession.CurrentUserSession.UserId == null)
         {
             AddCommentButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
         }
@@ -242,6 +242,16 @@ public sealed partial class GameBasePage : Page
             _selectedComment = null;
             ViewModel.LoadComments(gameIdentifier); // Refresh comments
         }
+    }
+
+    private void PreviousPageButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+        ViewModel.GoToPreviousPage();
+    }
+
+    private void NextPageButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+        ViewModel.GoToNextPage();
     }
     #endregion
 

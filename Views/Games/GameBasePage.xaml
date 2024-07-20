@@ -284,6 +284,10 @@
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="5">
+                        <Button Content="Wstecz" Click="PreviousPageButton_Click" IsEnabled="{x:Bind ViewModel.CanGoToPreviousPage, Mode=OneWay}" Style="{StaticResource AccentButtonStyle}" Margin="0,0,10,0" />
+                        <Button Content="Dalej" Click="NextPageButton_Click" IsEnabled="{x:Bind ViewModel.CanGoToNextPage, Mode=OneWay}" Style="{StaticResource AccentButtonStyle}" />
+                    </StackPanel>
                 </StackPanel>
 
 
@@ -296,7 +300,9 @@
             SecondaryButtonText="Usuń"
             CloseButtonText="Zamknij"
             PrimaryButtonClick="SaveCommentButton_Click"
-            SecondaryButtonClick="DeleteCommentButton_Click">
+            SecondaryButtonClick="DeleteCommentButton_Click"
+            PrimaryButtonStyle="{StaticResource AccentButtonStyle}"
+            SecondaryButtonStyle="{StaticResource AccentButtonStyle}">
 
             <StackPanel>
                 <TextBlock
@@ -315,7 +321,8 @@
             Title="Dodaj komentarz"
             PrimaryButtonText="Dodaj"
             CloseButtonText="Zamknij"
-            PrimaryButtonClick="AddCommentButton_Click">
+            PrimaryButtonClick="AddCommentButton_Click"
+            PrimaryButtonStyle="{StaticResource AccentButtonStyle}">
 
             <StackPanel>
                 <TextBlock
