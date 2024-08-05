@@ -212,9 +212,9 @@ select
 , d.Name
 , c.Comment
 from sgsGameComments c
-inner join sgsDevelopers d on d.Id = c.AuthorId
+inner join Registration r on r.Id = c.AuthorId
+inner join sgsDevelopers d on d.Id = r.DeveloperId
 inner join sgsGames g on g.Id = c.GameId
---where c.GameId = @GameIdentifier
 where Symbol = '{gameIdentifier}'
 order by 1 desc
 ";
