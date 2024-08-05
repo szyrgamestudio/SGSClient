@@ -17,7 +17,78 @@ namespace SGSClient.Controllers
         {
             _connectionString = connectionString;
         }
+        public List<GamesViewModel> LoadFeaturedGamesFromDatabase(bool bypassDraftP)
+        {
+            List<GamesViewModel> gamesList = new List<GamesViewModel>();
 
+            string query = @"
+select
+  g.Id       [GameId]
+, g.Title
+, g.Symbol   [GameSymbol]
+, d.Name     [GameDeveloper]
+, l.LogoPath [LogoPath]
+, t.Name	 [GameType]
+, g.PayloadName
+, g.ExeName
+, g.ZipLink
+, g.VersionLink
+, g.Description
+, g.HardwareRequirements
+, g.OtherInformation
+, g.DraftP
+from sgsGames g
+inner join sgsDevelopers d on d.Id = g.DeveloperId
+left join sgsGameLogo l on l.GameId = g.Id
+left join sgsGameTypes t on t.Id = g.TypeId
+where (g.DraftP = 0 and @bypassDraftP = 0 or @bypassDraftP = 1) and g.FeaturedP = 1
+order by g.Title
+";
+
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@bypassDraftP", bypassDraftP);
+                        SqlDataReader reader = command.ExecuteReader();
+
+                        while (reader.Read())
+                        {
+                            GamesViewModel game = new GamesViewModel(
+                                gameId: reader["GameId"].ToString(),
+                                gameSymbol: reader["GameSymbol"].ToString(),
+                                gameTitle: reader["Title"].ToString(),
+                                gamePayloadName: reader["PayloadName"].ToString(),
+                                gameExeName: reader["ExeName"].ToString(),
+                                gameZipLink: reader["ZipLink"].ToString(),
+                                gameVersionLink: reader["VersionLink"].ToString(),
+                                gameDescription: reader["Description"].ToString(),
+                                hardwareRequirements: reader["HardwareRequirements"].ToString(),
+                                otherInformations: reader["OtherInformation"].ToString(),
+                                gameDeveloper: reader["GameDeveloper"].ToString(),
+                                logoPath: reader["LogoPath"].ToString(),
+                                gameType: reader["GameType"].ToString(),
+                                draftP: reader["DraftP"].ToString()
+                            );
+
+                            gamesList.Add(game);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Obsługa błędu podczas komunikacji z bazą danych
+                Console.WriteLine($"Błąd podczas ładowania gier z bazy danych: {ex.Message}");
+                throw;
+            }
+
+            return gamesList;
+        }
         public List<GamesViewModel> LoadGamesFromDatabase(bool bypassDraftP)
         {
             List<GamesViewModel> gamesList = new List<GamesViewModel>();

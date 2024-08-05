@@ -11,6 +11,7 @@ namespace SGSClient.Views
     {
         private readonly ConfigurationManagerSQL configManagerSQL;
         private List<GamesViewModel> gamesList;
+        private List<GamesViewModel> gamesFeaturedList;
 
         public GamesViewModel ViewModel { get; }
         public GamesPage()
@@ -24,7 +25,9 @@ namespace SGSClient.Views
         private void LoadGamesFromDatabase()
         {
             gamesList = configManagerSQL.LoadGamesFromDatabase(false);
+            gamesFeaturedList = configManagerSQL.LoadFeaturedGamesFromDatabase(false);
             GamesItemsControl.ItemsSource = gamesList;
+            GamesFeaturedItemsControl.ItemsSource = gamesFeaturedList;
         }
 
         private void ButtonGame_Click(object sender, RoutedEventArgs e)

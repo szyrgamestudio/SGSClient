@@ -17,7 +17,7 @@
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="16">
             <TextBox x:Name="SearchTextBox" PlaceholderText="Szukaj po nazwie" Width="200" Margin="0,0,12,0" KeyDown="SearchTextBox_KeyDown"/>
             <TextBox x:Name="SearchAuthorTextBox" PlaceholderText="Szukaj po autorze" Width="200" Margin="0,0,12,0" KeyDown="SearchAuthorTextBox_KeyDown"/>
-            <ComboBox x:Name="CategoryComboBox" PlaceholderText="Wybierz kategorię" Width="200" Margin="0,0,12,0" KeyDown="CategoryComboBox_KeyDown">
+            <ComboBox x:Name="CategoryComboBox" PlaceholderText="Wybierz kategorię" Width="200" Margin="0,0,12,0" KeyDown="CategoryComboBox_KeyDown" Visibility="Collapsed" >
                 <ComboBoxItem Content="Wszystkie"/>
                 <ComboBoxItem Content="Akcja"/>
                 <ComboBoxItem Content="Przygodowe"/>
@@ -32,14 +32,72 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <Grid Grid.Row="1" Margin="16">
+                <!-- Polcename gry -->
+                <Grid Grid.Row="0" Margin="16">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
                     <Grid Grid.Row="0" Margin="0,12,0,0">
+                        <TextBlock
+                            Grid.Row="0"
+                            FontSize="16"
+                            FontWeight="Bold"
+                            Text="Polecane gry" />
+                    </Grid>
+
+                    <ItemsControl x:Name="GamesFeaturedItemsControl" Grid.Row="1" Margin="0,12,0,0">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <controls:WrapPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Click="ButtonGame_Click" Tag="{Binding GameSymbol}" Margin="0,0,4,4">
+                                    <StackPanel>
+                                        <Image
+                        Width="100"
+                        Height="100"
+                        Margin="14"
+                        VerticalAlignment="Center"
+                        Source="{Binding LogoPath}" />
+                                        <TextBlock
+                        FontSize="16"
+                        FontWeight="Bold"
+                        Text="{Binding GameTitle}" />
+                                        <TextBlock
+                        FontSize="12"
+                        Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                        Text="{Binding GameDeveloper}" />
+                                        <!--<RatingControl
+                        Margin="0,0,0,20"
+                        HorizontalAlignment="Left"
+                        IsReadOnly="True"
+                        PlaceholderValue="5" />-->
+                                        <TextBlock
+                        FontSize="12"
+                        FontWeight="Bold"
+                        Text="Dostępne" />
+                                    </StackPanel>
+                                </Button>
+
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Grid>
+                
+                <Grid Grid.Row="1" Margin="16">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" Margin="0,0,0,0">
                         <TextBlock
                             Grid.Row="0"
                             FontSize="16"
