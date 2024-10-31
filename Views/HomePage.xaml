@@ -304,6 +304,7 @@
                                 Height="38"
                                 Margin="8,-16,0,0"
                                 AutomationProperties.Name="Scroll left"
+                                Command="{Binding ScrollBackCommand}"
                                 Click="ScrollBackBtn_Click"
                                 ToolTipService.ToolTip="Scroll left"
                                 Visibility="Collapsed">
@@ -316,6 +317,7 @@
                                 Margin="0,-16,8,0"
                                 HorizontalAlignment="Right"
                                 AutomationProperties.Name="Scroll right"
+                                Command="{Binding ScrollForwardCommand}"
                                 Click="ScrollForwardBtn_Click"
                                 ToolTipService.ToolTip="Scroll right">
                                 <FontIcon FontSize="{ThemeResource FlipViewButtonFontSize}" Glyph="&#xEDDA;" />
