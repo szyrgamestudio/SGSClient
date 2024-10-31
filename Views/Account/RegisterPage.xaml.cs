@@ -4,7 +4,7 @@ using SGSClient.Core.Database;
 using SGSClient.ViewModels;
 using SGSClient.Services;
 using System;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 
 namespace SGSClient.Views
 {

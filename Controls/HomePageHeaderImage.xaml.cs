@@ -6,7 +6,7 @@ using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Composition;
 using Microsoft.UI;
-using CommunityToolkit.WinUI.UI.Animations;
+using CommunityToolkit.WinUI.Animations;
 using Windows.UI;
 using System;
 using CommunityToolkit.WinUI.UI;

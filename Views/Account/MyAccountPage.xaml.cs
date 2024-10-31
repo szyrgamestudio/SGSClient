@@ -6,7 +6,7 @@ using SGSClient.Helpers;
 using Microsoft.UI.Xaml.Navigation;
 using System.ComponentModel;
 using SGSClient.Core.Database;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using SGSClient.Core.Authorization;
 
 namespace SGSClient.Views;

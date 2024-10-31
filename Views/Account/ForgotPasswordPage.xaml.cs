@@ -3,7 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 using System.Net.Mail;
 using System.Net;
 using System.Text;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using SGSClient.Core.Database;
 using SGSClient.ViewModels;
 using SGSClient.Services;
