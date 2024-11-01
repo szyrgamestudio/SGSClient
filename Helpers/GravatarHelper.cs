@@ -1,42 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace SGSClient.Helpers;
-public static class GravatarHelper
+namespace SGSClient.Helpers
 {
-    public static string GetAvatarUrl(string email, int size = 80)
+    public static class GravatarHelper
     {
-        email = email.Trim().ToLower();
-
-        using (MD5 md5 = MD5.Create())
+        public static string GetAvatarUrl(string email, int size = 80)
         {
-            byte[] emailBytes = Encoding.UTF8.GetBytes(email);
-            byte[] hashBytes = md5.ComputeHash(emailBytes);
+            email = email.Trim().ToLower();
 
-            // Konwertuj bajty na stringa heksadecymalnego
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < hashBytes.Length; i++)
+            using (MD5 md5 = MD5.Create())
             {
-                sb.Append(hashBytes[i].ToString("x2"));
+                byte[] emailBytes = Encoding.UTF8.GetBytes(email);
+                byte[] hashBytes = md5.ComputeHash(emailBytes);
+
+                // Convert bytes to a hexadecimal string
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < hashBytes.Length; i++)
+                {
+                    sb.Append(hashBytes[i].ToString("x2"));
+                }
+
+                // Generate avatar URL
+                return $"https://www.gravatar.com/avatar/{sb.ToString()}?s={size}&d=mp";
             }
-
-            // Wygeneruj URL awatara
-            return $"https://www.gravatar.com/avatar/{sb.ToString()}?s={size}&d=mp";
         }
-    }
 
-    public static void DownloadAvatar(string email, string savePath)
-    {
-        string avatarUrl = GetAvatarUrl(email);
-
-        using (WebClient client = new WebClient())
+        public static async Task DownloadAvatarAsync(string email, string savePath)
         {
-            client.DownloadFile(new Uri(avatarUrl), savePath);
+            string avatarUrl = GetAvatarUrl(email);
+
+            using (WebClient client = new WebClient())
+            {
+                // Download the avatar asynchronously
+                await client.DownloadFileTaskAsync(new Uri(avatarUrl), savePath);
+            }
         }
     }
 }

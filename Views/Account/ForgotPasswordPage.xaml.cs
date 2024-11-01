@@ -9,6 +9,7 @@ using SGSClient.ViewModels;
 using SGSClient.Services;
 using System.Data;
 using Microsoft.UI.Xaml.Media.Animation;
+using SGSClient.Core;
 
 namespace SGSClient.Views;
 public sealed partial class ForgotPasswordPage : Page
@@ -103,51 +104,36 @@ public sealed partial class ForgotPasswordPage : Page
     // Sprawdza, czy podany token jest poprawny dla danego e-maila
     private bool IsTokenValid(string email, string token)
     {
-        using (SqlConnection con = new SqlConnection(Db.GetConnectionString()))
+        using (SqlConnection con = db.Connect())
         {
             string query = "SELECT Id, AccessToken FROM [dbo].[Registration] WHERE Email = @Email";
-            con.Open();
-            using (SqlCommand cmd = new SqlCommand(query, con))
+            SqlCommand cmd = db.CommandSQL(con, query, email);
+            IPasswordHasher passwordHasher = new PasswordHasher();
+
+            // Wykonanie zapytania i pobranie danych za pomocą Db.SelectSQL
+            DataSet dataSet = db.SelectSQL(cmd);
+
+            // Sprawdzenie czy użytkownik istnieje w bazie
+            if (dataSet.Tables[0].Rows.Count > 0)
             {
-                IPasswordHasher passwordHasher = new PasswordHasher();
+                // Pobranie hasła zaszyfrowanego oraz soli
+                string hashedPasswordWithSalt = dataSet.Tables[0].Rows[0]["AccessToken"].ToString();
+                string storedHashedToken = hashedPasswordWithSalt.Substring(0, 64); // Skrót hasła
+                string storedSalt = hashedPasswordWithSalt.Substring(64); // Sól
 
-                cmd.Parameters.AddWithValue("@Email", email);
+                // Wygenerowanie skrótu na podstawie podanego hasła oraz soli z bazy
+                string enteredToken = passwordHasher.HashPasswordWithSalt(token, Convert.FromBase64String(storedSalt));
 
-                using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                // Porównanie obliczonego skrótu hasła z przechowywanym skrótem
+                if (enteredToken == storedHashedToken)
                 {
-                    DataSet dataSet = new DataSet();
-                    adapter.Fill(dataSet);
-
-                    if (dataSet.Tables[0].Rows.Count > 0)
-                    {
-                        string hashedPasswordWithSalt = dataSet.Tables[0].Rows[0]["AccessToken"].ToString();
-                        string userId = dataSet.Tables[0].Rows[0]["id"].ToString();
-                        string storedHashedToken = hashedPasswordWithSalt.Substring(0, 64); // Pobierz tylko skrót hasła (bez soli)
-                        string storedSalt = hashedPasswordWithSalt.Substring(64); // Pobierz solę
-                        string password = textBoxAccessKey.Text;
-
-                        // Wygeneruj skrót hasła na podstawie podanego hasła i przechowywanej soli
-                        string enteredToken = passwordHasher.HashPasswordWithSalt(password, Convert.FromBase64String(storedSalt));
-
-                        // Sprawdź czy obliczony skrót hasła jest zgodny z przechowywanym skrótem
-                        if (enteredToken == storedHashedToken)
-                        {
-                            buttonSendResetCodePassword.IsEnabled = false;
-                            buttonResetPassword.IsEnabled = false;
-                            return true;
-                        }
-                        else
-                        {
-                            return false;
-                        }
-                    }
-                    else
-                    {
-                        return false;
-                    }
+                    buttonSendResetCodePassword.IsEnabled = false;
+                    buttonResetPassword.IsEnabled = false;
+                    return true;
                 }
             }
         }
+        return false;
     }
 
     #endregion
@@ -167,22 +153,16 @@ public sealed partial class ForgotPasswordPage : Page
     private void UpdatePasswordInDatabase(string email, string newPassword)
     {
         // Połączenie do bazy danych
-        using (SqlConnection connection = new SqlConnection(Db.GetConnectionString()))
+        using (SqlConnection connection = db.Connect())
         {
             try
             {
-                connection.Open();
-
                 // Zapytanie SQL do aktualizacji hasła dla użytkownika o danym adresie e-mail
-                string query = "update Registration set Password = @NewPassword WHERE Email = @Email";
+                string query = "UPDATE Registration SET Password = @NewPassword WHERE Email = @Email";
 
                 // Utwórz nowy obiekt SqlCommand z zapytaniem SQL i połączeniem
-                using (SqlCommand command = new SqlCommand(query, connection))
+                using (SqlCommand command = db.CommandSQL(connection, query, newPassword, email))
                 {
-                    // Dodaj parametry do zapytania SQL
-                    command.Parameters.AddWithValue("@NewPassword", newPassword);
-                    command.Parameters.AddWithValue("@Email", email);
-
                     // Wykonaj zapytanie SQL
                     int rowsAffected = command.ExecuteNonQuery();
 
@@ -206,26 +186,20 @@ public sealed partial class ForgotPasswordPage : Page
     private void UpdateTokenInDatabase(string email, string accessToken)
     {
         // Połączenie do bazy danych
-        using (SqlConnection connection = new SqlConnection(Db.GetConnectionString()))
+        using (SqlConnection connection = db.Connect())
         {
             try
             {
-                connection.Open();
-
-                // Zapytanie SQL do aktualizacji hasła dla użytkownika o danym adresie e-mail
-                string query = "update Registration set AccessToken = @AccessToken WHERE Email = @Email";
+                // Zapytanie SQL do aktualizacji tokenu dla użytkownika o danym adresie e-mail
+                string query = "UPDATE Registration SET AccessToken = @AccessToken WHERE Email = @Email";
 
                 // Utwórz nowy obiekt SqlCommand z zapytaniem SQL i połączeniem
-                using (SqlCommand command = new SqlCommand(query, connection))
+                using (SqlCommand command = db.CommandSQL(connection, query, accessToken, email))
                 {
-                    // Dodaj parametry do zapytania SQL
-                    command.Parameters.AddWithValue("@AccessToken", accessToken);
-                    command.Parameters.AddWithValue("@Email", email);
-
                     // Wykonaj zapytanie SQL
                     int rowsAffected = command.ExecuteNonQuery();
 
-                    // Sprawdź, czy hasło zostało zaktualizowane poprawnie
+                    // Sprawdź, czy token został zaktualizowany poprawnie
                     if (rowsAffected > 0)
                     {
                         Console.WriteLine($"Token użytkownika {email} został zaktualizowany.");
@@ -238,7 +212,7 @@ public sealed partial class ForgotPasswordPage : Page
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Wystąpił błąd podczas aktualizacji hasła w bazie danych: {ex.Message}");
+                Console.WriteLine($"Wystąpił błąd podczas aktualizacji tokenu w bazie danych: {ex.Message}");
             }
         }
     }

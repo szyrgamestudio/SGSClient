@@ -66,32 +66,34 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
     /// </summary>
     private void LoadGameTypes()
     {
-        string connectionString = Db.GetConnectionString();
-        string query = "select sgsgt.Id, sgsgt.Name from sgsGameTypes sgsgt";
+        string query = "SELECT sgsgt.Id, sgsgt.Name FROM sgsGameTypes sgsgt";
 
         try
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            // Użyj metody Connect z klasy db
+            using (SqlConnection connection = db.Connect())
             {
-                SqlCommand command = new SqlCommand(query, connection);
-                connection.Open();
-
-                SqlDataReader reader = command.ExecuteReader();
+                // Użyj metody SelectSQL z klasy db
+                DataSet dataSet = db.SelectSQL(connection, query);
                 List<GameTypeItem> gameTypeList = new List<GameTypeItem>();
 
-                while (reader.Read())
+                // Sprawdź, czy są jakiekolwiek tabele w DataSet
+                if (dataSet.Tables.Count > 0)
                 {
-                    int typeId = Convert.ToInt32(reader["Id"]);
-                    string typeName = reader["Name"].ToString();
-                    var pair = new KeyValuePair<int, string>(typeId, typeName);
-                    gameTypeList.Add(new GameTypeItem(typeId, pair));
-                }
+                    foreach (DataRow row in dataSet.Tables[0].Rows)
+                    {
+                        int typeId = Convert.ToInt32(row["Id"]);
+                        string typeName = row["Name"].ToString();
+                        var pair = new KeyValuePair<int, string>(typeId, typeName);
+                        gameTypeList.Add(new GameTypeItem(typeId, pair));
+                    }
 
-                reader.Close();
-
-                foreach (var item in gameTypeList)
-                {
-                    comboBoxGameType.Items.Add(item);
+                    // Wyczyść istniejące elementy ComboBox przed dodaniem nowych
+                    comboBoxGameType.Items.Clear();
+                    foreach (var item in gameTypeList)
+                    {
+                        comboBoxGameType.Items.Add(item);
+                    }
                 }
             }
         }
@@ -106,38 +108,41 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
     /// </summary>
     private void LoadGameEngines()
     {
-        string connectionString = Db.GetConnectionString();
-        string query = "select sgseg.Id, sgseg.Name from sgsGameEngines sgseg";
+        string query = "SELECT sgseg.Id, sgseg.Name FROM sgsGameEngines sgseg";
 
         try
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            // Otwórz połączenie przy użyciu metody z klasy db
+            using (SqlConnection connection = db.Connect())
             {
-                SqlCommand command = new SqlCommand(query, connection);
-                connection.Open();
-
-                SqlDataReader reader = command.ExecuteReader();
+                // Użyj metody SelectSQL z klasy db
+                DataSet dataSet = db.SelectSQL(connection, query);
                 List<GameEngineItem> enginesList = new List<GameEngineItem>();
 
-                while (reader.Read())
+                // Sprawdź, czy są jakiekolwiek tabele w DataSet
+                if (dataSet.Tables.Count > 0)
                 {
-                    int engineId = Convert.ToInt32(reader["Id"]);
-                    string engineName = reader["Name"].ToString();
-                    var pair = new KeyValuePair<int, string>(engineId, engineName);
-                    enginesList.Add(new GameEngineItem(engineId, pair));
-                }
+                    foreach (DataRow row in dataSet.Tables[0].Rows)
+                    {
+                        int engineId = Convert.ToInt32(row["Id"]);
+                        string engineName = row["Name"].ToString();
+                        var pair = new KeyValuePair<int, string>(engineId, engineName);
+                        enginesList.Add(new GameEngineItem(engineId, pair));
+                    }
 
-                reader.Close();
-                foreach (var item in enginesList)
-                {
-                    comboBoxGameEngine.Items.Add(item);
+                    // Wyczyść istniejące elementy ComboBox przed dodaniem nowych
+                    comboBoxGameEngine.Items.Clear();
+                    foreach (var item in enginesList)
+                    {
+                        comboBoxGameEngine.Items.Add(item);
+                    }
                 }
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Błąd: {ex.Message}");
-            throw;
+            throw; // Możesz obsłużyć wyjątek lub logować go, jeśli to konieczne
         }
     }
     private void GetSelectedGameTypeKey()
@@ -259,7 +264,6 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
         var gameEngine = selectedGameEngineId == 0 ? (int?)null : selectedGameEngineId;
         var gameType = selectedGameTypeId == 0 ? (int?)null : selectedGameTypeId;
 
-        string connectionString = Db.GetConnectionString();
         string addGameQuery = @"
     declare @developerId int = (select r.DeveloperId from Registration r where r.Id = @userId)
     INSERT INTO sgsGames (Title, DeveloperId, PayloadName, ExeName, ZipLink, VersionLink, CurrentVersion, Description, HardwareRequirements, OtherInformation, Symbol, EngineId, TypeId, DraftP)
@@ -269,48 +273,49 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
         string addImageQuery = "INSERT INTO sgsGameImages (GameId, ImagePath) VALUES (@GameId, @ImageUrl)";
         string addLogoQuery = "INSERT INTO sgsGameLogo (GameId, LogoPath) VALUES (@GameId, @ImageUrl)";
 
-        using (SqlConnection connection = new SqlConnection(connectionString))
+        using (SqlConnection connection = db.Connect())
         {
-            SqlCommand command = new SqlCommand(addGameQuery, connection);
-            command.Parameters.AddWithValue("@Name", gameName);
-            command.Parameters.AddWithValue("@userId", AppSession.CurrentUserSession.UserId);
-            command.Parameters.AddWithValue("@ExeName", exeName);
-            command.Parameters.AddWithValue("@ZipLink", zipLink);
-            command.Parameters.AddWithValue("@currentVersion", currentVersion);
-            command.Parameters.Add(gameDescriptionParam);
-            command.Parameters.Add(hardwareRequirementsParam);
-            command.Parameters.Add(otherInformationsParam);
-            command.Parameters.AddWithValue("@Symbol", symbol);
-            command.Parameters.AddWithValue("@GameEngine", gameEngine);
-            command.Parameters.AddWithValue("@GameType", gameType);
-
             try
             {
-                connection.Open();
-                int gameId = Convert.ToInt32(command.ExecuteScalar());
-
-                foreach (string imageUrl in galleryImageUrls)
+                // Utwórz nowy obiekt SqlCommand z zapytaniem SQL i połączeniem
+                using (SqlCommand command = db.CommandSQL(connection, addGameQuery, gameName,
+                                                           AppSession.CurrentUserSession.UserId, exeName,
+                                                           zipLink, currentVersion,
+                                                           gameDescriptionParam,
+                                                           hardwareRequirementsParam,
+                                                           otherInformationsParam, symbol,
+                                                           gameEngine, gameType))
                 {
-                    SqlCommand imageCommand = new SqlCommand(addImageQuery, connection);
-                    imageCommand.Parameters.AddWithValue("@GameId", gameId);
-                    imageCommand.Parameters.AddWithValue("@ImageUrl", imageUrl);
-                    imageCommand.ExecuteNonQuery();
-                }
+                    // Otwórz połączenie
+                    connection.Open();
 
-                SqlCommand logoCommand = new SqlCommand(addLogoQuery, connection);
-                logoCommand.Parameters.AddWithValue("@GameId", gameId);
-                logoCommand.Parameters.AddWithValue("@ImageUrl", gameLogo);
-                logoCommand.ExecuteNonQuery();
+                    // Wykonaj zapytanie i pobierz ID nowej gry
+                    int gameId = Convert.ToInt32(command.ExecuteScalar());
 
+                    // Dodaj obrazy do galerii
+                    foreach (string imageUrl in galleryImageUrls)
+                    {
+                        using (SqlCommand imageCommand = db.CommandSQL(connection, addImageQuery, gameId, imageUrl))
+                        {
+                            imageCommand.ExecuteNonQuery();
+                        }
+                    }
 
-                // Informacja o pomyślnym dodaniu
-                if (gameId > 0)
-                {
-                    Frame.Navigate(typeof(MyGamesPage), new DrillInNavigationTransitionInfo());
-                }
-                else
-                {
-                    System.Windows.MessageBox.Show("Błąd podczas dodawania gry do bazy danych.");
+                    // Dodaj logo
+                    using (SqlCommand logoCommand = db.CommandSQL(connection, addLogoQuery, gameId, gameLogo))
+                    {
+                        logoCommand.ExecuteNonQuery();
+                    }
+
+                    // Informacja o pomyślnym dodaniu
+                    if (gameId > 0)
+                    {
+                        Frame.Navigate(typeof(MyGamesPage), new DrillInNavigationTransitionInfo());
+                    }
+                    else
+                    {
+                        System.Windows.MessageBox.Show("Błąd podczas dodawania gry do bazy danych.");
+                    }
                 }
             }
             catch (Exception ex)

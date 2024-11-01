@@ -15,31 +15,29 @@ namespace SGSClient.Views
             get; set;
         }
         private readonly ConfigurationManagerSQL configManagerSQL;
-        string ConnectionString = Db.GetConnectionString();
-
         public MyGamesPage()
         {
             this.InitializeComponent();
             Games = new ObservableCollection<Game>();
-            configManagerSQL = new ConfigurationManagerSQL(ConnectionString);
-            LoadGamesFromDatabase();
+            LoadGamesFromDatabaseAsync();
         }
 
-        private void LoadGamesFromDatabase()
+        private async Task LoadGamesFromDatabaseAsync()
         {
-            List<GamesViewModel> gamesList = configManagerSQL.LoadMyGamesFromDatabase();
+            List<GamesViewModel> gamesList = await configManagerSQL.LoadMyGamesFromDatabaseAsync();
 
             foreach (var gameViewModel in gamesList)
             {
-                Games.Add(new Game { 
-                    GameId = gameViewModel.GameId
-                  , Title = gameViewModel.GameTitle
-                  , Genre = !string.IsNullOrEmpty(gameViewModel.GameType) ? gameViewModel.GameType : "-"
-                  , DraftP = Convert.ToBoolean(gameViewModel.DraftP) ? "Oczekuje na wydanie" : "Tak"
-                  , gameSymbol = gameViewModel.GameSymbol });
+                Games.Add(new Game
+                {
+                    GameId = gameViewModel.GameId,
+                    Title = gameViewModel.GameTitle,
+                    Genre = !string.IsNullOrEmpty(gameViewModel.GameType) ? gameViewModel.GameType : "-",
+                    DraftP = Convert.ToBoolean(gameViewModel.DraftP) ? "Oczekuje na wydanie" : "Tak",
+                    gameSymbol = gameViewModel.GameSymbol
+                });
             }
         }
-
         private void Action_Click(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;

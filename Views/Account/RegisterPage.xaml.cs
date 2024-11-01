@@ -47,12 +47,10 @@ namespace SGSClient.Views
 
         private void RegisterUser(string email, string username, string password)
         {
-            using (SqlConnection con = new SqlConnection(Db.GetConnectionString()))
+            try
             {
-                try
+                using (SqlConnection con = db.Connect()) // Używamy metody Connect z klasy db
                 {
-                    con.Open();
-
                     if (IsUserExisting(email, con))
                     {
                         errormessage.Text = "Użytkownik istnieje.";
@@ -64,10 +62,10 @@ namespace SGSClient.Views
                         Reset();
                     }
                 }
-                catch (Exception ex)
-                {
-                    errormessage.Text = $"Error: {ex.Message}";
-                }
+            }
+            catch (Exception ex)
+            {
+                errormessage.Text = $"Error: {ex.Message}";
             }
         }
 

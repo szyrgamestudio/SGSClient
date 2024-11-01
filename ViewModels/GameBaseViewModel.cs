@@ -19,9 +19,9 @@ namespace SGSClient.ViewModels
         [ObservableProperty]
         private int currentPage;
 
-        public GameBaseViewModel(ConfigurationManagerSQL configManagerSQL)
+        public GameBaseViewModel()
         {
-            _configManagerSQL = configManagerSQL;
+            _configManagerSQL = new ConfigurationManagerSQL(db.ConnectionString);
             _allComments = new ObservableCollection<Comment>();
             Comments = new ObservableCollection<Comment>();
             CurrentPage = 0;
@@ -51,10 +51,10 @@ namespace SGSClient.ViewModels
             }
         }
 
-        public void LoadComments(string gameIdentifier)
+        public async Task LoadCommentsAsync(string gameIdentifier)
         {
             _allComments.Clear();
-            var commentsFromDb = _configManagerSQL.LoadCommentsFromDatabase(gameIdentifier);
+            var commentsFromDb = await _configManagerSQL.LoadCommentsFromDatabaseAsync(gameIdentifier);
             foreach (var comment in commentsFromDb)
             {
                 _allComments.Add(comment);

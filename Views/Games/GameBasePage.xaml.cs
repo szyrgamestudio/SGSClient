@@ -50,13 +50,15 @@ public sealed partial class GameBasePage : Page
     {
         get;
     }
-    protected override void OnNavigatedTo(NavigationEventArgs e)
+    protected override async void OnNavigatedTo(NavigationEventArgs e)
     {
         if (e.Parameter is string parameterString && !string.IsNullOrWhiteSpace(parameterString))
         {
             gameIdentifier = parameterString;
 
-            var gameData = configManagerSQL.LoadGamesFromDatabase(true).Find(g => g.GameSymbol == gameIdentifier);
+            var gamesData = await configManagerSQL.LoadGamesFromDatabaseAsync(true);
+            var gameData = gamesData.Find(g => g.GameSymbol == gameIdentifier);
+
             if (gameData != null)
             {
                 gameTitle = gameData.GameTitle;
@@ -68,10 +70,11 @@ public sealed partial class GameBasePage : Page
                 otherInformations = gameData.OtherInformations;
                 gameExe = gameData.GameExeName;
 
-                LoadImagesFromDatabase(gameIdentifier);
-                LoadLogoFromDatabase(gameIdentifier);
+                await LoadImagesFromDatabaseAsync(gameIdentifier);
+                await LoadLogoFromDatabaseAsync(gameIdentifier);
 
-                ViewModel.LoadComments(gameIdentifier);
+                // Assuming LoadComments can also be made async
+                await ViewModel.LoadCommentsAsync(gameIdentifier);
             }
         }
 
@@ -80,7 +83,7 @@ public sealed partial class GameBasePage : Page
         var location = Path.Combine(ApplicationData.Current.LocalFolder.Path, "LocalState");
         rootPath = Path.GetDirectoryName(location) ?? string.Empty;
 
-        #region 
+        #region
         versionFile = Path.Combine(rootPath, "versions.xml");
         gameZip = Path.Combine(rootPath, $"{gameIdentifier}ARCHIVE");
         gameExe = Path.Combine(rootPath, gameIdentifier ?? "", $"{gameExe}.exe");
@@ -92,9 +95,9 @@ public sealed partial class GameBasePage : Page
     }
 
     #region DB Handling
-    private void LoadImagesFromDatabase(string gameName)
+    private async Task LoadImagesFromDatabaseAsync(string gameName)
     {
-        var gameImages = configManagerSQL.LoadGalleryImagesFromDatabase(gameName);
+        var gameImages = await configManagerSQL.LoadGalleryImagesFromDatabaseAsync(gameName);
 
         if (gameImages == null || gameImages.Count == 0)
         {
@@ -122,9 +125,10 @@ public sealed partial class GameBasePage : Page
             }
         }
     }
-    private void LoadLogoFromDatabase(string gameName)
+    private async Task LoadLogoFromDatabaseAsync(string gameName)
     {
-        var gameData = configManagerSQL.LoadGamesFromDatabase(true).Find(g => g.GameSymbol == gameName);
+        var games = await configManagerSQL.LoadGamesFromDatabaseAsync(true);
+        var gameData = games.Find(g => g.GameSymbol == gameName);
 
         if (gameData == null || string.IsNullOrEmpty(gameData.LogoPath))
         {
@@ -138,8 +142,6 @@ public sealed partial class GameBasePage : Page
             Image? gameLogoImage = FindName("GameLogoImage") as Image;
             if (gameLogoImage != null)
                 gameLogoImage.Source = new BitmapImage(logoImageUri);
-
-
         }
         catch (Exception ex)
         {
@@ -211,36 +213,36 @@ public sealed partial class GameBasePage : Page
         _ = AddCommentDetailsDialog.ShowAsync();
     }
 
-    private void AddCommentButton_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+    private async void AddCommentButton_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
     {
         Comment comment = new Comment();
         _selectedComment = comment;
         _selectedComment.Content = ACContentTextBox.Text;
         ViewModel.AddComment(gameIdentifier, _selectedComment);
-        ViewModel.LoadComments(gameIdentifier); // Refresh comments
+        await ViewModel.LoadCommentsAsync(gameIdentifier); // Refresh comments
 
         CommentDetailsDialog.Hide();
     }
 
-    private void SaveCommentButton_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+    private async void SaveCommentButton_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
     {
         if (_selectedComment != null)
         {
             _selectedComment.Author = AuthorTextBox.Text;
             _selectedComment.Content = ContentTextBox.Text;
             ViewModel.UpdateComment(_selectedComment);
-            ViewModel.LoadComments(gameIdentifier); // Refresh comments
+            await ViewModel.LoadCommentsAsync(gameIdentifier); // Refresh comments
         }
         CommentDetailsDialog.Hide();
     }
 
-    private void DeleteCommentButton_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+    private async void DeleteCommentButton_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
     {
         if (_selectedComment != null)
         {
             ViewModel.DeleteComment(_selectedComment);
             _selectedComment = null;
-            ViewModel.LoadComments(gameIdentifier); // Refresh comments
+            await ViewModel.LoadCommentsAsync(gameIdentifier); // Refresh comments
         }
     }
 
@@ -257,10 +259,8 @@ public sealed partial class GameBasePage : Page
 
     public GameBasePage()
     {
-        var ConnectionString = Db.GetConnectionString();
-        configManagerSQL = new ConfigurationManagerSQL(ConnectionString);
-
-        ViewModel = new GameBaseViewModel(new ConfigurationManagerSQL(Db.GetConnectionString()));
+        configManagerSQL = new ConfigurationManagerSQL(db.ConnectionString);
+        ViewModel = new GameBaseViewModel();
         InitializeComponent();
         DataContext = ViewModel;  // Set the DataContext
         Status = LauncherStatus.pageLauched;

@@ -16,19 +16,28 @@ namespace SGSClient.Views
         public GamesViewModel ViewModel { get; }
         public GamesPage()
         {
+            configManagerSQL = new ConfigurationManagerSQL(db.ConnectionString);
             InitializeComponent();
-
-            configManagerSQL = new ConfigurationManagerSQL(Db.GetConnectionString());
-            LoadGamesFromDatabase();
+            LoadGamesFromDatabaseAsync();
         }
 
-        private void LoadGamesFromDatabase()
+        private async Task LoadGamesFromDatabaseAsync()
         {
-            gamesList = configManagerSQL.LoadGamesFromDatabase(false);
-            gamesFeaturedList = configManagerSQL.LoadFeaturedGamesFromDatabase(false);
-            GamesItemsControl.ItemsSource = gamesList;
-            GamesFeaturedItemsControl.ItemsSource = gamesFeaturedList;
+            try
+            {
+                gamesList = await configManagerSQL.LoadGamesFromDatabaseAsync(false);
+                gamesFeaturedList = await configManagerSQL.LoadFeaturedGamesFromDatabaseAsync(false);
+
+                GamesItemsControl.ItemsSource = gamesList;
+                GamesFeaturedItemsControl.ItemsSource = gamesFeaturedList;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while loading games: {ex.Message}");
+            }
         }
+
+
 
         private void ButtonGame_Click(object sender, RoutedEventArgs e)
         {

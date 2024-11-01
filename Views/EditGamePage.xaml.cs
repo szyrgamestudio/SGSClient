@@ -92,32 +92,33 @@ namespace SGSClient.Views
 
         private void LoadGameTypes()
         {
-            string connectionString = Db.GetConnectionString();
             string query = "SELECT Id, Name FROM sgsGameTypes";
 
             try
             {
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                using (SqlConnection connection = db.Connect()) // Używamy metody Connect z klasy db
                 {
-                    SqlCommand command = new SqlCommand(query, connection);
-                    connection.Open();
-
-                    SqlDataReader reader = command.ExecuteReader();
+                    // Używamy SelectSQL z klasy db, aby wykonać zapytanie i otrzymać DataSet
+                    DataSet dataSet = db.SelectSQL(connection, query);
                     List<GameTypeItem> gameTypeList = new List<GameTypeItem>();
 
-                    while (reader.Read())
+                    // Sprawdzamy, czy są jakiekolwiek tabele w DataSet
+                    if (dataSet.Tables.Count > 0)
                     {
-                        int typeId = Convert.ToInt32(reader["Id"]);
-                        string typeName = reader["Name"].ToString();
-                        var pair = new KeyValuePair<int, string>(typeId, typeName);
-                        gameTypeList.Add(new GameTypeItem(typeId, pair));
-                    }
+                        foreach (DataRow row in dataSet.Tables[0].Rows)
+                        {
+                            int typeId = Convert.ToInt32(row["Id"]);
+                            string typeName = row["Name"].ToString();
+                            var pair = new KeyValuePair<int, string>(typeId, typeName);
+                            gameTypeList.Add(new GameTypeItem(typeId, pair));
+                        }
 
-                    reader.Close();
-
-                    foreach (var item in gameTypeList)
-                    {
-                        comboBoxGameType.Items.Add(item);
+                        // Wyczyść istniejące elementy ComboBox przed dodaniem nowych
+                        comboBoxGameType.Items.Clear();
+                        foreach (var item in gameTypeList)
+                        {
+                            comboBoxGameType.Items.Add(item);
+                        }
                     }
                 }
             }
@@ -129,31 +130,33 @@ namespace SGSClient.Views
 
         private void LoadGameEngines()
         {
-            string connectionString = Db.GetConnectionString();
             string query = "SELECT Id, Name FROM sgsGameEngines";
 
             try
             {
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                using (SqlConnection connection = db.Connect()) // Używamy metody Connect z klasy db
                 {
-                    SqlCommand command = new SqlCommand(query, connection);
-                    connection.Open();
-
-                    SqlDataReader reader = command.ExecuteReader();
+                    // Używamy SelectSQL z klasy db, aby wykonać zapytanie i otrzymać DataSet
+                    DataSet dataSet = db.SelectSQL(connection, query);
                     List<GameEngineItem> enginesList = new List<GameEngineItem>();
 
-                    while (reader.Read())
+                    // Sprawdzamy, czy są jakiekolwiek tabele w DataSet
+                    if (dataSet.Tables.Count > 0)
                     {
-                        int engineId = Convert.ToInt32(reader["Id"]);
-                        string engineName = reader["Name"].ToString();
-                        var pair = new KeyValuePair<int, string>(engineId, engineName);
-                        enginesList.Add(new GameEngineItem(engineId, pair));
-                    }
+                        foreach (DataRow row in dataSet.Tables[0].Rows)
+                        {
+                            int engineId = Convert.ToInt32(row["Id"]);
+                            string engineName = row["Name"].ToString();
+                            var pair = new KeyValuePair<int, string>(engineId, engineName);
+                            enginesList.Add(new GameEngineItem(engineId, pair));
+                        }
 
-                    reader.Close();
-                    foreach (var item in enginesList)
-                    {
-                        comboBoxGameEngine.Items.Add(item);
+                        // Wyczyść istniejące elementy ComboBox przed dodaniem nowych
+                        comboBoxGameEngine.Items.Clear();
+                        foreach (var item in enginesList)
+                        {
+                            comboBoxGameEngine.Items.Add(item);
+                        }
                     }
                 }
             }
@@ -183,17 +186,13 @@ namespace SGSClient.Views
 
         private void LoadGameData()
         {
-            string connectionString = Db.GetConnectionString();
             string query = "SELECT * FROM sgsGames WHERE Id = @GameId";
 
             try
             {
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                using (SqlConnection connection = db.Connect()) // Używamy metody Connect z klasy db
                 {
-                    SqlCommand command = new SqlCommand(query, connection);
-                    command.Parameters.AddWithValue("@GameId", gameId);
-                    connection.Open();
-
+                    SqlCommand command = db.CommandSQL(connection, query, gameId);
                     SqlDataReader reader = command.ExecuteReader();
 
                     if (reader.Read())
@@ -211,10 +210,10 @@ namespace SGSClient.Views
                         selectedGameEngineId = reader["EngineId"] != DBNull.Value ? Convert.ToInt32(reader["EngineId"]) : 0;
 
                         reader.Close();
+
                         // Load Game Logo
                         string logoQuery = "SELECT LogoPath FROM sgsGameLogo WHERE GameId = @GameId";
-                        SqlCommand logoCommand = new SqlCommand(logoQuery, connection);
-                        logoCommand.Parameters.AddWithValue("@GameId", gameId);
+                        SqlCommand logoCommand = db.CommandSQL(connection, logoQuery, gameId);
                         SqlDataReader logoReader = logoCommand.ExecuteReader();
 
                         if (logoReader.Read())
@@ -225,8 +224,7 @@ namespace SGSClient.Views
 
                         // Load Game Images
                         string imagesQuery = "SELECT ImagePath FROM sgsGameImages WHERE GameId = @GameId";
-                        SqlCommand imagesCommand = new SqlCommand(imagesQuery, connection);
-                        imagesCommand.Parameters.AddWithValue("@GameId", gameId);
+                        SqlCommand imagesCommand = db.CommandSQL(connection, imagesQuery, gameId);
                         SqlDataReader imagesReader = imagesCommand.ExecuteReader();
 
                         while (imagesReader.Read())
@@ -378,39 +376,37 @@ namespace SGSClient.Views
                 Value = string.Join(Environment.NewLine, otherInfo.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None))
             };
 
-            string connectionString = Db.GetConnectionString();
-
             string updateGameQuery = @"
-update g set
-  g.Title = @GameName
-, g.Symbol = @Symbol
-, g.CurrentVersion = @Version
-, g.ZipLink = @ZipLink
-, g.ExeName = @ExeName
-, g.Description = @gameDescriptionParam
-, g.HardwareRequirements = @hardwareRequirementsParam
-, g.OtherInformation = @otherInfoParam
-, g.TypeId = @GameTypeId
-, g.EngineId = @GameEngineId
-from sgsGames g
-where g.Id = @GameId";
+    UPDATE g SET
+        g.Title = @GameName,
+        g.Symbol = @Symbol,
+        g.CurrentVersion = @Version,
+        g.ZipLink = @ZipLink,
+        g.ExeName = @ExeName,
+        g.Description = @gameDescriptionParam,
+        g.HardwareRequirements = @hardwareRequirementsParam,
+        g.OtherInformation = @otherInfoParam,
+        g.TypeId = @GameTypeId,
+        g.EngineId = @GameEngineId
+    FROM sgsGames g
+    WHERE g.Id = @GameId";
 
             try
             {
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                using (SqlConnection connection = db.Connect()) // Używamy metody Connect z klasy db
                 {
-                    SqlCommand updateCommand = new SqlCommand(updateGameQuery, connection);
-                    updateCommand.Parameters.AddWithValue("@GameName", gameName);
-                    updateCommand.Parameters.AddWithValue("@Symbol", symbol);
-                    updateCommand.Parameters.AddWithValue("@Version", currentVersion);
-                    updateCommand.Parameters.AddWithValue("@ZipLink", zipLink);
-                    updateCommand.Parameters.AddWithValue("@ExeName", exeName);
-                    updateCommand.Parameters.Add(gameDescriptionParam);
-                    updateCommand.Parameters.Add(hardwareRequirementsParam);
-                    updateCommand.Parameters.Add(otherInfoParam);
-                    updateCommand.Parameters.AddWithValue("@GameTypeId", selectedGameTypeId);
-                    updateCommand.Parameters.AddWithValue("@GameEngineId", selectedGameEngineId);
-                    updateCommand.Parameters.AddWithValue("@GameId", gameId);
+                    SqlCommand updateCommand = db.CommandSQL(connection, updateGameQuery,
+                        gameName,
+                        symbol,
+                        currentVersion,
+                        zipLink,
+                        exeName,
+                        gameDescriptionParam,
+                        hardwareRequirementsParam,
+                        otherInfoParam,
+                        selectedGameTypeId,
+                        selectedGameEngineId,
+                        gameId);
 
                     connection.Open();
                     updateCommand.ExecuteNonQuery();
@@ -434,35 +430,47 @@ where g.Id = @GameId";
         #region Actions
         private void UpdateGameLogo(int gameId, string gameLogo)
         {
-            string connectionString = Db.GetConnectionString();
-
-            string selectLogoQuery = "SELECT COUNT(*) FROM sgsGameLogos WHERE GameId = @GameId";
-            string insertLogoQuery = "INSERT INTO sgsGameLogos (GameId, LogoPath) VALUES (@GameId, @LogoPath)";
-            string updateLogoQuery = "UPDATE sgsGameLogos SET LogoPath = @LogoPath WHERE GameId = @GameId";
-
             try
             {
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                using (SqlConnection connection = db.Connect())
                 {
-                    SqlCommand selectCommand = new SqlCommand(selectLogoQuery, connection);
-                    selectCommand.Parameters.AddWithValue("@GameId", gameId);
-                    connection.Open();
-
-                    int count = (int)selectCommand.ExecuteScalar();
-
-                    if (count > 0)
+                    try
                     {
-                        SqlCommand updateCommand = new SqlCommand(updateLogoQuery, connection);
-                        updateCommand.Parameters.AddWithValue("@GameId", gameId);
-                        updateCommand.Parameters.AddWithValue("@LogoPath", gameLogo);
-                        updateCommand.ExecuteNonQuery();
+                        // Sprawdzenie, czy logo dla danej gry już istnieje
+                        string selectLogoQuery = "SELECT COUNT(*) FROM GameLogos WHERE GameId = @GameId";
+                        using (SqlCommand selectCommand = db.CommandSQL(connection, selectLogoQuery))
+                        {
+                            selectCommand.Parameters.AddWithValue("@GameId", gameId);
+                            connection.Open();
+
+                            int count = (int)selectCommand.ExecuteScalar();
+
+                            // Jeśli logo istnieje, aktualizujemy je
+                            if (count > 0)
+                            {
+                                string updateLogoQuery = "UPDATE GameLogos SET LogoPath = @LogoPath WHERE GameId = @GameId";
+                                using (SqlCommand updateCommand = db.CommandSQL(connection, updateLogoQuery))
+                                {
+                                    updateCommand.Parameters.AddWithValue("@GameId", gameId);
+                                    updateCommand.Parameters.AddWithValue("@LogoPath", gameLogo);
+                                    updateCommand.ExecuteNonQuery();
+                                }
+                            }
+                            else // Jeśli logo nie istnieje, dodajemy nowe
+                            {
+                                string insertLogoQuery = "INSERT INTO GameLogos (GameId, LogoPath) VALUES (@GameId, @LogoPath)";
+                                using (SqlCommand insertCommand = db.CommandSQL(connection, insertLogoQuery))
+                                {
+                                    insertCommand.Parameters.AddWithValue("@GameId", gameId);
+                                    insertCommand.Parameters.AddWithValue("@LogoPath", gameLogo);
+                                    insertCommand.ExecuteNonQuery();
+                                }
+                            }
+                        }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        SqlCommand insertCommand = new SqlCommand(insertLogoQuery, connection);
-                        insertCommand.Parameters.AddWithValue("@GameId", gameId);
-                        insertCommand.Parameters.AddWithValue("@LogoPath", gameLogo);
-                        insertCommand.ExecuteNonQuery();
+                        System.Windows.MessageBox.Show($"Wystąpił błąd podczas aktualizacji logo: {ex.Message}");
                     }
                 }
             }
@@ -473,33 +481,44 @@ where g.Id = @GameId";
         }
         private void UpdateGameImages(int gameId)
         {
-            string connectionString = Db.GetConnectionString();
-
             string deleteImagesQuery = "DELETE FROM sgsGameImages WHERE GameId = @GameId";
             string insertImageQuery = "INSERT INTO sgsGameImages (GameId, ImagePath) VALUES (@GameId, @ImagePath)";
 
             try
             {
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                using (SqlConnection connection = db.Connect())
                 {
-                    SqlCommand deleteCommand = new SqlCommand(deleteImagesQuery, connection);
-                    deleteCommand.Parameters.AddWithValue("@GameId", gameId);
-                    connection.Open();
-                    deleteCommand.ExecuteNonQuery();
-
-                    foreach (var child in gameGalleryStackPanel.Children)
+                    try
                     {
-                        if (child is StackPanel panel && panel.Children[0] is TextBox textBox)
+                        // Usuwanie obrazów związanych z grą
+                        using (SqlCommand deleteCommand = db.CommandSQL(connection, deleteImagesQuery))
                         {
-                            string imagePath = textBox.Text;
-                            if (!string.IsNullOrEmpty(imagePath))
+                            deleteCommand.Parameters.AddWithValue("@GameId", gameId);
+                            connection.Open();
+                            deleteCommand.ExecuteNonQuery();
+                        }
+
+                        // Dodawanie nowych obrazów
+                        foreach (var child in gameGalleryStackPanel.Children)
+                        {
+                            if (child is StackPanel panel && panel.Children[0] is TextBox textBox)
                             {
-                                SqlCommand insertCommand = new SqlCommand(insertImageQuery, connection);
-                                insertCommand.Parameters.AddWithValue("@GameId", gameId);
-                                insertCommand.Parameters.AddWithValue("@ImagePath", imagePath);
-                                insertCommand.ExecuteNonQuery();
+                                string imagePath = textBox.Text;
+                                if (!string.IsNullOrEmpty(imagePath))
+                                {
+                                    using (SqlCommand insertCommand = db.CommandSQL(connection, insertImageQuery))
+                                    {
+                                        insertCommand.Parameters.AddWithValue("@GameId", gameId);
+                                        insertCommand.Parameters.AddWithValue("@ImagePath", imagePath);
+                                        insertCommand.ExecuteNonQuery();
+                                    }
+                                }
                             }
                         }
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Windows.MessageBox.Show($"Wystąpił błąd podczas aktualizacji obrazów: {ex.Message}");
                     }
                 }
             }

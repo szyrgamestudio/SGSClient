@@ -43,7 +43,7 @@
         <PasswordBox Grid.Row="4" Grid.Column="1" Height="40" Margin="0,5,0,0" Name="passwordBox1" VerticalAlignment="Top" FontSize="16" Padding="10" BorderThickness="1"/>
 
         <!-- Przycisk "Login" -->
-        <Button Grid.Row="5" Grid.Column="1" Content="Zaloguj" Height="40" Margin="0,20,0,0" Name="button1" VerticalAlignment="Top" Click="buttonLogin_Click" FontSize="16" Style="{StaticResource AccentButtonStyle}" BorderThickness="0" Width="120"/>
+        <Button Grid.Row="5" Grid.Column="1" Content="Zaloguj" Height="40" Margin="0,20,0,0" Name="button1" VerticalAlignment="Top" Click="ButtonLogin_Click" FontSize="16" Style="{StaticResource AccentButtonStyle}" BorderThickness="0" Width="120"/>
 
         <!-- Komunikat o błędzie -->
         <TextBlock Grid.Row="6" Grid.Column="1" Height="23" HorizontalAlignment="Left" x:Name="errormessage" Margin="0,10,0,0" Foreground="#FF0000" FontSize="14" TextWrapping="Wrap"/>
@@ -51,14 +51,14 @@
         <!-- Link do rejestracji -->
         <TextBlock Grid.Row="7" Grid.Column="1" Height="25" Margin="0,20,0,0" Name="textBlockHeading" VerticalAlignment="Top" FontSize="16" FontStyle="Italic" Padding="5">
         <Run Text="Nie masz konta? "/>
-        <Hyperlink Click="buttonRegister_Click" FontSize="16" FontStyle="Normal" Foreground="#0078D4">
+        <Hyperlink Click="ButtonRegister_Click" FontSize="16" FontStyle="Normal" Foreground="#0078D4">
             <Run Text="Zarejestruj się teraz"/>
         </Hyperlink>
         </TextBlock>
 
         <!-- Link "Zapomniałem hasła" -->
         <TextBlock Grid.Row="8" Grid.Column="1" Height="50" Margin="0,20,0,0" Name="textBlockForgotPassword" VerticalAlignment="Top" FontSize="16" FontStyle="Italic" Padding="5">
-            <Hyperlink Click="hyperlinkForgotPassword_Click" FontSize="16" FontStyle="Normal" Foreground="#0078D4">
+            <Hyperlink Click="HyperlinkForgotPassword_Click" FontSize="16" FontStyle="Normal" Foreground="#0078D4">
                 <Run Text="Zapomniałeś hasła?"/>
             </Hyperlink>
         </TextBlock>

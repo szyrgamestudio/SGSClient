@@ -9,8 +9,9 @@
     xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
     xmlns:local="using:SGSClient.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    behaviors:NavigationViewHeaderBehavior.HeaderMode="Never"
-    mc:Ignorable="d">
+    xmlns:vm="using:SGSClient.ViewModels" d:DataContext="{d:DesignInstance Type=vm:MyAccountViewModel}"
+    mc:Ignorable="d"
+    behaviors:NavigationViewHeaderBehavior.HeaderMode="Never">
     <Grid x:Name="ContentArea">
         <GridView
             x:Name="itemGridView"
@@ -28,7 +29,7 @@
                     </Grid.RowDefinitions>
                     <Ellipse Width="50" Height="50" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,12,12,0">
                         <Ellipse.Fill>
-                            <ImageBrush ImageSource="{x:Bind AvatarUrl, Mode=OneWay}" Stretch="UniformToFill"/>
+                            <ImageBrush ImageSource="{Binding AvatarUrl}" Stretch="UniformToFill"/>
                         </Ellipse.Fill>
                     </Ellipse>
                     <TextBlock AutomationProperties.AutomationId="__ClickableAreaTextBlock" />
@@ -45,7 +46,7 @@
                             x:Name="smallHeaderText"
                             FontSize="24"
                             FontWeight="Light"
-                            Text="{x:Bind WelcomeText, Mode=OneWay}" />
+                            Text="{Binding WelcomeText}" />
                     </StackPanel>
                     <ScrollViewer
                         x:Name="scroller"

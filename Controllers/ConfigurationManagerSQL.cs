@@ -1,25 +1,21 @@
-﻿using SGSClient.Core.Authorization;
-using SGSClient.Models;
+﻿using SGSClient.Models;
 using SGSClient.ViewModels;
-using System;
-using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
-using System.Data.SqlTypes;
+using SGSClient.Core.Database;
+using System.Data;
 
 namespace SGSClient.Controllers
 {
     public class ConfigurationManagerSQL
     {
         private readonly string _connectionString;
-        private readonly HttpClient httpClient = new();
-
         public ConfigurationManagerSQL(string connectionString)
         {
             _connectionString = connectionString;
         }
-        public List<GamesViewModel> LoadFeaturedGamesFromDatabase(bool bypassDraftP)
+        public async Task<List<GamesViewModel>> LoadGamesFromDatabaseAsync(bool bypassDraftP)
         {
-            List<GamesViewModel> gamesList = new List<GamesViewModel>();
+            List<GamesViewModel> gamesList = [];
 
             string query = @"
 select
@@ -41,110 +37,99 @@ from sgsGames g
 inner join sgsDevelopers d on d.Id = g.DeveloperId
 left join sgsGameLogo l on l.GameId = g.Id
 left join sgsGameTypes t on t.Id = g.TypeId
-where (g.DraftP = 0 and @bypassDraftP = 0 or @bypassDraftP = 1) and g.FeaturedP = 1
-order by g.Title
-";
+where g.DraftP = 0 and @p0 = 0 or @p0 = 1
+order by g.Title";
 
             try
             {
-                using (SqlConnection connection = new SqlConnection(_connectionString))
+                using SqlConnection connection = db.Connect();
+                DataSet result = await db.SelectSQLAsync(connection, query, bypassDraftP);
+
+                if (result.Tables.Count > 0)
                 {
-                    connection.Open();
-
-                    using (SqlCommand command = new SqlCommand(query, connection))
+                    foreach (DataRow row in result.Tables[0].Rows)
                     {
-                        command.Parameters.AddWithValue("@bypassDraftP", bypassDraftP);
-                        SqlDataReader reader = command.ExecuteReader();
+                        GamesViewModel game = new GamesViewModel(
+                            gameId: row["GameId"].ToString(),
+                            gameSymbol: row["GameSymbol"].ToString(),
+                            gameTitle: row["Title"].ToString(),
+                            gamePayloadName: row["PayloadName"].ToString(),
+                            gameExeName: row["ExeName"].ToString(),
+                            gameZipLink: row["ZipLink"].ToString(),
+                            gameVersionLink: row["VersionLink"].ToString(),
+                            gameDescription: row["Description"].ToString(),
+                            hardwareRequirements: row["HardwareRequirements"].ToString(),
+                            otherInformations: row["OtherInformation"].ToString(),
+                            gameDeveloper: row["GameDeveloper"].ToString(),
+                            logoPath: row["LogoPath"].ToString(),
+                            gameType: row["GameType"].ToString(),
+                            draftP: row["DraftP"].ToString()
+                        );
 
-                        while (reader.Read())
-                        {
-                            GamesViewModel game = new GamesViewModel(
-                                gameId: reader["GameId"].ToString(),
-                                gameSymbol: reader["GameSymbol"].ToString(),
-                                gameTitle: reader["Title"].ToString(),
-                                gamePayloadName: reader["PayloadName"].ToString(),
-                                gameExeName: reader["ExeName"].ToString(),
-                                gameZipLink: reader["ZipLink"].ToString(),
-                                gameVersionLink: reader["VersionLink"].ToString(),
-                                gameDescription: reader["Description"].ToString(),
-                                hardwareRequirements: reader["HardwareRequirements"].ToString(),
-                                otherInformations: reader["OtherInformation"].ToString(),
-                                gameDeveloper: reader["GameDeveloper"].ToString(),
-                                logoPath: reader["LogoPath"].ToString(),
-                                gameType: reader["GameType"].ToString(),
-                                draftP: reader["DraftP"].ToString()
-                            );
-
-                            gamesList.Add(game);
-                        }
+                        gamesList.Add(game);
                     }
                 }
             }
             catch (Exception ex)
             {
-                // Obsługa błędu podczas komunikacji z bazą danych
-                Console.WriteLine($"Błąd podczas ładowania gier z bazy danych: {ex.Message}");
+                Console.WriteLine($"Error loading games from the database: {ex.Message}");
                 throw;
             }
 
             return gamesList;
         }
-        public List<GamesViewModel> LoadGamesFromDatabase(bool bypassDraftP)
+        public async Task<List<GamesViewModel>> LoadFeaturedGamesFromDatabaseAsync(bool bypassDraftP)
         {
             List<GamesViewModel> gamesList = new List<GamesViewModel>();
 
             string query = @"
-select
-  g.Id       [GameId]
-, g.Title
-, g.Symbol   [GameSymbol]
-, d.Name     [GameDeveloper]
-, l.LogoPath [LogoPath]
-, t.Name	 [GameType]
-, g.PayloadName
-, g.ExeName
-, g.ZipLink
-, g.VersionLink
-, g.Description
-, g.HardwareRequirements
-, g.OtherInformation
-, g.DraftP
-from sgsGames g
-inner join sgsDevelopers d on d.Id = g.DeveloperId
-left join sgsGameLogo l on l.GameId = g.Id
-left join sgsGameTypes t on t.Id = g.TypeId
-where g.DraftP = 0 and @bypassDraftP = 0 or @bypassDraftP = 1
-order by g.Title
-";
+    select
+      g.Id       [GameId]
+    , g.Title
+    , g.Symbol   [GameSymbol]
+    , d.Name     [GameDeveloper]
+    , l.LogoPath [LogoPath]
+    , t.Name	 [GameType]
+    , g.PayloadName
+    , g.ExeName
+    , g.ZipLink
+    , g.VersionLink
+    , g.Description
+    , g.HardwareRequirements
+    , g.OtherInformation
+    , g.DraftP
+    from sgsGames g
+    inner join sgsDevelopers d on d.Id = g.DeveloperId
+    left join sgsGameLogo l on l.GameId = g.Id
+    left join sgsGameTypes t on t.Id = g.TypeId
+    where (g.DraftP = 0 and @p0 = 0 or @p0 = 1) and g.FeaturedP = 1
+    order by g.Title
+    ";
 
             try
             {
-                using (SqlConnection connection = new SqlConnection(_connectionString))
+                using (SqlConnection connection = db.Connect())
                 {
-                    connection.Open();
-
-                    using (SqlCommand command = new SqlCommand(query, connection))
+                    DataSet result = await db.SelectSQLAsync(connection, query, bypassDraftP);
+                    if (result.Tables.Count > 0)
                     {
-                        command.Parameters.AddWithValue("@bypassDraftP", bypassDraftP);
-                        SqlDataReader reader = command.ExecuteReader();
-
-                        while (reader.Read())
+                        foreach (DataRow row in result.Tables[0].Rows)
                         {
                             GamesViewModel game = new GamesViewModel(
-                                gameId: reader["GameId"].ToString(),
-                                gameSymbol: reader["GameSymbol"].ToString(),
-                                gameTitle: reader["Title"].ToString(),
-                                gamePayloadName: reader["PayloadName"].ToString(),
-                                gameExeName: reader["ExeName"].ToString(),
-                                gameZipLink: reader["ZipLink"].ToString(),
-                                gameVersionLink: reader["VersionLink"].ToString(),
-                                gameDescription: reader["Description"].ToString(),
-                                hardwareRequirements: reader["HardwareRequirements"].ToString(),
-                                otherInformations: reader["OtherInformation"].ToString(),
-                                gameDeveloper: reader["GameDeveloper"].ToString(),
-                                logoPath: reader["LogoPath"].ToString(),
-                                gameType: reader["GameType"].ToString(),
-                                draftP: reader["DraftP"].ToString()
+                                gameId: row["GameId"].ToString(),
+                                gameSymbol: row["GameSymbol"].ToString(),
+                                gameTitle: row["Title"].ToString(),
+                                gamePayloadName: row["PayloadName"].ToString(),
+                                gameExeName: row["ExeName"].ToString(),
+                                gameZipLink: row["ZipLink"].ToString(),
+                                gameVersionLink: row["VersionLink"].ToString(),
+                                gameDescription: row["Description"].ToString(),
+                                hardwareRequirements: row["HardwareRequirements"].ToString(),
+                                otherInformations: row["OtherInformation"].ToString(),
+                                gameDeveloper: row["GameDeveloper"].ToString(),
+                                logoPath: row["LogoPath"].ToString(),
+                                gameType: row["GameType"].ToString(),
+                                draftP: row["DraftP"].ToString()
                             );
 
                             gamesList.Add(game);
@@ -154,25 +139,24 @@ order by g.Title
             }
             catch (Exception ex)
             {
-                // Obsługa błędu podczas komunikacji z bazą danych
-                Console.WriteLine($"Błąd podczas ładowania gier z bazy danych: {ex.Message}");
+                Console.WriteLine($"Error loading featured games from the database: {ex.Message}");
                 throw;
             }
 
             return gamesList;
         }
-        public List<GamesViewModel> LoadMyGamesFromDatabase()
+        public async Task<List<GamesViewModel>> LoadMyGamesFromDatabaseAsync()
         {
             List<GamesViewModel> gamesList = new List<GamesViewModel>();
 
             string query = @"
 select  
-  g.Id       [gameId]
+  g.Id       [GameId]
 , g.Title
 , g.Symbol   [GameSymbol]
 , d.Name     [GameDeveloper]
 , l.LogoPath [LogoPath]
-, t.Name	 [GameType]
+, t.Name     [GameType]
 , g.PayloadName
 , g.ExeName
 , g.ZipLink
@@ -189,54 +173,72 @@ left join sgsGameTypes t on t.Id = g.TypeId
 where r.id = @userId/* and g.DraftP = 0*/
 ";
 
+            // Use the connection directly from db class
+            using SqlConnection connection = db.Connect();
             try
             {
-                using (SqlConnection connection = new SqlConnection(_connectionString))
+                Console.WriteLine($"Connection state before opening: {connection.State}");
+
+                if (connection.State != ConnectionState.Open)
                 {
-                    connection.Open();
+                    await connection.OpenAsync();
+                    Console.WriteLine("Connection opened.");
+                }
 
-                    using (SqlCommand command = new SqlCommand(query, connection))
+                object[] parameters = { AppSession.CurrentUserSession.UserId };
+                DataSet result;
+
+                try
+                {
+                    // Call the asynchronous method to get results
+                    result = await db.SelectSQLAsync(connection, query, parameters);
+                }
+                catch (Exception sqlEx)
+                {
+                    Console.WriteLine($"Error executing SQL command: {sqlEx.Message}");
+                    return gamesList; // Return empty list on error
+                }
+
+                // Check if any tables were returned and process the results
+                if (result.Tables.Count > 0 && result.Tables[0].Rows.Count > 0)
+                {
+                    foreach (DataRow row in result.Tables[0].Rows)
                     {
-                        command.Parameters.AddWithValue("@userId", AppSession.CurrentUserSession.UserId);
-                        SqlDataReader reader = command.ExecuteReader();
+                        GamesViewModel game = new GamesViewModel(
+                            gameId: row["GameId"].ToString(),
+                            gameSymbol: row["GameSymbol"].ToString(),
+                            gameTitle: row["Title"].ToString(),
+                            gamePayloadName: row["PayloadName"].ToString(),
+                            gameExeName: row["ExeName"].ToString(),
+                            gameZipLink: row["ZipLink"].ToString(),
+                            gameVersionLink: row["VersionLink"].ToString(),
+                            gameDescription: row["Description"].ToString(),
+                            hardwareRequirements: row["HardwareRequirements"].ToString(),
+                            otherInformations: row["OtherInformation"].ToString(),
+                            gameDeveloper: row["GameDeveloper"].ToString(),
+                            logoPath: row["LogoPath"].ToString(),
+                            gameType: row["GameType"].ToString(),
+                            draftP: row["DraftP"].ToString()
+                        );
 
-                        while (reader.Read())
-                        {
-                            GamesViewModel game = new GamesViewModel(
-                                gameId: reader["GameId"].ToString(),
-                                gameSymbol: reader["GameSymbol"].ToString(),
-                                gameTitle: reader["Title"].ToString(),
-                                gamePayloadName: reader["PayloadName"].ToString(),
-                                gameExeName: reader["ExeName"].ToString(),
-                                gameZipLink: reader["ZipLink"].ToString(),
-                                gameVersionLink: reader["VersionLink"].ToString(),
-                                gameDescription: reader["Description"].ToString(),
-                                hardwareRequirements: reader["HardwareRequirements"].ToString(),
-                                otherInformations: reader["OtherInformation"].ToString(),
-                                gameDeveloper: reader["GameDeveloper"].ToString(),
-                                logoPath: reader["LogoPath"].ToString(),
-                                gameType: reader["GameType"].ToString(),
-                                draftP: reader["DraftP"].ToString()
-                            );
-
-                            gamesList.Add(game);
-                        }
+                        gamesList.Add(game);
                     }
+                }
+                else
+                {
+                    Console.WriteLine($"No games found for user ID: {AppSession.CurrentUserSession.UserId}");
                 }
             }
             catch (Exception ex)
             {
-                // Obsługa błędu podczas komunikacji z bazą danych
-                Console.WriteLine($"Błąd podczas ładowania gier z bazy danych: {ex.Message}");
-                throw;
+                Console.WriteLine($"Error loading games from database: {ex.Message}");
             }
 
             return gamesList;
         }
-        public List<string> LoadGalleryImagesFromDatabase(string gameSymbol)
+        public async Task<List<string>> LoadGalleryImagesFromDatabaseAsync(string gameSymbol)
         {
             List<string> galleryImages = new List<string>();
-
             string query = @"
 select
   i.ImagePath
@@ -247,78 +249,86 @@ where g.Symbol = @GameSymbol
 
             try
             {
-                using (SqlConnection connection = new SqlConnection(_connectionString))
+                using (var connection = new SqlConnection(db.Config.GetConnectionString())) // Use the connection string from the db class
                 {
-                    connection.Open();
+                    await connection.OpenAsync(); // Open connection asynchronously
 
-                    using (SqlCommand command = new SqlCommand(query, connection))
+                    // Use the db class to create the command
+                    var command = db.CommandSQL(connection, query);
+                    command.Parameters.AddWithValue("@GameSymbol", gameSymbol); // Add parameter
+
+                    // Use SelectSQLAsync to execute the command
+                    var dataset = await db.SelectSQLAsync(command);
+
+                    // Assuming the DataSet contains one table and each row has the ImagePath
+                    foreach (DataRow row in dataset.Tables[0].Rows)
                     {
-                        command.Parameters.AddWithValue("@GameSymbol", gameSymbol);
-                        SqlDataReader reader = command.ExecuteReader();
-
-                        while (reader.Read())
-                        {
-                            string imagePath = reader["ImagePath"].ToString();
-                            galleryImages.Add(imagePath);
-                        }
+                        galleryImages.Add(row["ImagePath"].ToString());
                     }
                 }
             }
             catch (Exception ex)
             {
-                // Obsługa błędu podczas komunikacji z bazą danych
-                Console.WriteLine($"Błąd podczas ładowania obrazów galerii z bazy danych: {ex.Message}");
+                // Handle error during database communication
+                Console.WriteLine($"Error loading gallery images from database: {ex.Message}");
                 throw;
             }
 
             return galleryImages;
         }
-        public List<Comment> LoadCommentsFromDatabase(string gameIdentifier)
+        public async Task<List<Comment>> LoadCommentsFromDatabaseAsync(string gameIdentifier)
         {
             List<Comment> comments = new List<Comment>();
-            var query = $@"
+            var query = @"
 select
-  c.Id
-, d.Id [DeveloperId]
-, d.Name
-, c.Comment
+  c.Id,
+  d.Id as DeveloperId,
+  d.Name,
+  c.Comment
 from sgsGameComments c
 inner join Registration r on r.Id = c.AuthorId
 inner join sgsDevelopers d on d.Id = r.DeveloperId
 inner join sgsGames g on g.Id = c.GameId
-where Symbol = '{gameIdentifier}'
-order by 1 desc
+where g.Symbol = @GameIdentifier
+order by c.Id desc
 ";
+
             try
             {
-                using (var connection = new SqlConnection(_connectionString))
+                using (var connection = new SqlConnection(db.Config.GetConnectionString())) // Use the connection string from the db class
                 {
-                    connection.Open();
-                    using (var command = new SqlCommand(query, connection))
+                    await connection.OpenAsync(); // Open connection asynchronously
+
+                    // Use the db class to create the command
+                    var command = db.CommandSQL(connection, query);
+                    command.Parameters.AddWithValue("@GameIdentifier", gameIdentifier); // Add parameter
+
+                    // Use SelectSQLAsync to execute the command
+                    var dataset = await db.SelectSQLAsync(command);
+
+                    // Assuming the DataSet contains one table and extracting comments from the first table
+                    foreach (DataRow row in dataset.Tables[0].Rows)
                     {
-                        command.Parameters.AddWithValue("@GameIdentifier", gameIdentifier);
-                        using (var reader = command.ExecuteReader())
+                        comments.Add(new Comment
                         {
-                            while (reader.Read())
-                            {
-                                comments.Add(new Comment
-                                {
-                                    CommentId = reader.GetInt32(0),
-                                    AuthorId = reader.GetInt32(1),
-                                    Author = reader.GetString(2),
-                                    Content = reader.GetString(3)
-                                });
-                            }
-                        }
+                            CommentId = row.Field<int>("Id"),
+                            AuthorId = row.Field<int>("DeveloperId"),
+                            Author = row.Field<string>("Name"),
+                            Content = row.Field<string>("Comment")
+                        });
                     }
                 }
             }
             catch (Exception ex)
             {
-
+                Console.WriteLine($"Error loading comments from database: {ex.Message}"); // Handle error
+                throw; // Optionally rethrow or handle as needed
             }
+
             return comments;
         }
+
+
         public void AddCommentToDatabase(string gameIdentifier, Comment comment)
         {
             var query = $@"
