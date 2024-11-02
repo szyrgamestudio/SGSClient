@@ -6,6 +6,8 @@ using SGSClient.Activation;
 using SGSClient.Contracts.Services;
 using SGSClient.Core.Authorization;
 using SGSClient.Core.Contracts.Services;
+using SGSClient.Core.Database;
+using SGSClient.Core.Interface;
 using SGSClient.Core.Services;
 using SGSClient.Helpers;
 using SGSClient.Models;
@@ -73,6 +75,8 @@ public partial class App : Application
 
             // Core Services
             services.AddSingleton<IFileService, FileService>();
+            services.AddSingleton<IPasswordHasher, PasswordHasher>();
+            services.AddSingleton<DbContext, DbContext>();
 
             // Views and ViewModels
             services.AddTransient<EditGameViewModel>();

@@ -7,7 +7,6 @@ using System.Data;
 using System.Net.Mail;
 using System.Security.Cryptography;
 using System.Text;
-using Windows.System;
 
 namespace SGSClient.ViewModels
 {
