@@ -44,22 +44,23 @@ public partial class ForgotPasswordViewModel : ObservableRecipient
         get => _errorMessage;
         set { _errorMessage = value; OnPropertyChanged(); }
     }
-    public ICommand SendResetCodeCommand { get; }
-    public ICommand ResetPasswordCommand { get; }
+    public bool IsTokenValid
+    {
+        get => _isTokenValid;
+        set
+        {
+            _isTokenValid = value;
+            OnPropertyChanged();
+        }
+    }
 
+    public ICommand SendResetCodeCommand { get; }
 
     public ForgotPasswordViewModel(IPasswordHasher passwordHasher, DbContext dbContext)
     {
         SendResetCodeCommand = new RelayCommand<string>(SendResetCode);
-        ResetPasswordCommand = new RelayCommand(ResetPassword);
         _passwordHasher = passwordHasher;
         _dbContext = dbContext;
-    }
-
-
-    private void ResetPassword()
-    {
-        // Logic to reset password
     }
 
     private bool IsValidEmail(string email)
@@ -89,16 +90,6 @@ public partial class ForgotPasswordViewModel : ObservableRecipient
                 IsTokenValid = true;
                 return;
             }
-        }
-    }
-
-    public bool IsTokenValid
-    {
-        get => _isTokenValid;
-        set
-        {
-            _isTokenValid = value;
-            OnPropertyChanged();
         }
     }
 
@@ -136,7 +127,7 @@ public partial class ForgotPasswordViewModel : ObservableRecipient
     public async Task UpdatePasswordInDatabase(string email, string newPassword)
     {
         var existingUserDataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.checkUserSql, email);
-        if (existingUserDataSet.Tables[0].Rows.Count > 0) return;
+        if (existingUserDataSet.Tables[0].Rows.Count == 0) return;
 
         try
         {
