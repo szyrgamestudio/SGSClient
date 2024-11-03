@@ -1,6 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
+using Microsoft.UI.Xaml.Navigation;
 using SGSClient.Controllers;
 using SGSClient.Core.Database;
 using SGSClient.ViewModels;
@@ -10,34 +11,24 @@ namespace SGSClient.Views
     public sealed partial class GamesPage : Page
     {
         private readonly ConfigurationManagerSQL configManagerSQL;
+        private readonly DbContext _dbContext;
+
         private List<GamesViewModel> gamesList;
         private List<GamesViewModel> gamesFeaturedList;
 
         public GamesViewModel ViewModel { get; }
         public GamesPage()
         {
-            configManagerSQL = new ConfigurationManagerSQL(db.ConnectionString);
+            ViewModel = App.GetService<GamesViewModel>();
+            DataContext = ViewModel;
             InitializeComponent();
-            LoadGamesFromDatabaseAsync();
         }
 
-        private async Task LoadGamesFromDatabaseAsync()
+        protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
-            try
-            {
-                gamesList = await configManagerSQL.LoadGamesFromDatabaseAsync(false);
-                gamesFeaturedList = await configManagerSQL.LoadFeaturedGamesFromDatabaseAsync(false);
-
-                GamesItemsControl.ItemsSource = gamesList;
-                GamesFeaturedItemsControl.ItemsSource = gamesFeaturedList;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred while loading games: {ex.Message}");
-            }
+            base.OnNavigatedTo(e);
+            await ViewModel.LoadGamesFromDatabaseAsync();
         }
-
-
 
         private void ButtonGame_Click(object sender, RoutedEventArgs e)
         {
@@ -81,14 +72,18 @@ namespace SGSClient.Views
             string searchAuthorText = SearchAuthorTextBox.Text.ToLower();
             string? selectedCategory = (CategoryComboBox.SelectedItem as ComboBoxItem)?.Content.ToString();
 
-            var filteredGames = gamesList.Where(game =>
-                (string.IsNullOrEmpty(searchTitleText) || game.GameTitle.ToLower().Contains(searchTitleText))
-                && (string.IsNullOrEmpty(searchAuthorText) || game.GameDeveloper.ToLower().Contains(searchAuthorText))
-                && (selectedCategory == "Wszystkie" || string.IsNullOrEmpty(selectedCategory) || game.GameType == selectedCategory)).ToList();
+            try
+            {
+                var filteredGames = ViewModel.GamesList.Where(game =>
+    (string.IsNullOrEmpty(searchTitleText) || game.GameTitle.ToLower().Contains(searchTitleText))
+    && (string.IsNullOrEmpty(searchAuthorText) || game.GameDeveloper.ToLower().Contains(searchAuthorText))
+    /*&& (selectedCategory == "Wszystkie" || string.IsNullOrEmpty(selectedCategory) || game.GameType == selectedCategory)*/).ToList();
 
-            GamesItemsControl.ItemsSource = filteredGames;
+                GamesItemsControl.ItemsSource = filteredGames;
+
+            }
+            catch (Exception ex) { }
         }
-
         private void ClearFilterButton_Click(object sender, RoutedEventArgs e)
         {
             SearchTextBox.Text = string.Empty;

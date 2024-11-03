@@ -77,6 +77,7 @@ public partial class App : Application
             services.AddSingleton<IFileService, FileService>();
             services.AddSingleton<IPasswordHasher, PasswordHasher>();
             services.AddSingleton<DbContext, DbContext>();
+            services.AddSingleton<PasswordHasher, PasswordHasher>();
 
             // Views and ViewModels
             services.AddTransient<EditGameViewModel>();

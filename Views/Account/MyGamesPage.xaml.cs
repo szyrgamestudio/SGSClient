@@ -1,6 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
+using Microsoft.UI.Xaml.Navigation;
 using SGSClient.Controllers;
 using SGSClient.Core.Database;
 using SGSClient.ViewModels;
@@ -10,32 +11,38 @@ namespace SGSClient.Views
 {
     public sealed partial class MyGamesPage : Page
     {
-        public ObservableCollection<Game> Games
-        {
-            get; set;
-        }
-        private readonly ConfigurationManagerSQL configManagerSQL;
+        public ObservableCollection<Game> Games { get; set; }
+        public MyGamesViewModel ViewModel { get; }
         public MyGamesPage()
         {
-            this.InitializeComponent();
+            ViewModel = App.GetService<MyGamesViewModel>();
             Games = new ObservableCollection<Game>();
-            LoadGamesFromDatabaseAsync();
+            DataContext = ViewModel;
+            InitializeComponent();
         }
 
-        private async Task LoadGamesFromDatabaseAsync()
+        protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
-            List<GamesViewModel> gamesList = await configManagerSQL.LoadMyGamesFromDatabaseAsync();
+            base.OnNavigatedTo(e);
 
-            foreach (var gameViewModel in gamesList)
+            await ViewModel.LoadMyGamesFromDatabaseAsync();
+
+            if (ViewModel.GamesList == null)
+                return;
+
+            foreach (var gameViewModel in ViewModel.GamesList)
             {
-                Games.Add(new Game
+                if (gameViewModel != null)
                 {
-                    GameId = gameViewModel.GameId,
-                    Title = gameViewModel.GameTitle,
-                    Genre = !string.IsNullOrEmpty(gameViewModel.GameType) ? gameViewModel.GameType : "-",
-                    DraftP = Convert.ToBoolean(gameViewModel.DraftP) ? "Oczekuje na wydanie" : "Tak",
-                    gameSymbol = gameViewModel.GameSymbol
-                });
+                    Games.Add(new Game
+                    {
+                        GameId = gameViewModel.GameId,
+                        Title = gameViewModel.GameTitle,
+                        Genre = !string.IsNullOrEmpty(gameViewModel.GameType) ? gameViewModel.GameType : "-",
+                        DraftP = Convert.ToBoolean(gameViewModel.DraftP) ? "Oczekuje na wydanie" : "Tak",
+                        gameSymbol = gameViewModel.GameSymbol
+                    });
+                }
             }
         }
         private void Action_Click(object sender, RoutedEventArgs e)
@@ -46,7 +53,6 @@ namespace SGSClient.Views
             if (game != null)
                 Frame.Navigate(typeof(EditGamePage), game.GameId, new DrillInNavigationTransitionInfo());
         }
-
         private void Preview_Click(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;
@@ -55,7 +61,6 @@ namespace SGSClient.Views
             if (game != null)
                 Frame.Navigate(typeof(GameBasePage), game.gameSymbol, new DrillInNavigationTransitionInfo());
         }
-
     }
 
     public class Game

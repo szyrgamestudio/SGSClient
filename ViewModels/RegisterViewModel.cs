@@ -16,11 +16,10 @@ public partial class RegisterViewModel : ObservableRecipient
         _passwordHasher = passwordHasher;
         _dbContext = dbContext;
     }
-
     public async Task RegisterUserAsync(string email, string username, string password)
     {
-        var existingUserDataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.checkUserSql, email);
-        if (existingUserDataSet.Tables[0].Rows.Count > 0)
+        var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.checkUserSql, email);
+        if (dataSet.Tables[0].Rows.Count == 0)
         {
             return;
         }

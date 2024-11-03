@@ -19,21 +19,13 @@ namespace SGSClient.Views
             string password = passwordBox1.Password;
 
             if (string.IsNullOrEmpty(passwordBox1.Password))
-            {
                 errormessage.Text = "Podaj hasło.";
-            }
             else if (string.IsNullOrEmpty(passwordBoxConfirm.Password))
-            {
                 errormessage.Text = "Potwierdź hasło.";
-            }
             else if (passwordBox1.Password != passwordBoxConfirm.Password)
-            {
                 errormessage.Text = "Potwierdzenie hasła musi być takie samo jak hasło.";
-            }
             else
-            {
                 await ViewModel.RegisterUserAsync(email, username, password);
-            }
 
             errormessage.Text = ViewModel.ErrorMessage;
             if (string.IsNullOrEmpty(ViewModel.ErrorMessage))

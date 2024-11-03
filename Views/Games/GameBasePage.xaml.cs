@@ -259,7 +259,7 @@ public sealed partial class GameBasePage : Page
 
     public GameBasePage()
     {
-        configManagerSQL = new ConfigurationManagerSQL(db.ConnectionString);
+        configManagerSQL = new ConfigurationManagerSQL(new DbContext());
         ViewModel = new GameBaseViewModel();
         InitializeComponent();
         DataContext = ViewModel;  // Set the DataContext

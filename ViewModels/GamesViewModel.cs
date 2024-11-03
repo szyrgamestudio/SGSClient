@@ -1,10 +1,16 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using SGSClient.Controllers;
+using SGSClient.Core.Database;
 using System;
+using System.Collections.ObjectModel;
+using System.Data;
 
 namespace SGSClient.ViewModels
 {
     public class GamesViewModel : ObservableRecipient
     {
+
+        private readonly ConfigurationManagerSQL _configManagerSQL;
         public string _gameId;
         private string _gameSymbol;
         private string _gameName;
@@ -22,6 +28,7 @@ namespace SGSClient.ViewModels
         private string _logoPath;
         private string _gameType;
         private string _draftP;
+        private ConfigurationManagerSQL configManagerSQL;
 
         public string GameId
         {
@@ -121,8 +128,6 @@ namespace SGSClient.ViewModels
             get => _draftP;
             set => SetProperty(ref _draftP, value);
         }
-
-        // Aktualizacja konstruktora
         public GamesViewModel(string gameId, string gameSymbol, string gameTitle, string gamePayloadName, string gameExeName,
             string gameZipLink, string gameVersionLink, string gameDescription, string hardwareRequirements, string otherInformations, string gameDeveloper, string logoPath, string gameType, string draftP)
         {
@@ -141,5 +146,108 @@ namespace SGSClient.ViewModels
             GameType = gameType;
             DraftP = draftP;
         }
+
+        private readonly DbContext _dbContext;
+
+        private ObservableCollection<GamesViewModel> _gamesList;
+        private ObservableCollection<GamesViewModel> _gamesFeaturedList;
+
+        public ObservableCollection<GamesViewModel> GamesList
+        {
+            get => _gamesList;
+            private set => SetProperty(ref _gamesList, value);
+        }
+
+        public ObservableCollection<GamesViewModel> GamesFeaturedList
+        {
+            get => _gamesFeaturedList;
+            private set => SetProperty(ref _gamesFeaturedList, value);
+        }
+
+        public GamesViewModel(DbContext dbContext)
+        {
+            _dbContext = dbContext;
+            GamesList = new ObservableCollection<GamesViewModel>();
+            GamesFeaturedList = new ObservableCollection<GamesViewModel>();
+        }
+
+        public async Task LoadGamesFromDatabaseAsync()
+        {
+            try
+            {
+                GamesList = new ObservableCollection<GamesViewModel>(await LoadGamesFromDatabaseAsync(false));
+                GamesFeaturedList = new ObservableCollection<GamesViewModel>(await LoadFeaturedGamesFromDatabaseAsync(false));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while loading games: {ex.Message}");
+            }
+        }
+
+        public async Task<List<GamesViewModel>> LoadGamesFromDatabaseAsync(bool bypassDraftP)
+        {
+            List<GamesViewModel> gamesList = [];
+            var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.gamesInfo, bypassDraftP);
+            if (dataSet.Tables[0].Rows.Count > 0)
+            {
+                foreach (DataRow row in dataSet.Tables[0].Rows)
+                {
+                    GamesViewModel game = new GamesViewModel(
+                        gameId: row["GameId"].ToString(),
+                        gameSymbol: row["GameSymbol"].ToString(),
+                        gameTitle: row["Title"].ToString(),
+                        gamePayloadName: row["PayloadName"].ToString(),
+                        gameExeName: row["ExeName"].ToString(),
+                        gameZipLink: row["ZipLink"].ToString(),
+                        gameVersionLink: row["VersionLink"].ToString(),
+                        gameDescription: row["Description"].ToString(),
+                        hardwareRequirements: row["HardwareRequirements"].ToString(),
+                        otherInformations: row["OtherInformation"].ToString(),
+                        gameDeveloper: row["GameDeveloper"].ToString(),
+                        logoPath: row["LogoPath"].ToString(),
+                        gameType: row["GameType"].ToString(),
+                        draftP: row["DraftP"].ToString()
+                    );
+
+                    gamesList.Add(game);
+                }
+                return gamesList;
+            }
+            else
+                return gamesList;
+        }
+        public async Task<List<GamesViewModel>> LoadFeaturedGamesFromDatabaseAsync(bool bypassDraftP)
+        {
+            List<GamesViewModel> gamesList = [];
+            var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.gamesFeaturedInfo, bypassDraftP);
+            if (dataSet.Tables[0].Rows.Count > 0)
+            {
+                foreach (DataRow row in dataSet.Tables[0].Rows)
+                {
+                    GamesViewModel game = new GamesViewModel(
+                        gameId: row["GameId"].ToString(),
+                        gameSymbol: row["GameSymbol"].ToString(),
+                        gameTitle: row["Title"].ToString(),
+                        gamePayloadName: row["PayloadName"].ToString(),
+                        gameExeName: row["ExeName"].ToString(),
+                        gameZipLink: row["ZipLink"].ToString(),
+                        gameVersionLink: row["VersionLink"].ToString(),
+                        gameDescription: row["Description"].ToString(),
+                        hardwareRequirements: row["HardwareRequirements"].ToString(),
+                        otherInformations: row["OtherInformation"].ToString(),
+                        gameDeveloper: row["GameDeveloper"].ToString(),
+                        logoPath: row["LogoPath"].ToString(),
+                        gameType: row["GameType"].ToString(),
+                        draftP: row["DraftP"].ToString()
+                    );
+
+                    gamesList.Add(game);
+                }
+                return gamesList;
+            }
+            else
+                return gamesList;
+        }
+
     }
 }

@@ -13,6 +13,7 @@ public class SGSVersion
         internal static Version zero = new Version(0, 0, 0);
 
         private short major, minor, subMinor;
+        private Task<string> onlineVersionString;
 
         internal Version(short _major, short _minor, short _subMinor)
         {
@@ -34,6 +35,11 @@ public class SGSVersion
             major = short.Parse(versionStrings[0]);
             minor = short.Parse(versionStrings[1]);
             subMinor = short.Parse(versionStrings[2]);
+        }
+
+        public Version(Task<string> onlineVersionString) : this()
+        {
+            this.onlineVersionString=onlineVersionString;
         }
 
         internal bool IsDifferentThan(Version _otherVersion)

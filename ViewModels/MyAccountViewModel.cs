@@ -4,6 +4,7 @@ using SGSClient.Core.Database;
 using SGSClient.Helpers;
 using System.Data;
 using SGSClient.Contracts.Services;
+using Windows.UI;
 
 namespace SGSClient.ViewModels
 {
@@ -20,13 +21,15 @@ namespace SGSClient.ViewModels
             get => _welcomeText;
             set => SetProperty(ref _welcomeText, value);
         }
+        private readonly DbContext _dbContext;
         private readonly INavigationService _navigationService;
         #endregion
 
         #region Constructor
-        public MyAccountViewModel(INavigationService navigationService)
+        public MyAccountViewModel(INavigationService navigationService, DbContext dbContext)
         {
             _navigationService = navigationService;
+            _dbContext = dbContext;
         }
         #endregion
 
@@ -38,61 +41,19 @@ namespace SGSClient.ViewModels
         #region Methods
         public async void LoadUserData(string userId)
         {
-            string email = "test@test.com";
+            string email;
             string username;
 
-            using SqlConnection con = db.Connect();
-            try
-            {
-                Console.WriteLine($"Connection state before opening: {con.State}");
+            var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.userDetailsSql, userId);
+            if (dataSet.Tables[0].Rows.Count == 0)
+                return;
 
-                if (con.State != ConnectionState.Open)
-                {
-                    await con.OpenAsync();
-                    Console.WriteLine("Connection opened.");
-                }
-
-                string query = @"
-    select
-      r.Email,
-      d.Name
-    from Registration r
-    inner join sgsDevelopers d on d.Id = r.DeveloperId
-    where r.Id = @p0";
-
-                object[] parameters = { userId };
-                DataSet result;
-
-                try
-                {
-                    result = await db.SelectSQLAsync(con, query, parameters);
-                }
-                catch (Exception sqlEx)
-                {
-                    Console.WriteLine($"Error executing SQL command: {sqlEx.Message}");
-                    return;
-                }
-
-                if (result.Tables.Count > 0 && result.Tables[0].Rows.Count > 0)
-                {
-                    DataRow row = result.Tables[0].Rows[0];
-                    email = row["Email"].ToString();
-                    username = row["Name"].ToString();
-
-                    AvatarUrl = GravatarHelper.GetAvatarUrl(email);
-                    WelcomeText = "Witaj, " + username + "!";
-                }
-                else
-                {
-                    Console.WriteLine($"Nie znaleziono użytkownika o Id: {userId}");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Wystąpił błąd podczas ładowania danych użytkownika: {ex.Message}");
-            }
+            DataRow row = dataSet.Tables[0].Rows[0];
+            email = row["Email"].ToString();
+            username = row["Name"].ToString();
 
             AvatarUrl = GravatarHelper.GetAvatarUrl(email);
+            WelcomeText = "Witaj, " + username + "!";
         }
         public void NavigateToUpload()
         {
@@ -102,7 +63,6 @@ namespace SGSClient.ViewModels
         {
             _navigationService.NavigateTo(typeof(MyGamesViewModel).FullName!);
         }
-
         #endregion
     }
 }

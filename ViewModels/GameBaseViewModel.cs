@@ -21,7 +21,7 @@ namespace SGSClient.ViewModels
 
         public GameBaseViewModel()
         {
-            _configManagerSQL = new ConfigurationManagerSQL(db.ConnectionString);
+            _configManagerSQL = new ConfigurationManagerSQL(new DbContext());
             _allComments = new ObservableCollection<Comment>();
             Comments = new ObservableCollection<Comment>();
             CurrentPage = 0;
@@ -33,11 +33,10 @@ namespace SGSClient.ViewModels
 
         public void AddComment(string gameIdentifier, Comment newComment)
         {
-            _configManagerSQL.AddCommentToDatabase(gameIdentifier, newComment);
+            _configManagerSQL.AddCommentToDatabaseAsync(gameIdentifier, newComment);
             _allComments.Add(newComment);
             LoadPage(CurrentPage);
         }
-
         public void UpdateComment(Comment updatedComment)
         {
             _configManagerSQL.UpdateCommentInDatabase(updatedComment);
@@ -50,7 +49,6 @@ namespace SGSClient.ViewModels
                 LoadPage(CurrentPage); // Refresh the current page
             }
         }
-
         public async Task LoadCommentsAsync(string gameIdentifier)
         {
             _allComments.Clear();

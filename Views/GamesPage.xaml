@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls" xmlns:viewmodels="using:SGSClient.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:GamesViewModel}"
     mc:Ignorable="d">
 
     <Grid>
@@ -50,7 +50,7 @@
                             Text="Polecane gry" />
                     </Grid>
 
-                    <ItemsControl x:Name="GamesFeaturedItemsControl" Grid.Row="1" Margin="0,12,0,0">
+                    <ItemsControl ItemsSource="{Binding GamesFeaturedList}" x:Name="GamesFeaturedItemsControl" Grid.Row="1" Margin="0,12,0,0">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <controls:WrapPanel Orientation="Horizontal" />
@@ -105,7 +105,7 @@
                             Text="Wszystkie gry" />
                     </Grid>
 
-                    <ItemsControl x:Name="GamesItemsControl" Grid.Row="1" Margin="0,12,0,12">
+                    <ItemsControl ItemsSource="{Binding GamesList}" x:Name="GamesItemsControl" Grid.Row="1" Margin="0,12,0,12">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <controls:WrapPanel Orientation="Horizontal" />
