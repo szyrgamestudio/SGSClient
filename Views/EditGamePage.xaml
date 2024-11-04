@@ -110,25 +110,35 @@
                     <Rectangle Height="1" HorizontalAlignment="Stretch" Fill="{ThemeResource ControlElevationBorderBrush}" />
 
                     <!-- ItemsControl for displaying game images -->
-                    <ItemsControl ItemsSource="{Binding GameImages}">
+                    <ItemsControl ItemsSource="{Binding GameImages}" x:Name="ImagesGrid">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <ItemsWrapGrid Orientation="Horizontal" ItemWidth="150" ItemHeight="150" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <Image Source="{Binding ImageSource}" Width="100" Height="100" Margin="5" />
-                                    <Button Margin="5" Click="RemoveImageButton_Click" ToolTipService.ToolTip="Usuń">
-                                        <Button.Content>
-                                            <FontIcon Glyph="&#xE74D;"/>
-                                        </Button.Content>
-                                    </Button>
-                                    <Button Margin="5" Click="PreviewImageButton_Click" ToolTipService.ToolTip="Podgląd">
-                                        <Button.Content>
-                                            <FontIcon Glyph="&#xE71E;"/>
-                                        </Button.Content>
-                                    </Button>
-                                </StackPanel>
+                                <Grid Width="150" Height="150" Margin="5" Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}">
+                                    <Image Source="{Binding ImageSource}" Stretch="UniformToFill" />
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="5">
+                                        <Button Click="RemoveImageButton_Click" ToolTipService.ToolTip="Usuń">
+                                            <FontIcon Glyph="&#xE74D;" />
+                                        </Button>
+                                        <Button Click="PreviewImageButton_Click" ToolTipService.ToolTip="Podgląd">
+                                            <FontIcon Glyph="&#xE71E;" />
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
+
+                    <!-- Placeholder for "Add Image" -->
+                    <Button Width="150" Height="150" Margin="5" Click="AddImageButton_Click">
+                        <Grid Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}">
+                            <FontIcon Glyph="&#xE710;" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="48" />
+                        </Grid>
+                    </Button>
 
                     <!-- Button to add additional image text box -->
                     <StackPanel x:Name="ImageTextBox2Panel" Orientation="Horizontal">

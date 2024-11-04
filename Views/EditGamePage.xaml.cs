@@ -164,61 +164,46 @@ namespace SGSClient.Views
         }
         private void AddImageButton_Click(object sender, RoutedEventArgs e)
         {
-            // Tworzenie nowego TextBoxa dla kolejnego zdjęcia
-            StackPanel imageTextBoxPanel = new StackPanel();
-            imageTextBoxPanel.Orientation = Orientation.Horizontal;
+            // Create a new StackPanel to hold the placeholder image and buttons
+            StackPanel imagePanel = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(5) };
 
-            TextBox newImageTextBox = new TextBox
+            // Placeholder Image
+            Image placeholderImage = new Image
             {
-                Name = "ImageTextBox" + (additionalImageCount + 1),
-                Margin = new Thickness(5),
-                PlaceholderText = "Wstaw link do zdjęcia",
-                Width = 400,
-                TextWrapping = TextWrapping.Wrap
+                Width = 100,
+                Height = 100,
+                Stretch = Stretch.Uniform,
+                Source = new BitmapImage(new Uri("ms-appx:///Assets/placeholder.png")) // Path to your placeholder image
             };
+            imagePanel.Children.Add(placeholderImage);
 
-            // Przyciski "Usuń" i "Podgląd"
+            // Delete Button
             Button removeButton = new Button
             {
                 Margin = new Thickness(5),
-                Content = new FontIcon { Glyph = "\xE74D" }
+                //ToolTipService.ToolTip = "Usuń"
             };
-            removeButton.Click += RemoveImageButton_Click;
-            ToolTipService.SetToolTip(removeButton, "Usuń");
+            removeButton.Click += (s, e) => ViewModel.GameImages.Remove(new GameImage("http://placeholder.url")); // Ensure GameImage is removed
+            removeButton.Content = new FontIcon { Glyph = "\xE74D" }; // Trash icon
+            imagePanel.Children.Add(removeButton);
 
+            // Preview Button (for editing URL)
             Button previewButton = new Button
             {
                 Margin = new Thickness(5),
-                Content = new FontIcon { Glyph = "\xE71E" }
+                //ToolTipService.ToolTip = "Podgląd"
             };
+            previewButton.Content = new FontIcon { Glyph = "\xE71E" }; // Magnifying glass icon
             previewButton.Click += async (s, e) =>
             {
-                string imageUrl = newImageTextBox.Text;
-
-                if (!string.IsNullOrEmpty(imageUrl))
-                {
-                    GameImage newGameImage = new GameImage(imageUrl); // Use the constructor that takes a URL
-                    await OpenImagePreviewDialog(newGameImage); // Pass the GameImage instance to the dialog
-                }
+                GameImage newGameImage = new GameImage("http://placeholder.url"); // Initial URL placeholder
+                await OpenImagePreviewDialog(newGameImage); // Open dialog to edit the URL
+                placeholderImage.Source = new BitmapImage(new Uri(newGameImage.Url)); // Update image after URL is set
             };
+            imagePanel.Children.Add(previewButton);
 
-            ToolTipService.SetToolTip(previewButton, "Podgląd");
-
-            // Dodanie nowego TextBoxa do StackPanelu
-            imageTextBoxPanel.Children.Add(newImageTextBox);
-            imageTextBoxPanel.Children.Add(removeButton);
-            imageTextBoxPanel.Children.Add(previewButton);
-
-            gameGalleryStackPanel.Children.Insert(gameGalleryStackPanel.Children.Count - 1, imageTextBoxPanel);
-
-            // Zwiększanie licznika dodatkowych zdjęć
-            additionalImageCount++;
-
-            // Ukrycie przycisku dodawania zdjęcia, jeśli osiągnięto limit
-            if (additionalImageCount >= 10) // Dla przykładu, limit 10 zdjęć
-            {
-                AddImageButton.Visibility = Visibility.Collapsed;
-            }
+            // Add the new panel to the StackPanel
+            gameGalleryStackPanel.Children.Insert(gameGalleryStackPanel.Children.Count - 1, imagePanel); // Insert before the last add button
         }
         private async Task OpenImagePreviewDialog(GameImage gameImage)
         {
@@ -226,7 +211,8 @@ namespace SGSClient.Views
             {
                 Title = "Podgląd zdjęcia",
                 CloseButtonText = "Zamknij",
-                PrimaryButtonText = "Zatwierdź"
+                PrimaryButtonText = "Zatwierdź",
+                XamlRoot = this.XamlRoot
             };
 
             // StackPanel for dialog layout
@@ -237,48 +223,44 @@ namespace SGSClient.Views
             {
                 Margin = new Thickness(5),
                 PlaceholderText = "Wstaw link do zdjęcia",
-                Text = gameImage.Url // Use the URL from the GameImage object
+                Text = gameImage.Url
             };
             dialogStackPanel.Children.Add(urlTextBox);
 
             // Image for displaying the preview
             Image imagePreview = new Image
             {
-                Width = 200, // Set size as needed
+                Width = 200,
                 Height = 150,
                 Stretch = Stretch.Uniform,
-                Margin = new Thickness(5)
+                Margin = new Thickness(5),
+                Source = new BitmapImage(new Uri(gameImage.Url)) // Preview initial URL
+            };
+            dialogStackPanel.Children.Add(imagePreview);
+
+            // Update image preview as the URL changes
+            urlTextBox.TextChanged += (s, e) =>
+            {
+                try
+                {
+                    imagePreview.Source = new BitmapImage(new Uri(urlTextBox.Text));
+                }
+                catch
+                {
+                    // Handle invalid URI
+                    imagePreview.Source = null;
+                }
             };
 
-            // Load the image from the URL
-            try
-            {
-                imagePreview.Source = new BitmapImage(new Uri(gameImage.Url));
-            }
-            catch (Exception)
-            {
-                imagePreview.Source = null; // Clear image if there's an error
-                dialogStackPanel.Children.Add(new TextBlock
-                {
-                    Text = "Nie udało się załadować obrazu. Sprawdź link.",
-                });
-            }
-
-            dialogStackPanel.Children.Add(imagePreview);
             previewDialog.Content = dialogStackPanel;
 
-            // Set the XamlRoot to ensure the dialog displays correctly
-            previewDialog.XamlRoot = this.XamlRoot; // or any parent control's XamlRoot
-
-            // Handle the PrimaryButtonClick event
-            // Inside OpenImagePreviewDialog
-            previewDialog.PrimaryButtonClick += (s, e) =>
+            // Show the dialog and confirm changes
+            var result = await previewDialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
             {
+                // Update the game image URL
                 gameImage.Url = urlTextBox.Text;
-            };
-
-
-            await previewDialog.ShowAsync();
+            }
         }
         private void gotoSGSClientWWW_Click(object sender, RoutedEventArgs e)
         {

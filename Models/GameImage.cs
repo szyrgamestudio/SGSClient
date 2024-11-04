@@ -42,13 +42,9 @@ public class GameImage : INotifyPropertyChanged
     private void UpdateImageSource()
     {
         if (!string.IsNullOrEmpty(Url))
-        {
             ImageSource = new BitmapImage(new Uri(Url));
-        }
         else
-        {
             ImageSource = null; // Clear if the URL is empty
-        }
     }
 
     public event PropertyChangedEventHandler PropertyChanged;
