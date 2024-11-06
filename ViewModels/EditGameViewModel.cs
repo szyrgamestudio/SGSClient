@@ -3,13 +3,9 @@ using Microsoft.Data.SqlClient;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
 using SGSClient.Core.Database;
-using SGSClient.Models;
-using SGSClient.Views;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Data;
 using System.Text.RegularExpressions;
-using System.Xml.Linq;
 using static SGSClient.Views.EditGamePage;
 
 namespace SGSClient.ViewModels;
@@ -180,36 +176,11 @@ public partial class EditGameViewModel : ObservableRecipient
 
         try
         {
-            SqlParameter gameDescriptionParam = new SqlParameter("@gameDescriptionParam", SqlDbType.NVarChar)
-            {
-                Value = string.Join(Environment.NewLine, GameDescription.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None))
-            };
+            string gameDescriptionParam = string.Join(Environment.NewLine, GameDescription.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
+            string hardwareRequirementsParam = string.Join(Environment.NewLine, HardwareRequirements.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
+            string otherInfoParam = string.Join(Environment.NewLine, OtherInfo.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
 
-            SqlParameter hardwareRequirementsParam = new SqlParameter("@hardwareRequirementsParam", SqlDbType.NVarChar)
-            {
-                Value = string.Join(Environment.NewLine, HardwareRequirements.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None))
-            };
-
-            SqlParameter otherInfoParam = new SqlParameter("@otherInfoParam", SqlDbType.NVarChar)
-            {
-                Value = string.Join(Environment.NewLine, OtherInfo.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None))
-            };
-
-            var parameters = new List<object>
-            {
-                GameName,
-                Symbol,
-                CurrentVersion,
-                ZipLink,
-                ExeName,
-                gameDescriptionParam,
-                hardwareRequirementsParam,
-                otherInfoParam,
-                SelectedGameTypeId,
-                SelectedGameEngineId,
-                gameId
-            };
-            await _dbContext.ExecuteQueryAsync(SqlQueries.updateGameDetailsSQL, parameters);
+            await _dbContext.ExecuteQueryAsync(SqlQueries.updateGameDetailsSQL, GameName, Symbol, CurrentVersion, ZipLink, ExeName,  gameDescriptionParam,  hardwareRequirementsParam, otherInfoParam, SelectedGameTypeId, SelectedGameEngineId, gameId);
         }
         catch (Exception ex)
         {
@@ -221,28 +192,22 @@ public partial class EditGameViewModel : ObservableRecipient
     }
     private async Task UpdateGameLogo(int gameId, string logoPath)
     {
-        var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.gameLogoSQL);
+        var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.gameLogoSQL, gameId);
         if (dataSet.Tables.Count > 0)
         {
-           await _dbContext.ExecuteQueryAsync(SqlQueries.updateLogoSQL, GameLogo, gameId);
+            await _dbContext.ExecuteQueryAsync(SqlQueries.updateLogoSQL, GameLogo, gameId);
         }
         else
         {
-           await _dbContext.ExecuteQueryAsync(SqlQueries.insertLogoSQL, gameId, GameLogo);
+            await _dbContext.ExecuteQueryAsync(SqlQueries.insertLogoSQL, gameId, GameLogo);
         }
     }
     private async Task UpdateGameImages(int gameId)
     {
-        string deleteImagesQuery = "DELETE FROM sgsGameImages WHERE GameId = @GameId";
-        string insertImageQuery = "INSERT INTO sgsGameImages (GameId, ImagePath) VALUES (@GameId, @ImagePath)";
-
         await _dbContext.ExecuteQueryAsync(SqlQueries.deleteImagesSQL, gameId);
-        foreach (var imagePath in GameImagePaths)
+        foreach (var image in GameImages)
         {
-            if (!string.IsNullOrEmpty(imagePath))
-            {
-                await _dbContext.ExecuteQueryAsync(SqlQueries.insertImageSQL, gameId, imagePath);
-            }
+            await _dbContext.ExecuteQueryAsync(SqlQueries.insertImageSQL, gameId, image.Url);
         }
     }
 
