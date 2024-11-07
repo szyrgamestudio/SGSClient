@@ -1,5 +1,9 @@
 ﻿using Microsoft.UI.Xaml.Media.Imaging;
+using System;
 using System.ComponentModel;
+using System.IO;
+using System.Security.Policy;
+using Windows.Storage.Streams;
 
 public class GameImage : INotifyPropertyChanged
 {
@@ -36,15 +40,44 @@ public class GameImage : INotifyPropertyChanged
     public GameImage(string url)
     {
         Url = url;
-        UpdateImageSource(); // Initialize the BitmapImage based on the URL
+        UpdateImageSource();
+    }
+
+    public GameImage(BitmapImage imageSource)
+    {
+        ImageSource = imageSource;
+    }
+
+    public GameImage(string url, BitmapImage imageSource)
+    {
+        Url = url;
+        UpdateImageSource();
+        ImageSource = imageSource;
     }
 
     private void UpdateImageSource()
     {
         if (!string.IsNullOrEmpty(Url))
-            ImageSource = new BitmapImage(new Uri(Url));
+        {
+            // Sprawdź, czy ścieżka to ścieżka lokalna
+            if (Uri.IsWellFormedUriString(Url, UriKind.Absolute) && Url.StartsWith("file://"))
+            {
+                ImageSource = new BitmapImage(new Uri(Url));
+            }
+            else if (Uri.IsWellFormedUriString(Url, UriKind.Absolute))
+            {
+                ImageSource = new BitmapImage(new Uri(Url));
+            }
+            else
+            {
+                // Obsługa ścieżek lokalnych jako 'file://'
+                ImageSource = new BitmapImage(new Uri("file://" + Url));
+            }
+        }
         else
+        {
             ImageSource = null; // Clear if the URL is empty
+        }
     }
 
     public event PropertyChangedEventHandler PropertyChanged;

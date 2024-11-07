@@ -3,9 +3,14 @@ using Microsoft.Data.SqlClient;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
 using SGSClient.Core.Database;
+using SGSClient.Core.Helpers;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.Net.Http.Headers;
+using System.Security.Policy;
+using System.Text;
 using System.Text.RegularExpressions;
+using Windows.Storage;
 using static SGSClient.Views.EditGamePage;
 
 namespace SGSClient.ViewModels;
@@ -100,11 +105,44 @@ public partial class EditGameViewModel : ObservableRecipient
             foreach (DataRow imageRow in imagesData.Tables[0].Rows)
             {
                 string imageUrl = imageRow["ImagePath"].ToString();
-                BitmapImage bitmapImage = new BitmapImage(new Uri(imageUrl));
 
-                GameImages.Add(new GameImage(imageUrl));
+                string username = "sgsclient";
+                string password = "yGnxE-Tykxe-SwjwW-NooLc-xSwPT";
+
+                await LoadImageFromNextcloud(imageRow, username, password);
             }
 
+        }
+    }
+
+    public async Task LoadImageFromNextcloud(DataRow imageRow, string username, string password)
+    {
+        string imageUrl = imageRow["ImagePath"].ToString();
+
+        using (var client = new HttpClient())
+        {
+            // Ustawienie nagłówka autoryzacji (Basic Authentication)
+            var authHeader = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}"));
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authHeader);
+
+            // Pobranie obrazu z Nextcloud
+            var response = await client.GetAsync(imageUrl);
+            if (response.IsSuccessStatusCode)
+            {
+                // Pobranie strumienia obrazu
+                var imageStream = await response.Content.ReadAsStreamAsync();
+
+                // Załadowanie obrazu do BitmapImage
+                BitmapImage bitmapImage = new BitmapImage();
+                await bitmapImage.SetSourceAsync(imageStream.AsRandomAccessStream());
+
+                // Dodanie do kolekcji GameImages
+                GameImages.Add(new GameImage(imageUrl, bitmapImage));
+            }
+            else
+            {
+                GameImages.Add(new GameImage(imageUrl));
+            }
         }
     }
     public async Task LoadGameTypes()
@@ -180,7 +218,7 @@ public partial class EditGameViewModel : ObservableRecipient
             string hardwareRequirementsParam = string.Join(Environment.NewLine, HardwareRequirements.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
             string otherInfoParam = string.Join(Environment.NewLine, OtherInfo.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
 
-            await _dbContext.ExecuteQueryAsync(SqlQueries.updateGameDetailsSQL, GameName, Symbol, CurrentVersion, ZipLink, ExeName,  gameDescriptionParam,  hardwareRequirementsParam, otherInfoParam, SelectedGameTypeId, SelectedGameEngineId, gameId);
+            await _dbContext.ExecuteQueryAsync(SqlQueries.updateGameDetailsSQL, GameName, Symbol, CurrentVersion, ZipLink, ExeName, gameDescriptionParam, hardwareRequirementsParam, otherInfoParam, SelectedGameTypeId, SelectedGameEngineId, gameId);
         }
         catch (Exception ex)
         {
@@ -205,9 +243,31 @@ public partial class EditGameViewModel : ObservableRecipient
     private async Task UpdateGameImages(int gameId)
     {
         await _dbContext.ExecuteQueryAsync(SqlQueries.deleteImagesSQL, gameId);
+        //foreach (var image in GameImages)
+        //{
+        //    await _dbContext.ExecuteQueryAsync(SqlQueries.insertImageSQL, gameId, image.Url);
+        //}
+        var uploader = new NextcloudUploader("https://cloud.m455yn.dev/", "sgsclient", "yGnxE-Tykxe-SwjwW-NooLc-xSwPT");
+
         foreach (var image in GameImages)
         {
-            await _dbContext.ExecuteQueryAsync(SqlQueries.insertImageSQL, gameId, image.Url);
+            string imageUrl = image.Url;
+
+            // Check if the image is a local file
+            if (Path.IsPathRooted(imageUrl))
+            {
+                // It's a local file, so upload it to Nextcloud
+                var file = await StorageFile.GetFileFromPathAsync(imageUrl);
+                string uploadedUrl = await uploader.UploadFileAsync(file.Path); // Upload file and get URL
+
+                if (uploadedUrl != null)
+                {
+                    imageUrl = uploadedUrl; // Update URL with the Nextcloud URL
+                }
+            }
+
+            // Insert the URL (which may now be from Nextcloud) into the database
+            await _dbContext.ExecuteQueryAsync(SqlQueries.insertImageSQL, gameId, imageUrl);
         }
     }
 

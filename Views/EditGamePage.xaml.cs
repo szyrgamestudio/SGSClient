@@ -6,6 +6,13 @@ using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
 using SGSClient.ViewModels;
+using Windows.Storage.Pickers;
+using Windows.Storage.Streams;
+using Windows.Storage;
+using ModernWpf.Controls.Primitives;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Windows.Media.Imaging;
 
 namespace SGSClient.Views
 {
@@ -78,12 +85,47 @@ namespace SGSClient.Views
             }
         }
 
-        #region Buttons
-        private void AddImageButton_Click(object sender, RoutedEventArgs e)
+        private async void AddImageButton_Click(object sender, RoutedEventArgs e)
         {
-            var newGameImage = new GameImage("ms-appx:///Assets/placeholder.png");
-            ViewModel.GameImages.Add(newGameImage);
+            var picker = new FileOpenPicker();
+            picker.ViewMode = PickerViewMode.Thumbnail;
+            picker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
+            picker.FileTypeFilter.Add(".jpg");
+            picker.FileTypeFilter.Add(".jpeg");
+            picker.FileTypeFilter.Add(".png");
+
+            // Inicjalizuj picker z uchwytem okna
+            Helpers.WindowHelper.InitializeWithWindow(picker, App.MainWindow);
+
+            StorageFile file = await picker.PickSingleFileAsync();
+            if (file != null)
+            {
+                // Load the selected image
+                using (IRandomAccessStream fileStream = await file.OpenAsync(FileAccessMode.Read))
+                {
+                    var bitmapImage = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage();
+                    await bitmapImage.SetSourceAsync(fileStream);
+
+                    // Add the selected image to the GameImages collection
+                    var newGameImage = new GameImage(bitmapImage)
+                    {
+                        Url = file.Path // Store the image path (URL)
+                    };
+
+                    ViewModel.GameImages.Add(newGameImage);
+
+                    // Open the preview dialog to show the image immediately
+                    await OpenImagePreviewDialog(newGameImage);
+                }
+            }
+            else
+            {
+                // If no file is chosen, add a placeholder image
+                //var placeholderImage = new GameImage("ms-appx:///Assets/placeholder.png");
+                //ViewModel.GameImages.Add(placeholderImage);
+            }
         }
+
         private void RemoveImageButton_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button button && button.DataContext is GameImage gameImage)
@@ -123,66 +165,115 @@ namespace SGSClient.Views
         {
             Frame.Navigate(typeof(MyGamesPage), new DrillInNavigationTransitionInfo());
         }
-        #endregion
-
-        #region Tasks
         private async Task OpenImagePreviewDialog(GameImage gameImage)
         {
             var previewDialog = new ContentDialog
             {
                 Title = "Podgląd zdjęcia",
                 CloseButtonText = "Zamknij",
-                PrimaryButtonText = "Zatwierdź",
-                XamlRoot = this.XamlRoot
+                PrimaryButtonText = "Zmień zdjęcie",
+                XamlRoot = this.XamlRoot,
+                Width = 800,
+                Height = 450
             };
 
             // StackPanel for dialog layout
             StackPanel dialogStackPanel = new StackPanel();
 
-            // TextBox for entering image URL
-            TextBox urlTextBox = new TextBox
-            {
-                Margin = new Thickness(5),
-                PlaceholderText = "Wstaw link do zdjęcia",
-                Text = gameImage.Url
-            };
-            dialogStackPanel.Children.Add(urlTextBox);
-
             // Image for displaying the preview
             Image imagePreview = new Image
             {
-                Width = 200,
-                Height = 150,
+                Width = 800,
+                Height = 450,
                 Stretch = Stretch.Uniform,
-                Margin = new Thickness(5),
-                Source = new BitmapImage(new Uri(gameImage.Url)) // Preview initial URL
+                Margin = new Thickness(5)
             };
-            dialogStackPanel.Children.Add(imagePreview);
 
-            // Update image preview as the URL changes
-            urlTextBox.TextChanged += (s, e) =>
+            // Load initial image source asynchronously
+            if (!string.IsNullOrEmpty(gameImage.Url))
             {
                 try
                 {
-                    imagePreview.Source = new BitmapImage(new Uri(urlTextBox.Text));
+                    string username = "sgsclient";
+                    string password = "yGnxE-Tykxe-SwjwW-NooLc-xSwPT";
+
+                    var uri = new Uri(gameImage.Url, UriKind.RelativeOrAbsolute);
+                    if (uri.Scheme == "http" || uri.Scheme == "https")
+                    {
+                        using (var client = new HttpClient())
+                        {
+                            var authHeader = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}"));
+                            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authHeader);
+
+                            var response = await client.GetAsync(uri);
+                            if (response.IsSuccessStatusCode)
+                            {
+                                var imageStream = await response.Content.ReadAsStreamAsync();
+
+                                Microsoft.UI.Xaml.Media.Imaging.BitmapImage bitmapImage = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage();
+                                await bitmapImage.SetSourceAsync(imageStream.AsRandomAccessStream());
+
+                                imagePreview.Source = bitmapImage;
+                            }
+                            else
+                            {
+                                var bitmapImage = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage();
+                                await bitmapImage.SetSourceAsync(await RandomAccessStreamReference.CreateFromUri(uri).OpenReadAsync());
+                                imagePreview.Source = bitmapImage;
+                            }
+                        }
+                    }
+
+                    else if (uri.IsFile) // If it's a local file path, use StorageFile
+                    {
+                        var file = await StorageFile.GetFileFromPathAsync(gameImage.Url); // Use the local path
+                        using (IRandomAccessStream fileStream = await file.OpenAsync(FileAccessMode.Read))
+                        {
+                            var bitmapImage = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage();
+                            await bitmapImage.SetSourceAsync(fileStream);
+                            imagePreview.Source = bitmapImage;
+                        }
+                    }
                 }
                 catch
                 {
-                    // Handle invalid URI
-                    imagePreview.Source = null;
+                    imagePreview.Source = null; // Handle invalid URIs
                 }
-            };
+            }
+
+            dialogStackPanel.Children.Add(imagePreview);
 
             previewDialog.Content = dialogStackPanel;
 
-            // Show the dialog and confirm changes
-            var result = await previewDialog.ShowAsync();
-            if (result == ContentDialogResult.Primary)
+            // Define the action for the primary button click (Change Image)
+            previewDialog.PrimaryButtonClick += async (s, e) =>
             {
-                // Update the game image URL
-                gameImage.Url = urlTextBox.Text;
-            }
+                // Open file picker
+                var picker = new Windows.Storage.Pickers.FileOpenPicker();
+                picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.PicturesLibrary;
+                picker.FileTypeFilter.Add(".jpg");
+                picker.FileTypeFilter.Add(".png");
+                picker.FileTypeFilter.Add(".bmp");
+
+                // Ensure picker works in desktop apps
+                var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
+                WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+
+                var file = await picker.PickSingleFileAsync();
+                if (file != null)
+                {
+                    // Update image preview with the selected file
+                    var fileStream = await file.OpenAsync(Windows.Storage.FileAccessMode.Read);
+                    var bitmapImage = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage();
+                    await bitmapImage.SetSourceAsync(fileStream);
+
+                    imagePreview.Source = bitmapImage;
+                    gameImage.Url = file.Path; // Update the GameImage URL to reflect the local path
+                }
+            };
+
+            // Show the dialog
+            await previewDialog.ShowAsync();
         }
-        #endregion
     }
 }
