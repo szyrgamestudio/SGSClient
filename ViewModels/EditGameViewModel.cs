@@ -1,5 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.Data.SqlClient;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
 using SGSClient.Core.Database;
@@ -7,7 +6,6 @@ using SGSClient.Core.Helpers;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Net.Http.Headers;
-using System.Security.Policy;
 using System.Text;
 using System.Text.RegularExpressions;
 using Windows.Storage;
@@ -54,6 +52,36 @@ public partial class EditGameViewModel : ObservableRecipient
     [ObservableProperty]
     private GameEngineItem _selectedGameEngine;
 
+    #region Logo
+    private ObservableCollection<GameImage> _gameLogos;
+    public ObservableCollection<GameImage> GameLogos
+    {
+        get => _gameLogos;
+        set
+        {
+            _gameLogos = value;
+            OnPropertyChanged(nameof(GameLogos));
+        }
+    }
+    public ObservableCollection<string> GameLogoPaths { get; set; } = new ObservableCollection<string>();
+
+    private bool _isAddLogoBtnEnabled;
+    public bool IsAddLogoBtnEnabled
+    {
+        get => _isAddLogoBtnEnabled;
+        set
+        {
+            if (_isAddLogoBtnEnabled != value)
+            {
+                _isAddLogoBtnEnabled = value;
+                OnPropertyChanged(nameof(IsAddLogoBtnEnabled));
+            }
+        }
+    }
+
+    #endregion
+
+    #region Images gallery
     private ObservableCollection<GameImage> _gameImages;
     public ObservableCollection<GameImage> GameImages
     {
@@ -65,11 +93,15 @@ public partial class EditGameViewModel : ObservableRecipient
         }
     }
     public ObservableCollection<string> GameImagePaths { get; set; } = new ObservableCollection<string>();
+    #endregion
+
     public EditGameViewModel(DbContext dbContext)
     {
         _dbContext = dbContext;
+        GameLogos = new ObservableCollection<GameImage>();
         GameImages = new ObservableCollection<GameImage>();
     }
+
     public int SelectedGameTypeId => SelectedGameType?.Id ?? 0;
     public int SelectedGameEngineId => SelectedGameEngine?.Id ?? 0;
 
@@ -96,11 +128,19 @@ public partial class EditGameViewModel : ObservableRecipient
             SelectedGameEngine = GameEngines.FirstOrDefault(g => g.Id == gameEngineId);
 
             var logoData = await _dbContext.ExecuteQueryAsync(SqlQueries.gameLogoSQL, gameId);
-            GameLogo = (logoData.Tables[0].Rows.Count > 0 && !logoData.Tables[0].Rows[0].IsNull("LogoPath"))
-                ? logoData.Tables[0].Rows[0]["LogoPath"].ToString()
-                : string.Empty;
-
             var imagesData = await _dbContext.ExecuteQueryAsync(SqlQueries.gameImagesByIdSQL, gameId);
+
+            GameLogos.Clear();
+            foreach (DataRow logoRow in logoData.Tables[0].Rows)
+            {
+                string imageUrl = logoRow["LogoPath"].ToString();
+
+                string username = "sgsclient";
+                string password = "yGnxE-Tykxe-SwjwW-NooLc-xSwPT";
+
+                await LoadLogoFromNextcloud(logoRow, username, password);
+            }
+
             GameImages.Clear();
             foreach (DataRow imageRow in imagesData.Tables[0].Rows)
             {
@@ -115,28 +155,49 @@ public partial class EditGameViewModel : ObservableRecipient
         }
     }
 
+    public async Task LoadLogoFromNextcloud(DataRow imageRow, string username, string password)
+    {
+        string imageUrl = imageRow["LogoPath"].ToString();
+
+        using (var client = new HttpClient())
+        {
+            var authHeader = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}"));
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authHeader);
+
+            var response = await client.GetAsync(imageUrl);
+            if (response.IsSuccessStatusCode)
+            {
+                var imageStream = await response.Content.ReadAsStreamAsync();
+                BitmapImage bitmapImage = new BitmapImage();
+                await bitmapImage.SetSourceAsync(imageStream.AsRandomAccessStream());
+
+                GameLogos.Add(new GameImage(imageUrl, bitmapImage));
+            }
+            else
+            {
+                GameLogos.Add(new GameImage(imageUrl));
+            }
+        }
+
+        IsAddLogoBtnEnabled = !GameLogos.Any();
+
+    }
     public async Task LoadImageFromNextcloud(DataRow imageRow, string username, string password)
     {
         string imageUrl = imageRow["ImagePath"].ToString();
 
         using (var client = new HttpClient())
         {
-            // Ustawienie nagłówka autoryzacji (Basic Authentication)
             var authHeader = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}"));
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authHeader);
 
-            // Pobranie obrazu z Nextcloud
             var response = await client.GetAsync(imageUrl);
             if (response.IsSuccessStatusCode)
             {
-                // Pobranie strumienia obrazu
                 var imageStream = await response.Content.ReadAsStreamAsync();
-
-                // Załadowanie obrazu do BitmapImage
                 BitmapImage bitmapImage = new BitmapImage();
                 await bitmapImage.SetSourceAsync(imageStream.AsRandomAccessStream());
 
-                // Dodanie do kolekcji GameImages
                 GameImages.Add(new GameImage(imageUrl, bitmapImage));
             }
             else
@@ -145,6 +206,8 @@ public partial class EditGameViewModel : ObservableRecipient
             }
         }
     }
+
+
     public async Task LoadGameTypes()
     {
         try
@@ -225,28 +288,34 @@ public partial class EditGameViewModel : ObservableRecipient
             Console.WriteLine($"Error: {ex.Message}");
         }
 
-        await UpdateGameLogo(gameId, GameLogo);
+        await UpdateGameLogo(gameId);
         await UpdateGameImages(gameId);
     }
-    private async Task UpdateGameLogo(int gameId, string logoPath)
+    private async Task UpdateGameLogo(int gameId)
     {
-        var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.gameLogoSQL, gameId);
-        if (dataSet.Tables.Count > 0)
+        await _dbContext.ExecuteQueryAsync(SqlQueries.deleteLogoSQL, gameId);
+        var uploader = new NextcloudUploader("https://cloud.m455yn.dev/", "sgsclient", "yGnxE-Tykxe-SwjwW-NooLc-xSwPT");
+
+        foreach (var logo in GameLogos)
         {
-            await _dbContext.ExecuteQueryAsync(SqlQueries.updateLogoSQL, GameLogo, gameId);
-        }
-        else
-        {
-            await _dbContext.ExecuteQueryAsync(SqlQueries.insertLogoSQL, gameId, GameLogo);
+            string imageUrl = logo.Url;
+
+            if (Path.IsPathRooted(imageUrl))
+            {
+                var file = await StorageFile.GetFileFromPathAsync(imageUrl);
+                string uploadedUrl = await uploader.UploadFileAsync(file.Path);
+
+                if (uploadedUrl != null)
+                {
+                    imageUrl = uploadedUrl;
+                }
+            }
+            await _dbContext.ExecuteQueryAsync(SqlQueries.insertLogoSQL, gameId, imageUrl);
         }
     }
     private async Task UpdateGameImages(int gameId)
     {
         await _dbContext.ExecuteQueryAsync(SqlQueries.deleteImagesSQL, gameId);
-        //foreach (var image in GameImages)
-        //{
-        //    await _dbContext.ExecuteQueryAsync(SqlQueries.insertImageSQL, gameId, image.Url);
-        //}
         var uploader = new NextcloudUploader("https://cloud.m455yn.dev/", "sgsclient", "yGnxE-Tykxe-SwjwW-NooLc-xSwPT");
 
         foreach (var image in GameImages)

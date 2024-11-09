@@ -1,18 +1,14 @@
-﻿using System.Diagnostics;
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
-using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
 using SGSClient.ViewModels;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using Windows.Storage;
-using ModernWpf.Controls.Primitives;
 using System.Net.Http.Headers;
 using System.Text;
-using System.Windows.Media.Imaging;
 
 namespace SGSClient.Views
 {
@@ -85,6 +81,49 @@ namespace SGSClient.Views
             }
         }
 
+        #region Logo
+        private async void AddLogoButton_Click(object sender, RoutedEventArgs e)
+        {
+            var picker = new FileOpenPicker();
+            picker.ViewMode = PickerViewMode.Thumbnail;
+            picker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
+            picker.FileTypeFilter.Add(".jpg");
+            picker.FileTypeFilter.Add(".jpeg");
+            picker.FileTypeFilter.Add(".png");
+
+            // Inicjalizuj picker z uchwytem okna
+            Helpers.WindowHelper.InitializeWithWindow(picker, App.MainWindow);
+
+            StorageFile file = await picker.PickSingleFileAsync();
+            if (file != null)
+            {
+                // Load the selected image
+                using (IRandomAccessStream fileStream = await file.OpenAsync(FileAccessMode.Read))
+                {
+                    var bitmapImage = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage();
+                    await bitmapImage.SetSourceAsync(fileStream);
+
+                    var newGameImage = new GameImage(bitmapImage)
+                    {
+                        Url = file.Path
+                    };
+
+                    ViewModel.GameLogos.Add(newGameImage);
+                    AddLogoBtn.IsEnabled = false;
+                    //await OpenImagePreviewDialog(newGameImage);
+                }
+            }
+        }
+        private void RemoveLogoButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.DataContext is GameImage gameImage)
+                ViewModel.GameLogos.Remove(gameImage);
+
+            AddLogoBtn.IsEnabled = true;
+        }
+        #endregion
+
+        #region Images gallery
         private async void AddImageButton_Click(object sender, RoutedEventArgs e)
         {
             var picker = new FileOpenPicker();
@@ -125,7 +164,6 @@ namespace SGSClient.Views
                 //ViewModel.GameImages.Add(placeholderImage);
             }
         }
-
         private void RemoveImageButton_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button button && button.DataContext is GameImage gameImage)
@@ -140,22 +178,9 @@ namespace SGSClient.Views
                 _ = OpenImagePreviewDialog(gameImage);
             }
         }
-        private void gotoSGSClientWWW_Click(object sender, RoutedEventArgs e)
-        {
-            var URL = "https://sgsclient.m455yn.dev/upload";
-            try
-            {
-                Process.Start(new ProcessStartInfo
-                {
-                    FileName = URL,
-                    UseShellExecute = true
-                });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Wystąpił błąd podczas otwierania linku do logo gry: " + ex.Message);
-            }
-        }
+        #endregion
+
+        #region Buttons
         private async void ButtonSave_Click(object sender, RoutedEventArgs e)
         {
             await ViewModel.SaveGameData(gameId);
@@ -165,6 +190,8 @@ namespace SGSClient.Views
         {
             Frame.Navigate(typeof(MyGamesPage), new DrillInNavigationTransitionInfo());
         }
+        #endregion
+
         private async Task OpenImagePreviewDialog(GameImage gameImage)
         {
             var previewDialog = new ContentDialog

@@ -88,19 +88,42 @@
                 <StackPanel Grid.Row="1" Margin="5" Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="0.5" CornerRadius="5">
                     <TextBlock Margin="5" Padding="5" FontSize="20" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Logo gry" />
                     <Rectangle Height="1" HorizontalAlignment="Stretch" Fill="{ThemeResource ControlElevationBorderBrush}" />
-                    <StackPanel x:Name="ImageTextBox1Panels" Orientation="Horizontal">
-                        <TextBox x:Name="gameLogoTextBox" Margin="5" Text="{Binding GameLogo, Mode=TwoWay}" PlaceholderText="Wprowadź link do loga twojej gry" Width="400" />
-                        <Button Margin="5" Click="PreviewImageButton_Click" ToolTipService.ToolTip="Podgląd">
-                            <Button.Content>
-                                <FontIcon Glyph="&#xE71E;"/>
-                            </Button.Content>
-                        </Button>
-                        <Button x:Name="AddImageButton2j" Margin="5" ToolTipService.ToolTip="Dodaj zdjęcie na hosting SGS" Click="gotoSGSClientWWW_Click">
-                            <Button.Content>
-                                <FontIcon Glyph="&#xE8A7;"/>
-                            </Button.Content>
-                        </Button>
-                    </StackPanel>
+                    <ScrollViewer Grid.Row="0" Grid.Column="0" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto">
+                        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="5" Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="0.5" CornerRadius="5" x:Name="gameLogoStackPanel">
+                            <Rectangle Height="1" HorizontalAlignment="Stretch" Fill="{ThemeResource ControlElevationBorderBrush}" />
+
+                            <!-- Placeholder for "Add Image" -->
+                            <Button Width="150" Height="150" Margin="5" Click="AddLogoButton_Click" x:Name="AddLogoBtn" IsEnabled="{Binding IsAddLogoBtnEnabled}">
+                                <Grid Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}">
+                                    <FontIcon Glyph="&#xE710;" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="48" />
+                                </Grid>
+                            </Button>
+
+                            <!-- ItemsControl for displaying game images -->
+                            <ItemsControl ItemsSource="{Binding GameLogos}" x:Name="LogosGrid">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <ItemsWrapGrid Orientation="Horizontal" ItemWidth="150" ItemHeight="150" Margin="5"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Width="150" Height="150" Margin="5" Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}">
+                                            <Image Source="{Binding ImageSource}" Stretch="UniformToFill" />
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="5">
+                                                <Button Click="RemoveLogoButton_Click" ToolTipService.ToolTip="Usuń">
+                                                    <FontIcon Glyph="&#xE74D;" />
+                                                </Button>
+                                                <Button Click="PreviewImageButton_Click" ToolTipService.ToolTip="Podgląd">
+                                                    <FontIcon Glyph="&#xE71E;" />
+                                                </Button>
+                                            </StackPanel>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </ScrollViewer>
                 </StackPanel>
 
                 <!-- Zrzuty ekranu -->

@@ -58,34 +58,39 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Button Click="ButtonGame_Click" Tag="{Binding GameSymbol}" Margin="0,0,4,4">
-                                    <StackPanel>
-                                        <Image
-                        Width="100"
-                        Height="100"
-                        Margin="14"
-                        VerticalAlignment="Center"
-                        Source="{Binding LogoPath}" />
-                                        <TextBlock
-                        FontSize="16"
+                                <Button Click="ButtonGame_Click" Tag="{Binding GameSymbol}" Margin="0,0,8,8">
+                                    <Grid Width="400" Height="250">
+                                        <!-- Obraz tła -->
+                                        <Grid.Background>
+                                            <ImageBrush ImageSource="{Binding LogoPath}" Stretch="UniformToFill" />
+                                        </Grid.Background>
+
+                                        <!-- Nakładka gradientowa dla lepszej widoczności tekstu -->
+                                        <Rectangle Fill="Black" Opacity="0.45" />
+
+                                        <!-- Tekst i szczegóły -->
+                                        <StackPanel VerticalAlignment="Bottom" Margin="20">
+                                            <TextBlock
+                        FontSize="24"
                         FontWeight="Bold"
+                        Foreground="White"
                         Text="{Binding GameTitle}" />
-                                        <TextBlock
-                        FontSize="12"
-                        Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                            <TextBlock
+                        FontSize="16"
+                        Foreground="White"
                         Text="{Binding GameDeveloper}" />
-                                        <!--<RatingControl
-                        Margin="0,0,0,20"
+                                            <RatingControl
                         HorizontalAlignment="Left"
                         IsReadOnly="True"
-                        PlaceholderValue="5" />-->
-                                        <TextBlock
-                        FontSize="12"
+                        PlaceholderValue="5" />
+                                            <TextBlock
+                        FontSize="14"
                         FontWeight="Bold"
+                        Foreground="White"
                         Text="Dostępne" />
-                                    </StackPanel>
+                                        </StackPanel>
+                                    </Grid>
                                 </Button>
-
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
