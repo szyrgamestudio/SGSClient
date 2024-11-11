@@ -264,32 +264,91 @@
                     </TextBlock>
                 </StackPanel>
                 <!--Comments-->
-                <StackPanel Grid.Row="4" Margin="5" Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="0.5" CornerRadius="5" x:Name="CommentsStackPanel">
+                <StackPanel Grid.Row="4" Margin="5" Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="0.5" CornerRadius="5" x:Name="ReviewsStackPanel">
                     <Grid Margin="5" Padding="5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" FontSize="20" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Komentarze" VerticalAlignment="Center" />
-                        <Button x:Name="AddCommentButton" Grid.Column="1" Content="+" Click="AddCommentButton_Click" HorizontalAlignment="Right" Style="{StaticResource AccentButtonStyle}"/>
+                        <TextBlock Grid.Column="0" FontSize="20" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Oceny i recenzje" VerticalAlignment="Center" />
+                        <Button x:Name="AddReviewButton" Grid.Column="1" Click="AddRatingButton_Click" HorizontalAlignment="Right" Style="{StaticResource AccentButtonStyle}">
+                            <Button.Content>
+                                <FontIcon Glyph="&#xE734;" />
+                            </Button.Content>
+                            <ToolTipService.ToolTip>
+                                <ToolTip Content="Oceń"/>
+                            </ToolTipService.ToolTip>
+                        </Button>
                     </Grid>
                     <Rectangle Height="1" HorizontalAlignment="Stretch" Fill="{ThemeResource ControlElevationBorderBrush}" />
-                    <ListView Margin="5" Padding="5" x:Name="CommentsListView" ItemsSource="{x:Bind ViewModel.Comments}" IsItemClickEnabled="True" ItemClick="CommentsListView_ItemClick">
-                        <ListView.ItemTemplate>
-                            <DataTemplate x:DataType="local:Comment">
-                                <StackPanel>
-                                    <TextBlock FontSize="14" Style="{ThemeResource CaptionTextBlockStyle}" Text="{x:Bind Author}" />
-                                    <TextBlock FontSize="12" Style="{ThemeResource CaptionTextBlockStyle}" Text="{x:Bind Content}" />
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
+                    <Grid Margin="5" Padding="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Ocena ogólna i liczba ocen -->
+                        <Grid Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,10,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" FontSize="40" Text="5,0" FontWeight="Bold" HorizontalAlignment="Left" Margin="5" />
+                            <TextBlock Grid.Row="1" FontSize="14" Text="OCENY: 1" HorizontalAlignment="Left" />
+                        </Grid>
+
+                        <!-- Wskaźniki ocen -->
+                        <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="5" Width="20" />
+                                <ProgressBar Value="100" Height="10" Width="200" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="4" Width="20" />
+                                <ProgressBar Value="0" Height="10" Width="200" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="3" Width="20" />
+                                <ProgressBar Value="0" Height="10" Width="200" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="2" Width="20" />
+                                <ProgressBar Value="0" Height="10" Width="200" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="1" Width="20" />
+                                <ProgressBar Value="0" Height="10" Width="200" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                    <StackPanel Margin="5" Padding="5">
+                        <!-- Recenzja -->
+                        <ListView x:Name="CommentsListView" ItemsSource="{x:Bind ViewModel.Ratings}">
+                            <ListView.ItemTemplate>
+                                <DataTemplate x:DataType="local:GameRating">
+                                    <StackPanel>
+                                        <!-- Title of the review -->
+                                        <TextBlock FontSize="16" FontWeight="Bold" Text="{x:Bind Title}" />
+
+                                        <!-- Rating value -->
+                                        <RatingControl HorizontalAlignment="Left" IsReadOnly="True" PlaceholderValue="{x:Bind Rating}" />
+
+                                        <!-- Review content -->
+                                        <TextBlock FontSize="14" Text="{x:Bind Review}" />
+
+                                        <!-- Author -->
+                                        <TextBlock FontSize="12" Text="{x:Bind Author}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                        <HyperlinkButton Content="Wyświetl wszystko" HorizontalAlignment="Left" Click="ShowAllReviewsButton_Click" />
+                    </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="5">
                         <Button Content="Wstecz" Click="PreviousPageButton_Click" IsEnabled="{x:Bind ViewModel.CanGoToPreviousPage, Mode=OneWay}" Style="{StaticResource AccentButtonStyle}" Margin="0,0,10,0" />
                         <Button Content="Dalej" Click="NextPageButton_Click" IsEnabled="{x:Bind ViewModel.CanGoToNextPage, Mode=OneWay}" Style="{StaticResource AccentButtonStyle}" />
                     </StackPanel>
                 </StackPanel>
-
 
             </Grid>
         </ScrollViewer>
@@ -299,8 +358,8 @@
             PrimaryButtonText="Aktualizuj"
             SecondaryButtonText="Usuń"
             CloseButtonText="Zamknij"
-            PrimaryButtonClick="SaveCommentButton_Click"
-            SecondaryButtonClick="DeleteCommentButton_Click"
+            PrimaryButtonClick="SaveRatingButton_Click" 
+            SecondaryButtonClick="DeleteRatingButton_Click"
             PrimaryButtonStyle="{StaticResource AccentButtonStyle}"
             SecondaryButtonStyle="{StaticResource AccentButtonStyle}">
 
@@ -317,23 +376,36 @@
             </StackPanel>
         </ContentDialog>
         <ContentDialog
-            x:Name="AddCommentDetailsDialog"
-            Title="Dodaj komentarz"
-            PrimaryButtonText="Dodaj"
-            CloseButtonText="Zamknij"
-            PrimaryButtonClick="AddCommentButton_Click"
-            PrimaryButtonStyle="{StaticResource AccentButtonStyle}">
+    x:Name="AddRatingDetailsDialog"
+    Title="Oceń"
+    PrimaryButtonText="Oceń"
+    CloseButtonText="Zamknij"
+    PrimaryButtonClick="AddRatingButton_Click"
+    PrimaryButtonStyle="{StaticResource AccentButtonStyle}">
 
             <StackPanel>
-                <TextBlock
-                    x:Name="ACAuthorTextBox"
-                    Margin="0,0,0,10"/>
+                <!-- TextBox for entering the title of the rating -->
                 <TextBox
-                    x:Name="ACContentTextBox"
-                    Header="Treść"
-                    AcceptsReturn="True"
-                    TextWrapping="Wrap"
-                    Height="200"/>
+            x:Name="RatingTitleTextBox"
+            Header="Tytuł oceny"
+            TextWrapping="Wrap"
+            Height="60"
+            Margin="0,0,0,10"/>
+
+                <!-- RatingControl for the rating value -->
+                <RatingControl
+            x:Name="RatingRatingControl"
+            HorizontalAlignment="Left"
+            ValueChanged="RatingRatingControl_ValueChanged"
+            Margin="0,0,0,10" />
+
+                <!-- TextBox for entering the content of the rating -->
+                <TextBox
+            x:Name="RatingReviewTextBox"
+            Header="Treść oceny"
+            AcceptsReturn="True"
+            TextWrapping="Wrap"
+            Height="200"/>
             </StackPanel>
         </ContentDialog>
 

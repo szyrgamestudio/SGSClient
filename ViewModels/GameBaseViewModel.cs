@@ -10,69 +10,76 @@ namespace SGSClient.ViewModels
     public partial class GameBaseViewModel : ObservableRecipient
     {
         private readonly ConfigurationManagerSQL _configManagerSQL;
-        private ObservableCollection<Comment> _allComments;
-        private const int PageSize = 10;
+        private ObservableCollection<GameRating> _allRatings;
+        private const int PageSize = 3;
 
         [ObservableProperty]
-        private ObservableCollection<Comment> comments;
+        private ObservableCollection<GameRating> ratings;
 
         [ObservableProperty]
         private int currentPage;
+        public bool CanGoToPreviousPage => CurrentPage > 0;
+        public bool CanGoToNextPage => (CurrentPage + 1) * PageSize < _allRatings.Count;
 
         public GameBaseViewModel()
         {
             _configManagerSQL = new ConfigurationManagerSQL(new DbContext());
-            _allComments = new ObservableCollection<Comment>();
-            Comments = new ObservableCollection<Comment>();
+            _allRatings = new ObservableCollection<GameRating>();
+
+            Ratings = new ObservableCollection<GameRating>();
             CurrentPage = 0;
         }
 
-        public bool CanGoToPreviousPage => CurrentPage > 0;
 
-        public bool CanGoToNextPage => (CurrentPage + 1) * PageSize < _allComments.Count;
+        public async Task LoadRatings(string gameIdentifier)
+        {
+            _allRatings.Clear();
+            var ratings = await _configManagerSQL.LoadRatingsFromDB(gameIdentifier);
+            foreach (var gameRating in ratings)
+                _allRatings.Add(gameRating);
 
-        public void AddComment(string gameIdentifier, Comment newComment)
-        {
-            _configManagerSQL.AddCommentToDatabaseAsync(gameIdentifier, newComment);
-            _allComments.Add(newComment);
-            LoadPage(CurrentPage);
-        }
-        public void UpdateComment(Comment updatedComment)
-        {
-            _configManagerSQL.UpdateCommentInDatabase(updatedComment);
-
-            var comment = _allComments.FirstOrDefault(c => c.CommentId == updatedComment.CommentId);
-            if (comment != null)
-            {
-                comment.Author = updatedComment.Author;
-                comment.Content = updatedComment.Content;
-                LoadPage(CurrentPage); // Refresh the current page
-            }
-        }
-        public async Task LoadCommentsAsync(string gameIdentifier)
-        {
-            _allComments.Clear();
-            var commentsFromDb = await _configManagerSQL.LoadCommentsFromDatabaseAsync(gameIdentifier);
-            foreach (var comment in commentsFromDb)
-            {
-                _allComments.Add(comment);
-            }
             LoadPage(0);
         }
 
+
+        public async void AddRating(string gameIdentifier, GameRating gameRating)
+        {
+            await _configManagerSQL.AddRatingToDB(gameIdentifier, gameRating);
+            _allRatings.Add(gameRating);
+            LoadPage(CurrentPage);
+        }
+        public async void UpdateRating(GameRating gameRating)
+        {
+            await _configManagerSQL.UpdateRatingInDB(gameRating);
+
+            var comment = _allRatings.FirstOrDefault(c => c.RatingId == gameRating.RatingId);
+            if (comment != null)
+            {
+                comment.Author = gameRating.Author;
+                comment.Review = gameRating.Review;
+                LoadPage(CurrentPage); // Refresh the current page
+            }
+        }
+        public async void DeleteRating(GameRating gameRating)
+        {
+            await _configManagerSQL.DeleteRatingInDB(gameRating);
+            _allRatings.Remove(gameRating);
+            LoadPage(CurrentPage); // Refresh the current page
+        }
+
+
         public void LoadPage(int pageNumber)
         {
-            Comments.Clear();
+            Ratings.Clear();
             CurrentPage = pageNumber;
-            var commentsToShow = _allComments.Skip(CurrentPage * PageSize).Take(PageSize);
-            foreach (var comment in commentsToShow)
+            var ratingsToShow = _allRatings.Skip(CurrentPage * PageSize).Take(PageSize);
+            foreach (var gameRating in ratingsToShow)
             {
-                Comments.Add(comment);
+                Ratings.Add(gameRating);
             }
             OnPropertyChanged(nameof(CanGoToPreviousPage));
             OnPropertyChanged(nameof(CanGoToNextPage));
         }
-
         public void GoToPreviousPage()
         {
             if (CanGoToPreviousPage)
@@ -80,20 +87,12 @@ namespace SGSClient.ViewModels
                 LoadPage(CurrentPage - 1);
             }
         }
-
         public void GoToNextPage()
         {
             if (CanGoToNextPage)
             {
                 LoadPage(CurrentPage + 1);
             }
-        }
-
-        public void DeleteComment(Comment commentToDelete)
-        {
-            _configManagerSQL.DeleteCommentFromDatabase(commentToDelete);
-            _allComments.Remove(commentToDelete);
-            LoadPage(CurrentPage); // Refresh the current page
         }
     }
 }

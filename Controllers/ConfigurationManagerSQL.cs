@@ -135,40 +135,42 @@ namespace SGSClient.Controllers
         }
         #endregion
 
-        #region Comments
-        public async Task<List<Comment>> LoadCommentsFromDatabaseAsync(string gameIdentifier)
+        #region Rating
+        public async Task<List<GameRating>> LoadRatingsFromDB(string gameIdentifier)
         {
-            List<Comment> comments = [];
-            var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.loadCommentsSQL, gameIdentifier);
+            List<GameRating> gameRatings = [];
+            var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.loadRatingsSQL, gameIdentifier);
             if (dataSet.Tables[0].Rows.Count > 0)
             {
                 foreach (DataRow row in dataSet.Tables[0].Rows)
                 {
-                    comments.Add(new Comment
+                    gameRatings.Add(new GameRating
                     {
-                        CommentId = row.Field<int>("Id"),
-                        AuthorId = row.Field<int>("DeveloperId"),
-                        Author = row.Field<string>("Name"),
-                        Content = row.Field<string>("Comment")
+                        RatingId = row.Field<int>("Id"),
+                        UserId   = row.Field<int>("DeveloperId"),
+                        Author   = row.Field<string>("Name"),
+                        Rating   = row.Field<int>("Rating"),
+                        Title    =  row.Field<string>("Title"),
+                        Review   =  row.Field<string>("Review")
                     });
                 }
 
-                return comments;
+                return gameRatings;
             }
             else
-                return comments;
+                return gameRatings;
         }
-        public async Task AddCommentToDatabaseAsync(string gameIdentifier, Comment comment)
+        public async Task AddRatingToDB(string gameIdentifier, GameRating gameRating)
         {
-            await _dbContext.ExecuteQueryAsync(SqlQueries.insertCommentSQL, AppSession.CurrentUserSession.UserId, comment.Content, gameIdentifier);
+            await _dbContext.ExecuteQueryAsync(SqlQueries.insertCommentSQL, AppSession.CurrentUserSession.UserId, gameRating.Review, gameIdentifier);
         }
-        public async Task UpdateCommentInDatabase(Comment comment)
+        public async Task UpdateRatingInDB(GameRating gameRating)
         {
-            await _dbContext.ExecuteQueryAsync(SqlQueries.updateCommentSQL, comment.Content, comment.CommentId);
+            await _dbContext.ExecuteQueryAsync(SqlQueries.updateCommentSQL, gameRating.Rating, gameRating.RatingId);
         }
-        public async Task DeleteCommentFromDatabase(Comment comment)
+        public async Task DeleteRatingInDB(GameRating gameRating)
         {
-            await _dbContext.ExecuteQueryAsync(SqlQueries.deleteCommentSQL, comment.CommentId);
+            await _dbContext.ExecuteQueryAsync(SqlQueries.deleteCommentSQL, gameRating.RatingId);
         }
         #endregion
     }

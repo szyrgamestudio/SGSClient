@@ -14,6 +14,7 @@ using SGSClient.Core.Database;
 using SevenZipExtractor;
 using SGSClient.Models;
 using Windows.System;
+using Microsoft.UI.Xaml.Controls.Primitives;
 
 namespace SGSClient.Views;
 
@@ -34,6 +35,7 @@ public sealed partial class GameBasePage : Page
     private string? hardwareRequirements;
     private string? otherInformations;
     private Comment _selectedComment;
+    private GameRating? _gameRating;
     private readonly ConfigurationManagerSQL configManagerSQL;
     private readonly HttpClient httpClient = new();
 
@@ -73,8 +75,7 @@ public sealed partial class GameBasePage : Page
                 await LoadImagesFromDatabaseAsync(gameIdentifier);
                 await LoadLogoFromDatabaseAsync(gameIdentifier);
 
-                // Assuming LoadComments can also be made async
-                await ViewModel.LoadCommentsAsync(gameIdentifier);
+                await ViewModel.LoadRatings(gameIdentifier);
             }
         }
 
@@ -187,62 +188,56 @@ public sealed partial class GameBasePage : Page
 
         if (AppSession.CurrentUserSession.UserId == null)
         {
-            AddCommentButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+            //AddCommentButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
         }
     }
     #endregion
 
-    #region Comments
-    private void CommentsListView_ItemClick(object sender, ItemClickEventArgs e)
+    #region Rating
+    private void RatingRatingControl_ValueChanged(RatingControl sender, object args)
     {
-        string userId = AppSession.CurrentUserSession.UserId;
-        if (e.ClickedItem is Comment comment && comment.AuthorId.ToString() == userId)
+        if (sender is null)
         {
-            _selectedComment = comment;
-            AuthorTextBox.Text = comment.Author;
-            ContentTextBox.Text = comment.Content;
-            _ = CommentDetailsDialog.ShowAsync();
+            throw new ArgumentNullException(nameof(sender));
         }
     }
-    private void AddCommentButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    private void AddRatingButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
-        _selectedComment = null; // Indicates that we are adding a new comment
-        ACAuthorTextBox.Text = string.Empty;
-        ACContentTextBox.Text = string.Empty;
-        AddCommentDetailsDialog.Title = "Dodaj komentarz";
-        _ = AddCommentDetailsDialog.ShowAsync();
+        _gameRating = null;
+        RatingTitleTextBox.Text = string.Empty;
+        RatingReviewTextBox.Text = string.Empty;
+        AddRatingDetailsDialog.Title = "Oceń";
+        _ = AddRatingDetailsDialog.ShowAsync();
     }
-
-    private async void AddCommentButton_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+    private async void AddRatingButton_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
     {
-        Comment comment = new Comment();
-        _selectedComment = comment;
-        _selectedComment.Content = ACContentTextBox.Text;
-        ViewModel.AddComment(gameIdentifier, _selectedComment);
-        await ViewModel.LoadCommentsAsync(gameIdentifier); // Refresh comments
+        GameRating gameRating = new();
+        _gameRating = gameRating;
+        _gameRating.Title = RatingTitleTextBox.Text;
+        _gameRating.Review = RatingReviewTextBox.Text;
+        ViewModel.AddRating(gameIdentifier, _gameRating);
+        await ViewModel.LoadRatings(gameIdentifier);
 
-        CommentDetailsDialog.Hide();
+        AddRatingDetailsDialog.Hide();
     }
-
-    private async void SaveCommentButton_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+    private async void SaveRatingButton_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
     {
-        if (_selectedComment != null)
+        if (_gameRating != null)
         {
-            _selectedComment.Author = AuthorTextBox.Text;
-            _selectedComment.Content = ContentTextBox.Text;
-            ViewModel.UpdateComment(_selectedComment);
-            await ViewModel.LoadCommentsAsync(gameIdentifier); // Refresh comments
+            _gameRating.Title = RatingTitleTextBox.Text;
+            _gameRating.Review = RatingReviewTextBox.Text;
+            ViewModel.UpdateRating(_gameRating);
+            await ViewModel.LoadRatings(gameIdentifier);
         }
-        CommentDetailsDialog.Hide();
+        AddRatingDetailsDialog.Hide();
     }
-
-    private async void DeleteCommentButton_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+    private async void DeleteRatingButton_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
     {
-        if (_selectedComment != null)
+        if (_gameRating != null)
         {
-            ViewModel.DeleteComment(_selectedComment);
-            _selectedComment = null;
-            await ViewModel.LoadCommentsAsync(gameIdentifier); // Refresh comments
+            ViewModel.DeleteRating(_gameRating);
+            _gameRating = null;
+            await ViewModel.LoadRatings(gameIdentifier); // Refresh comments
         }
     }
 
@@ -250,7 +245,6 @@ public sealed partial class GameBasePage : Page
     {
         ViewModel.GoToPreviousPage();
     }
-
     private void NextPageButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
         ViewModel.GoToNextPage();
@@ -472,4 +466,10 @@ public sealed partial class GameBasePage : Page
         CheckForUpdates();
     }
     #endregion
+
+    private void ShowAllReviewsButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+       
+    }
+
 }
