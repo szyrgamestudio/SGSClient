@@ -293,31 +293,34 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" FontSize="40" Text="5,0" FontWeight="Bold" HorizontalAlignment="Left" Margin="5" />
-                            <TextBlock Grid.Row="1" FontSize="14" Text="OCENY: 1" HorizontalAlignment="Left" />
+                            <TextBlock Grid.Row="0" FontSize="40" Text="{Binding AvgRating}" FontWeight="Bold" HorizontalAlignment="Left" Margin="5" />
+                            <TextBlock Grid.Row="1" FontSize="14" HorizontalAlignment="Left">
+                                 <Run Text="OCENY: " />
+                                 <Run Text="{Binding RatingCount}" />
+                            </TextBlock>
                         </Grid>
 
                         <!-- Wskaźniki ocen -->
                         <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center">
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                 <TextBlock Text="5" Width="20" />
-                                <ProgressBar Value="100" Height="10" Width="200" />
+                                <ProgressBar Value="{Binding Count5}" Height="10" Width="200" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                 <TextBlock Text="4" Width="20" />
-                                <ProgressBar Value="0" Height="10" Width="200" />
+                                <ProgressBar Value="{Binding Count4}" Height="10" Width="200" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                 <TextBlock Text="3" Width="20" />
-                                <ProgressBar Value="0" Height="10" Width="200" />
+                                <ProgressBar Value="{Binding Count3}" Height="10" Width="200" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                 <TextBlock Text="2" Width="20" />
-                                <ProgressBar Value="0" Height="10" Width="200" />
+                                <ProgressBar Value="{Binding Count2}" Height="10" Width="200" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                 <TextBlock Text="1" Width="20" />
-                                <ProgressBar Value="0" Height="10" Width="200" />
+                                <ProgressBar Value="{Binding Count1}" Height="10" Width="200" />
                             </StackPanel>
                         </StackPanel>
                     </Grid>
@@ -344,37 +347,10 @@
                         </ListView>
                         <HyperlinkButton Content="Wyświetl wszystko" HorizontalAlignment="Left" Click="ShowAllReviewsButton_Click" />
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="5">
-                        <Button Content="Wstecz" Click="PreviousPageButton_Click" IsEnabled="{x:Bind ViewModel.CanGoToPreviousPage, Mode=OneWay}" Style="{StaticResource AccentButtonStyle}" Margin="0,0,10,0" />
-                        <Button Content="Dalej" Click="NextPageButton_Click" IsEnabled="{x:Bind ViewModel.CanGoToNextPage, Mode=OneWay}" Style="{StaticResource AccentButtonStyle}" />
-                    </StackPanel>
                 </StackPanel>
 
             </Grid>
         </ScrollViewer>
-        <ContentDialog
-            x:Name="CommentDetailsDialog"
-            Title="Podgląd komentarza"
-            PrimaryButtonText="Aktualizuj"
-            SecondaryButtonText="Usuń"
-            CloseButtonText="Zamknij"
-            PrimaryButtonClick="SaveRatingButton_Click" 
-            SecondaryButtonClick="DeleteRatingButton_Click"
-            PrimaryButtonStyle="{StaticResource AccentButtonStyle}"
-            SecondaryButtonStyle="{StaticResource AccentButtonStyle}">
-
-            <StackPanel>
-                <TextBlock
-                    x:Name="AuthorTextBox"
-                    Margin="0,0,0,10"/>
-                <TextBox
-                    x:Name="ContentTextBox"
-                    Header="Treść"
-                    AcceptsReturn="True"
-                    TextWrapping="Wrap"
-                    Height="200"/>
-            </StackPanel>
-        </ContentDialog>
         <ContentDialog
     x:Name="AddRatingDetailsDialog"
     Title="Oceń"

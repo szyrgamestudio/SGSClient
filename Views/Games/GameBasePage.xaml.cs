@@ -15,6 +15,7 @@ using SevenZipExtractor;
 using SGSClient.Models;
 using Windows.System;
 using Microsoft.UI.Xaml.Controls.Primitives;
+using System.Data;
 
 namespace SGSClient.Views;
 
@@ -76,6 +77,7 @@ public sealed partial class GameBasePage : Page
                 await LoadLogoFromDatabaseAsync(gameIdentifier);
 
                 await ViewModel.LoadRatings(gameIdentifier);
+                await ViewModel.LoadGameRatingsStats(gameIdentifier);
             }
         }
 
@@ -201,62 +203,68 @@ public sealed partial class GameBasePage : Page
             throw new ArgumentNullException(nameof(sender));
         }
     }
-    private void AddRatingButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    private async void AddRatingButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
-        _gameRating = null;
-        RatingTitleTextBox.Text = string.Empty;
-        RatingReviewTextBox.Text = string.Empty;
-        AddRatingDetailsDialog.Title = "Oceń";
-        _ = AddRatingDetailsDialog.ShowAsync();
+        bool hasUserRated = await ViewModel.UserRatingP();
+
+        if (hasUserRated)
+        {
+            List<GameRating> gameRatings = [];
+            var dataSet = await ViewModel.ReturnUserRating(gameIdentifier);
+            if (dataSet.Tables[0].Rows.Count > 0)
+            {
+                foreach (DataRow row in dataSet.Tables[0].Rows)
+                {
+                    _gameRating = new GameRating();
+                    _gameRating.RatingId = row.Field<int>("Id");
+                    RatingTitleTextBox.Text = row.Field<string>("Title");
+                    RatingRatingControl.Value = row.Field<int>("Rating");
+                    RatingReviewTextBox.Text = row.Field<string>("Review");
+                    AddRatingDetailsDialog.Title = "Oceń";
+                    await AddRatingDetailsDialog.ShowAsync();
+                }
+            }
+            AddRatingDetailsDialog.Title = "Oceń";
+            await AddRatingDetailsDialog.ShowAsync();
+        }
+        else
+        {
+            _gameRating = null;
+            RatingTitleTextBox.Text = string.Empty;
+            RatingRatingControl.Value = 5;
+            RatingReviewTextBox.Text = string.Empty;
+            AddRatingDetailsDialog.Title = "Oceń";
+            await AddRatingDetailsDialog.ShowAsync();
+        }
     }
     private async void AddRatingButton_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
     {
         GameRating gameRating = new();
         _gameRating = gameRating;
+        var dataSet = await ViewModel.ReturnUserRating(gameIdentifier);
+        if (dataSet.Tables[0].Rows.Count > 0)
+        {
+            foreach (DataRow row in dataSet.Tables[0].Rows)
+            {
+                _gameRating.RatingId = row.Field<int>("Id");
+            }
+        }
         _gameRating.Title = RatingTitleTextBox.Text;
+        _gameRating.Rating = (int)RatingRatingControl.Value;
         _gameRating.Review = RatingReviewTextBox.Text;
         ViewModel.AddRating(gameIdentifier, _gameRating);
         await ViewModel.LoadRatings(gameIdentifier);
 
         AddRatingDetailsDialog.Hide();
     }
-    private async void SaveRatingButton_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
-    {
-        if (_gameRating != null)
-        {
-            _gameRating.Title = RatingTitleTextBox.Text;
-            _gameRating.Review = RatingReviewTextBox.Text;
-            ViewModel.UpdateRating(_gameRating);
-            await ViewModel.LoadRatings(gameIdentifier);
-        }
-        AddRatingDetailsDialog.Hide();
-    }
-    private async void DeleteRatingButton_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
-    {
-        if (_gameRating != null)
-        {
-            ViewModel.DeleteRating(_gameRating);
-            _gameRating = null;
-            await ViewModel.LoadRatings(gameIdentifier); // Refresh comments
-        }
-    }
-
-    private void PreviousPageButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
-    {
-        ViewModel.GoToPreviousPage();
-    }
-    private void NextPageButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
-    {
-        ViewModel.GoToNextPage();
-    }
     #endregion
 
     public GameBasePage()
     {
         configManagerSQL = new ConfigurationManagerSQL(new DbContext());
-        ViewModel = new GameBaseViewModel();
+        ViewModel = new GameBaseViewModel(new DbContext());
         InitializeComponent();
-        DataContext = ViewModel;  // Set the DataContext
+        DataContext = ViewModel;
         Status = LauncherStatus.pageLauched;
     }
 
@@ -469,7 +477,7 @@ public sealed partial class GameBasePage : Page
 
     private void ShowAllReviewsButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
-       
+
     }
 
 }

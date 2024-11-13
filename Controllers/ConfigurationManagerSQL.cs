@@ -160,17 +160,18 @@ namespace SGSClient.Controllers
             else
                 return gameRatings;
         }
+
         public async Task AddRatingToDB(string gameIdentifier, GameRating gameRating)
         {
-            await _dbContext.ExecuteQueryAsync(SqlQueries.insertCommentSQL, AppSession.CurrentUserSession.UserId, gameRating.Review, gameIdentifier);
+            await _dbContext.ExecuteQueryAsync(SqlQueries.insertRatingSQL, AppSession.CurrentUserSession.UserId, gameRating.Review, gameIdentifier);
         }
         public async Task UpdateRatingInDB(GameRating gameRating)
         {
-            await _dbContext.ExecuteQueryAsync(SqlQueries.updateCommentSQL, gameRating.Rating, gameRating.RatingId);
+            await _dbContext.ExecuteQueryAsync(SqlQueries.updateRatingSQL, gameRating.Rating, gameRating.RatingId);
         }
         public async Task DeleteRatingInDB(GameRating gameRating)
         {
-            await _dbContext.ExecuteQueryAsync(SqlQueries.deleteCommentSQL, gameRating.RatingId);
+            await _dbContext.ExecuteQueryAsync(SqlQueries.deleteRatingSQL, gameRating.RatingId);
         }
         #endregion
     }
