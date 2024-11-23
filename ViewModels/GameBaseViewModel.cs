@@ -12,7 +12,6 @@ namespace SGSClient.ViewModels
 {
     public partial class GameBaseViewModel : ObservableRecipient
     {
-        private readonly ConfigurationManagerSQL _configManagerSQL;
         private ObservableCollection<GameRating> _allRatings;
         private readonly DbContext _dbContext;
         private const int PageSize = 2;
@@ -46,7 +45,6 @@ namespace SGSClient.ViewModels
         [ObservableProperty]
         private int count5;
 
-
         public GameBaseViewModel(DbContext dbContext)
         {
             ratingCount = 0;
@@ -58,14 +56,11 @@ namespace SGSClient.ViewModels
             count5 = 0;
 
             _dbContext = dbContext;
-
-            _configManagerSQL = new ConfigurationManagerSQL(new DbContext());
             _allRatings = new ObservableCollection<GameRating>();
 
             Ratings = new ObservableCollection<GameRating>();
             CurrentPage = 0;
         }
-
         public async Task<bool> UserRatingP()
         {
             var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.userRatingSQL, AppSession.CurrentUserSession.UserId);
@@ -74,17 +69,28 @@ namespace SGSClient.ViewModels
             else
                 return false;
         }
-
         public async Task LoadRatings(string gameIdentifier)
         {
             _allRatings.Clear();
-            var ratings = await _configManagerSQL.LoadRatingsFromDB(gameIdentifier);
-            foreach (var gameRating in ratings)
-                _allRatings.Add(gameRating);
-
+            List<GameRating> gameRatings = [];
+            var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.loadRatingsSQL, gameIdentifier);
+            if (dataSet.Tables[0].Rows.Count > 0)
+            {
+                foreach (DataRow row in dataSet.Tables[0].Rows)
+                {
+                    _allRatings.Add(new GameRating
+                    {
+                        RatingId = row.Field<int>("Id"),
+                        UserId   = row.Field<int>("DeveloperId"),
+                        Author   = row.Field<string>("Name"),
+                        Rating   = row.Field<int>("Rating"),
+                        Title    =  row.Field<string>("Title"),
+                        Review   =  row.Field<string>("Review")
+                    });
+                }
+            }
             LoadPage(0);
         }
-
         public async Task LoadGameRatingsStats(string gameIdentifier)
         {
             var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.loadGameRatingStatsSQL, gameIdentifier);
@@ -102,13 +108,11 @@ namespace SGSClient.ViewModels
                 }
             }
         }
-
-        public async Task<System.Data.DataSet> ReturnUserRating(string gameIdentifier)
+        public async Task<DataSet> ReturnUserRating(string gameIdentifier)
         {
             var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.loadRatingSQL, gameIdentifier, AppSession.CurrentUserSession.UserId);
             return dataSet;
         }
-
 
         public async void AddRating(string gameIdentifier, GameRating gameRating)
         {
@@ -126,12 +130,6 @@ namespace SGSClient.ViewModels
             await LoadGameRatingsStats(gameIdentifier);
             LoadPage(CurrentPage);
         }
-        public async void DeleteRating(GameRating gameRating)
-        {
-            await _dbContext.ExecuteQueryAsync(SqlQueries.deleteRatingSQL, gameRating.RatingId);
-            _allRatings.Remove(gameRating);
-            LoadPage(CurrentPage);
-        }
 
         public void LoadPage(int pageNumber)
         {
@@ -144,20 +142,6 @@ namespace SGSClient.ViewModels
             }
             OnPropertyChanged(nameof(CanGoToPreviousPage));
             OnPropertyChanged(nameof(CanGoToNextPage));
-        }
-        public void GoToPreviousPage()
-        {
-            if (CanGoToPreviousPage)
-            {
-                LoadPage(CurrentPage - 1);
-            }
-        }
-        public void GoToNextPage()
-        {
-            if (CanGoToNextPage)
-            {
-                LoadPage(CurrentPage + 1);
-            }
         }
     }
 }

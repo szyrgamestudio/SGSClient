@@ -221,7 +221,6 @@ public sealed partial class GameBasePage : Page
                     RatingRatingControl.Value = row.Field<int>("Rating");
                     RatingReviewTextBox.Text = row.Field<string>("Review");
                     AddRatingDetailsDialog.Title = "Oceń";
-                    await AddRatingDetailsDialog.ShowAsync();
                 }
             }
             AddRatingDetailsDialog.Title = "Oceń";
