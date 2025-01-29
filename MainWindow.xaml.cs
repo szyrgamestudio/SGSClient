@@ -1,5 +1,4 @@
-﻿using Microsoft.Data.SqlClient;
-using SGSClient.Helpers;
+﻿using SGSClient.Helpers;
 
 using Windows.UI.ViewManagement;
 

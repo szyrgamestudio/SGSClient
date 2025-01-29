@@ -1,11 +1,8 @@
 ﻿using System.Collections.Specialized;
 using System.Web;
-using Microsoft.UI.Xaml.Controls;
 using Microsoft.Windows.AppNotifications;
 
 using SGSClient.Contracts.Services;
-using SGSClient.ViewModels;
-using WinUIEx.Messaging;
 
 namespace SGSClient.Notifications;
 

@@ -1,7 +1,7 @@
 ﻿using System.Data;
-using Microsoft.Data.SqlClient;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using Microsoft.Data.SqlClient;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
@@ -15,7 +15,7 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
 {
     private int selectedGameTypeId; //zmienna przechowująca wybrany gatunek gry
     private int selectedGameEngineId; //zmienna przechowująca wybrany silnik gry
-
+    private readonly IAppUser _appUser;  // Declare _appUser
     public class GameTypeItem
     {
         public int Id
@@ -279,7 +279,7 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
             {
                 // Utwórz nowy obiekt SqlCommand z zapytaniem SQL i połączeniem
                 using (SqlCommand command = db.CommandSQL(connection, addGameQuery, gameName,
-                                                           AppSession.CurrentUserSession.UserId, exeName,
+                                                           _appUser.UserId, exeName,
                                                            zipLink, currentVersion,
                                                            gameDescriptionParam,
                                                            hardwareRequirementsParam,
@@ -433,14 +433,14 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
         Frame.Navigate(typeof(MyGamesPage), new DrillInNavigationTransitionInfo());
     }
 
-    [Obsolete]
-    private void LogoutButton_Click(object sender, RoutedEventArgs e)
-    {
-        AppSession.CurrentUserSession.IsLoggedIn = false;
-        AppSession.CurrentUserSession.UserId = null;
-        AppSession.CurrentUserSession.UserName = null;
+    //[Obsolete]
+    //private void LogoutButton_Click(object sender, RoutedEventArgs e)
+    //{
+    //    _appUser.IsLoggedIn = false;
+    //    _appUser.UserId = null;
+    //    _appUser.UserName = null;
 
-        Frame.Navigate(typeof(LoginPage), new DrillInNavigationTransitionInfo());
-    }
+    //    Frame.Navigate(typeof(LoginPage), new DrillInNavigationTransitionInfo());
+    //}
 
 }

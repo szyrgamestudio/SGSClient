@@ -1,17 +1,15 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using SGSClient.Models;
-using SGSClient.Core.Database;
-using System.Collections.ObjectModel;
-using System.Linq;
-using SGSClient.Controllers;
-using Windows.UI;
+﻿using System.Collections.ObjectModel;
 using System.Data;
-using System.Diagnostics.Metrics;
+using CommunityToolkit.Mvvm.ComponentModel;
+using SGSClient.Core.Authorization;
+using SGSClient.Core.Database;
+using SGSClient.Models;
 
 namespace SGSClient.ViewModels
 {
     public partial class GameBaseViewModel : ObservableRecipient
     {
+        private readonly IAppUser _appUser;
         private ObservableCollection<GameRating> _allRatings;
         private readonly DbContext _dbContext;
         private const int PageSize = 2;
@@ -45,7 +43,7 @@ namespace SGSClient.ViewModels
         [ObservableProperty]
         private int count5;
 
-        public GameBaseViewModel(DbContext dbContext)
+        public GameBaseViewModel(DbContext dbContext, IAppUser appUser)
         {
             ratingCount = 0;
             avgRating = "5.0";
@@ -60,10 +58,11 @@ namespace SGSClient.ViewModels
 
             Ratings = new ObservableCollection<GameRating>();
             CurrentPage = 0;
+            _appUser = appUser;
         }
         public async Task<bool> UserRatingP()
         {
-            var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.userRatingSQL, AppSession.CurrentUserSession.UserId);
+            var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.userRatingSQL, _appUser.UserId);
             if (dataSet.Tables[0].Rows.Count > 0)
                 return true;
             else
@@ -81,11 +80,11 @@ namespace SGSClient.ViewModels
                     _allRatings.Add(new GameRating
                     {
                         RatingId = row.Field<int>("Id"),
-                        UserId   = row.Field<int>("DeveloperId"),
-                        Author   = row.Field<string>("Name"),
-                        Rating   = row.Field<int>("Rating"),
-                        Title    =  row.Field<string>("Title"),
-                        Review   =  row.Field<string>("Review")
+                        UserId = row.Field<int>("DeveloperId"),
+                        Author = row.Field<string>("Name"),
+                        Rating = row.Field<int>("Rating"),
+                        Title = row.Field<string>("Title"),
+                        Review = row.Field<string>("Review")
                     });
                 }
             }
@@ -110,7 +109,7 @@ namespace SGSClient.ViewModels
         }
         public async Task<DataSet> ReturnUserRating(string gameIdentifier)
         {
-            var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.loadRatingSQL, gameIdentifier, AppSession.CurrentUserSession.UserId);
+            var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.loadRatingSQL, gameIdentifier, _appUser.UserId);
             return dataSet;
         }
 
@@ -119,7 +118,7 @@ namespace SGSClient.ViewModels
             if (gameRating.RatingId > 0)
                 UpdateRating(gameRating, gameIdentifier);
             else
-                await _dbContext.ExecuteQueryAsync(SqlQueries.insertRatingSQL, gameIdentifier, AppSession.CurrentUserSession.UserId, gameRating.Rating, gameRating.Title, gameRating.Review);
+                await _dbContext.ExecuteQueryAsync(SqlQueries.insertRatingSQL, gameIdentifier, _appUser.UserId, gameRating.Rating, gameRating.Title, gameRating.Review);
 
             await LoadGameRatingsStats(gameIdentifier);
             LoadPage(CurrentPage);

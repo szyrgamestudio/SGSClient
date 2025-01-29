@@ -1,12 +1,9 @@
-﻿using SGSClient.Contracts.Services;
+﻿using Microsoft.Extensions.Options;
+using SGSClient.Contracts.Services;
 using SGSClient.Core.Contracts.Services;
 using SGSClient.Core.Helpers;
 using SGSClient.Helpers;
 using SGSClient.Models;
-
-using Microsoft.Extensions.Options;
-
-using Windows.ApplicationModel;
 using Windows.Storage;
 
 namespace SGSClient.Services;

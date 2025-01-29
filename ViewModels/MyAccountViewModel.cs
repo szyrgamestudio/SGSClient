@@ -1,58 +1,49 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using System.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
-using SGSClient.Core.Database;
-using SGSClient.Helpers;
-using System.Data;
 using SGSClient.Contracts.Services;
-using Windows.UI;
-
+using SGSClient.Core.Authorization;
+using SGSClient.Core.Database;
 namespace SGSClient.ViewModels
 {
-    public partial class MyAccountViewModel : ObservableRecipient
+    public partial class MyAccountViewModel(INavigationService navigationService, DbContext dbContext, IAppUser appUser) : ObservableRecipient
     {
-        #region Properties
-        public string AvatarUrl
-        {
-            get => _avatarUrl;
-            set => SetProperty(ref _avatarUrl, value);
-        }
-        public string WelcomeText
-        {
-            get => _welcomeText;
-            set => SetProperty(ref _welcomeText, value);
-        }
-        private readonly DbContext _dbContext;
-        private readonly INavigationService _navigationService;
-        #endregion
-
-        #region Constructor
-        public MyAccountViewModel(INavigationService navigationService, DbContext dbContext)
-        {
-            _navigationService = navigationService;
-            _dbContext = dbContext;
-        }
-        #endregion
-
         #region Fields
         private string? _avatarUrl;
         private string? _welcomeText;
         #endregion
 
-        #region Methods
-        public async void LoadUserData(string userId)
+        #region Properties
+        public string? AvatarUrl
         {
-            string email;
-            string username;
+            get => _avatarUrl;
+            set => SetProperty(ref _avatarUrl, value);
+        }
+        public string? WelcomeText
+        {
+            get => _welcomeText;
+            set => SetProperty(ref _welcomeText, value);
+        }
+        private readonly DbContext _dbContext = dbContext;
+        private readonly INavigationService _navigationService = navigationService;
+        private readonly IAppUser _appUser = appUser;
 
-            var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.userDetailsSql, userId);
+        #endregion
+
+        #region Methods
+        public async void LoadUserData()
+        {
+            string? email;
+            string? username;
+
+            var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.userDetailsSql, _appUser.UserId);
             if (dataSet.Tables[0].Rows.Count == 0)
                 return;
 
             DataRow row = dataSet.Tables[0].Rows[0];
-            email = row["Email"].ToString();
-            username = row["Name"].ToString();
+            email = row["Email"] == DBNull.Value ? string.Empty : row["Email"].ToString();
+            username = row["Name"] == DBNull.Value ? string.Empty : row["Name"].ToString();
 
-            AvatarUrl = GravatarHelper.GetAvatarUrl(email);
+            AvatarUrl = _appUser.GetGravatar(email);
             WelcomeText = "Witaj, " + username + "!";
         }
         public void NavigateToUpload()

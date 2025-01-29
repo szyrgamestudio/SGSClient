@@ -1,16 +1,11 @@
-﻿using Azure.Core;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using Microsoft.Data.SqlClient;
-using SGSClient.Core.Database;
-using SGSClient.Core.Interface;
-using SGSClient.Services;
-using System.Data;
-using System.Net;
+﻿using System.Net;
 using System.Net.Mail;
 using System.Text;
 using System.Windows.Input;
-using Windows.UI;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using SGSClient.Core.Database;
+using SGSClient.Core.Interface;
 
 namespace SGSClient.ViewModels;
 

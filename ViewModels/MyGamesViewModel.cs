@@ -1,7 +1,8 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using SGSClient.Core.Database;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Data;
+using CommunityToolkit.Mvvm.ComponentModel;
+using SGSClient.Core.Authorization;
+using SGSClient.Core.Database;
 
 namespace SGSClient.ViewModels;
 
@@ -9,15 +10,18 @@ public partial class MyGamesViewModel : ObservableRecipient
 {
     private readonly DbContext _dbContext;
     private ObservableCollection<GamesViewModel> _gamesList;
+    private readonly IAppUser _appUser;
+
     public ObservableCollection<GamesViewModel> GamesList
     {
         get => _gamesList;
         private set => SetProperty(ref _gamesList, value);
     }
-    public MyGamesViewModel(DbContext dbContext)
+    public MyGamesViewModel(DbContext dbContext, IAppUser appUser)
     {
         _dbContext = dbContext;
         GamesList = new ObservableCollection<GamesViewModel>();
+        _appUser = appUser;
     }
 
     public async Task LoadMyGamesFromDatabaseAsync()
@@ -35,7 +39,7 @@ public partial class MyGamesViewModel : ObservableRecipient
     public async Task<List<GamesViewModel>> LoadMyGamesFromDBAsync()
     {
         List<GamesViewModel> gamesList = [];
-        var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.gamesUserInfo, AppSession.CurrentUserSession.UserId);
+        var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.gamesUserInfo, _appUser.UserId);
         if (dataSet.Tables[0].Rows.Count > 0)
         {
             foreach (DataRow row in dataSet.Tables[0].Rows)

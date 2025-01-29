@@ -1,11 +1,9 @@
-﻿using Microsoft.UI.Xaml;
+﻿using System.Collections.ObjectModel;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
-using SGSClient.Controllers;
-using SGSClient.Core.Database;
 using SGSClient.ViewModels;
-using System.Collections.ObjectModel;
 
 namespace SGSClient.Views
 {

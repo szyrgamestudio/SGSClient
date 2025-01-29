@@ -8,6 +8,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 
 using SGSClient.Contracts.Services;
+using SGSClient.Core.Authorization;
 using SGSClient.Helpers;
 
 using Windows.ApplicationModel;
@@ -17,6 +18,7 @@ namespace SGSClient.ViewModels;
 public partial class SettingsViewModel : ObservableRecipient, INotifyPropertyChanged
 {
     private readonly IThemeSelectorService _themeSelectorService;
+    private readonly IAppUser _appUser;
 
     [ObservableProperty]
     private ElementTheme _elementTheme;
@@ -29,7 +31,7 @@ public partial class SettingsViewModel : ObservableRecipient, INotifyPropertyCha
         get;
     }
 
-    public SettingsViewModel(IThemeSelectorService themeSelectorService)
+    public SettingsViewModel(IThemeSelectorService themeSelectorService, IAppUser appUser)
     {
         _themeSelectorService = themeSelectorService;
         _elementTheme = _themeSelectorService.Theme;
@@ -44,6 +46,7 @@ public partial class SettingsViewModel : ObservableRecipient, INotifyPropertyCha
                     await _themeSelectorService.SetThemeAsync(param);
                 }
             });
+        _appUser = appUser;
     }
 
     private static string GetVersionDescription()
@@ -62,5 +65,9 @@ public partial class SettingsViewModel : ObservableRecipient, INotifyPropertyCha
         }
 
         return $"{"AppDisplayName".GetLocalized()} - {version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
+    }
+    public void Logout()
+    {
+        _appUser.Logout();
     }
 }

@@ -17,7 +17,24 @@
             <!-- App settings Section -->
             <!--<TextBlock x:Uid="Settings_About" Style="{StaticResource BodyStrongTextBlockStyle}" />-->
             <StackPanel>
+                <TextBlock Text="Ustawienia konta" Margin="{StaticResource SettingsPageHeaderTextBox}" />
+            </StackPanel>
+            <labs:SettingsCard
+                Description="Ustaw podstawowe informację jak hasło, email."
+                Header="Twoje informacje"
+                IsClickEnabled="True">
+                <labs:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE779;" />
+                </labs:SettingsCard.HeaderIcon>
+            </labs:SettingsCard>
+            <StackPanel>
+                <TextBlock Text="Ustawienia aplikacji" Margin="{StaticResource SettingsPageHeaderTextBox}" />
+            </StackPanel>
+            <StackPanel>
                 <labs:SettingsExpander Description="Wybierz motyw aplikacji do wyświetlenia" Header="Wygląd aplikacji">
+                    <labs:SettingsExpander.HeaderIcon>
+                        <FontIcon Glyph="&#xE771;" />
+                    </labs:SettingsExpander.HeaderIcon>
                     <labs:SettingsExpander.Items>
                         <labs:SettingsCard
                             HorizontalContentAlignment="Left"

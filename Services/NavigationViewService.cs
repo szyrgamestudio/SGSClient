@@ -1,10 +1,8 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-
+using Microsoft.UI.Xaml.Controls;
 using SGSClient.Contracts.Services;
 using SGSClient.Helpers;
 using SGSClient.ViewModels;
-
-using Microsoft.UI.Xaml.Controls;
 
 namespace SGSClient.Services;
 

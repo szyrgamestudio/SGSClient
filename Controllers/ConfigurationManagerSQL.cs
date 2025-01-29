@@ -1,17 +1,20 @@
-﻿using SGSClient.Models;
-using SGSClient.ViewModels;
+﻿using System.Data;
+using SGSClient.Core.Authorization;
 using SGSClient.Core.Database;
-using System.Data;
+using SGSClient.Models;
+using SGSClient.ViewModels;
 
 namespace SGSClient.Controllers
 {
     public class ConfigurationManagerSQL
     {
         private readonly DbContext _dbContext;
+        private readonly IAppUser _appUser;
 
         public ConfigurationManagerSQL(DbContext dbContext)
         {
             _dbContext = dbContext;
+            //_appUser = appUser;
         }
         #region Game info
         public async Task<List<GamesViewModel>> LoadGamesFromDatabaseAsync(bool bypassDraftP)
@@ -81,7 +84,7 @@ namespace SGSClient.Controllers
         public async Task<List<GamesViewModel>> LoadMyGamesFromDatabaseAsync()
         {
             List<GamesViewModel> gamesList = [];
-            var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.gamesUserInfo, AppSession.CurrentUserSession.UserId);
+            var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.gamesUserInfo, _appUser.UserId);
             if (dataSet.Tables[0].Rows.Count > 0)
             {
                 foreach (DataRow row in dataSet.Tables[0].Rows)
@@ -147,11 +150,11 @@ namespace SGSClient.Controllers
                     gameRatings.Add(new GameRating
                     {
                         RatingId = row.Field<int>("Id"),
-                        UserId   = row.Field<int>("DeveloperId"),
-                        Author   = row.Field<string>("Name"),
-                        Rating   = row.Field<int>("Rating"),
-                        Title    =  row.Field<string>("Title"),
-                        Review   =  row.Field<string>("Review")
+                        UserId = row.Field<int>("DeveloperId"),
+                        Author = row.Field<string>("Name"),
+                        Rating = row.Field<int>("Rating"),
+                        Title = row.Field<string>("Title"),
+                        Review = row.Field<string>("Review")
                     });
                 }
 
@@ -163,7 +166,7 @@ namespace SGSClient.Controllers
 
         public async Task AddRatingToDB(string gameIdentifier, GameRating gameRating)
         {
-            await _dbContext.ExecuteQueryAsync(SqlQueries.insertRatingSQL, AppSession.CurrentUserSession.UserId, gameRating.Review, gameIdentifier);
+            await _dbContext.ExecuteQueryAsync(SqlQueries.insertRatingSQL, _appUser.UserId, gameRating.Review, gameIdentifier);
         }
         public async Task UpdateRatingInDB(GameRating gameRating)
         {

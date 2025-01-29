@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using SGSClient.Core.Database;
 using SGSClient.Core.Interface;
-using SGSClient.Services;
 
 namespace SGSClient.ViewModels;
 

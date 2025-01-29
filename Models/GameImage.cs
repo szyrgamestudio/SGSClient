@@ -1,9 +1,5 @@
-﻿using Microsoft.UI.Xaml.Media.Imaging;
-using System;
-using System.ComponentModel;
-using System.IO;
-using System.Security.Policy;
-using Windows.Storage.Streams;
+﻿using System.ComponentModel;
+using Microsoft.UI.Xaml.Media.Imaging;
 
 public class GameImage : INotifyPropertyChanged
 {

@@ -1,9 +1,8 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Collections.ObjectModel;
+using System.Data;
+using CommunityToolkit.Mvvm.ComponentModel;
 using SGSClient.Controllers;
 using SGSClient.Core.Database;
-using System;
-using System.Collections.ObjectModel;
-using System.Data;
 
 namespace SGSClient.ViewModels
 {

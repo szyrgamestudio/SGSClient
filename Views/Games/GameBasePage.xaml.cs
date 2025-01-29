@@ -1,21 +1,19 @@
-﻿using SGSClient.Controllers;
-using SGSClient.Helpers;
-using SGSClient.ViewModels;
-using Microsoft.UI.Xaml.Controls;
+﻿using System.Data;
 using System.Diagnostics;
 using System.Windows;
+using System.Xml.Linq;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Imaging;
+using Microsoft.UI.Xaml.Navigation;
+using SevenZipExtractor;
+using SGSClient.Controllers;
+using SGSClient.Core.Database;
+using SGSClient.Helpers;
+using SGSClient.Models;
+using SGSClient.ViewModels;
 using Windows.ApplicationModel.Core;
 using Windows.Storage;
 using File = System.IO.File;
-using Microsoft.UI.Xaml.Navigation;
-using System.Xml.Linq;
-using Microsoft.UI.Xaml.Media.Imaging;
-using SGSClient.Core.Database;
-using SevenZipExtractor;
-using SGSClient.Models;
-using Windows.System;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using System.Data;
 
 namespace SGSClient.Views;
 
@@ -39,6 +37,7 @@ public sealed partial class GameBasePage : Page
     private GameRating? _gameRating;
     private readonly ConfigurationManagerSQL configManagerSQL;
     private readonly HttpClient httpClient = new();
+    public GameBaseViewModel ViewModel { get; }
 
     internal LauncherStatus Status
     {
@@ -49,12 +48,9 @@ public sealed partial class GameBasePage : Page
             LauncherStatusHelper.UpdateStatus(PlayButton, CheckUpdateButton, UninstallButton, DownloadProgressBorder, _status, gameZip ?? "");
         }
     }
-    public GameBaseViewModel ViewModel
-    {
-        get;
-    }
     protected override async void OnNavigatedTo(NavigationEventArgs e)
     {
+        DataContext = ViewModel;
         if (e.Parameter is string parameterString && !string.IsNullOrWhiteSpace(parameterString))
         {
             gameIdentifier = parameterString;
@@ -187,11 +183,6 @@ public sealed partial class GameBasePage : Page
         {
             reqStackPanel.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
         }
-
-        if (AppSession.CurrentUserSession.UserId == null)
-        {
-            //AddCommentButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-        }
     }
     #endregion
 
@@ -261,11 +252,11 @@ public sealed partial class GameBasePage : Page
     public GameBasePage()
     {
         configManagerSQL = new ConfigurationManagerSQL(new DbContext());
-        ViewModel = new GameBaseViewModel(new DbContext());
+        ViewModel = App.GetService<GameBaseViewModel>();
         InitializeComponent();
-        DataContext = ViewModel;
         Status = LauncherStatus.pageLauched;
     }
+
 
     private void IsUpdated()
     {

@@ -1,13 +1,10 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.Data.SqlClient;
+﻿using System.Data;
+using System.Net.Mail;
+using CommunityToolkit.Mvvm.ComponentModel;
 using SGSClient.Contracts.Services;
 using SGSClient.Core.Authorization;
 using SGSClient.Core.Database;
 using SGSClient.Services;
-using System.Data;
-using System.Net.Mail;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace SGSClient.ViewModels
 {
@@ -20,15 +17,19 @@ namespace SGSClient.ViewModels
         private readonly INavigationService _navigationService;
         private readonly DbContext _dbContext;
         private readonly PasswordHasher _passwdHasher;
+        private readonly IAppUser _appUser;
+
         #endregion
 
         #region Constructor
-        public LoginViewModel(INavigationService navigationService, DbContext dbContext, PasswordHasher passwordHasher)
+        public LoginViewModel(INavigationService navigationService, DbContext dbContext, PasswordHasher passwordHasher, IAppUser appUser)
         {
             _navigationService = navigationService;
             _dbContext = dbContext;
             _passwdHasher = passwordHasher;
+            _appUser = appUser;
         }
+
         #endregion
 
         #region Public Methods
@@ -36,7 +37,7 @@ namespace SGSClient.ViewModels
         {
             await Task.Delay(100);
 
-            if (AppSession.CurrentUserSession.IsLoggedIn)
+            if (_appUser.IsLoggedIn)
             {
                 _navigationService.NavigateTo(typeof(MyAccountViewModel).FullName!);
             }
@@ -99,9 +100,9 @@ namespace SGSClient.ViewModels
 
             if (VerifyPassword(Password, storedPasswordHash.Substring(0, 64), storedSalt))
             {
-                AppSession.CurrentUserSession.IsLoggedIn = true;
-                AppSession.CurrentUserSession.UserId = userId;
-                SessionManager.SaveSession(AppSession.CurrentUserSession);
+                _appUser.IsLoggedIn = true;
+                _appUser.UserId = userId;
+                _appUser.SaveSession();
                 _navigationService.NavigateTo(typeof(MyAccountViewModel).FullName!);
             }
             else

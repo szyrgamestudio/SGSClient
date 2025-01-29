@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SGSClient.Controllers;
+﻿namespace SGSClient.Controllers;
 
 public class SGSVersion
 {
@@ -39,7 +33,7 @@ public class SGSVersion
 
         public Version(Task<string> onlineVersionString) : this()
         {
-            this.onlineVersionString=onlineVersionString;
+            this.onlineVersionString = onlineVersionString;
         }
 
         internal bool IsDifferentThan(Version _otherVersion)

@@ -1,15 +1,14 @@
 using System.Numerics;
+using CommunityToolkit.WinUI.Animations;
+using CommunityToolkit.WinUI.UI;
 using Microsoft.Graphics.Canvas.Effects;
+using Microsoft.UI;
+using Microsoft.UI.Composition;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Media.Animation;
-using Microsoft.UI.Composition;
-using Microsoft.UI;
-using CommunityToolkit.WinUI.Animations;
 using Windows.UI;
-using System;
-using CommunityToolkit.WinUI.UI;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.

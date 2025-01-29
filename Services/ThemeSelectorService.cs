@@ -1,7 +1,6 @@
-﻿using SGSClient.Contracts.Services;
+﻿using Microsoft.UI.Xaml;
+using SGSClient.Contracts.Services;
 using SGSClient.Helpers;
-
-using Microsoft.UI.Xaml;
 
 namespace SGSClient.Services;
 

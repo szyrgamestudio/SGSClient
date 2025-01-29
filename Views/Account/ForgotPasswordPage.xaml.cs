@@ -1,13 +1,10 @@
-﻿using Microsoft.UI.Xaml;
+﻿using System.Net.Mail;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using System.Net.Mail;
-using Microsoft.Data.SqlClient;
-using SGSClient.Core.Database;
-using SGSClient.ViewModels;
-using SGSClient.Services;
-using System.Data;
 using Microsoft.UI.Xaml.Media.Animation;
 using SGSClient.Core.Interface;
+using SGSClient.Services;
+using SGSClient.ViewModels;
 
 namespace SGSClient.Views;
 public sealed partial class ForgotPasswordPage : Page

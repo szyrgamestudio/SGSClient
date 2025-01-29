@@ -1,14 +1,14 @@
-﻿using Microsoft.UI.Xaml;
+﻿using System.Net.Http.Headers;
+using System.Text;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using SGSClient.ViewModels;
+using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
-using Windows.Storage;
-using System.Net.Http.Headers;
-using System.Text;
 
 namespace SGSClient.Views
 {

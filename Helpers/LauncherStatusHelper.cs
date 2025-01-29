@@ -18,45 +18,45 @@ namespace SGSClient.Helpers
         {
             switch (status)
             {
-                    case LauncherStatus.pageLauched:
-                        PlayButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                        CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                        UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                        DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-                        break;
-                    case LauncherStatus.readyNoGame:
-                        PlayButton.Content = "Zainstaluj";
-                        PlayButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-                        DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                        UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                        CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                        break;
-                    case LauncherStatus.ready:
-                        PlayButton.Content = "Graj";
-                        PlayButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-                        CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                        DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                        UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-                        File.Delete(gameZip); //delete file zip (free memory is important)
-                        break;
-                    case LauncherStatus.failed:
-                        UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-                        DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                        break;
-                    case LauncherStatus.downloadingGame:
-                        PlayButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                        CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                        UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                        DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-                        break;
-                    case LauncherStatus.downloadingUpdate:
-                        PlayButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                        CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                        UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-                        DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-                        break;
-                    default:
-                        break;
+                case LauncherStatus.pageLauched:
+                    PlayButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                    CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                    UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                    DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+                    break;
+                case LauncherStatus.readyNoGame:
+                    PlayButton.Content = "Zainstaluj";
+                    PlayButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+                    DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                    UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                    CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                    break;
+                case LauncherStatus.ready:
+                    PlayButton.Content = "Graj";
+                    PlayButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+                    CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                    DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                    UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+                    File.Delete(gameZip); //delete file zip (free memory is important)
+                    break;
+                case LauncherStatus.failed:
+                    UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+                    DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                    break;
+                case LauncherStatus.downloadingGame:
+                    PlayButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                    CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                    UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                    DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+                    break;
+                case LauncherStatus.downloadingUpdate:
+                    PlayButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                    CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                    UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+                    DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+                    break;
+                default:
+                    break;
             }
         }
     }

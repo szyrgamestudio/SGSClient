@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.UI.Xaml;
-
 using SGSClient.Activation;
 using SGSClient.Contracts.Services;
 using SGSClient.Core.Authorization;
@@ -9,13 +9,11 @@ using SGSClient.Core.Contracts.Services;
 using SGSClient.Core.Database;
 using SGSClient.Core.Interface;
 using SGSClient.Core.Services;
-using SGSClient.Helpers;
 using SGSClient.Models;
 using SGSClient.Notifications;
 using SGSClient.Services;
 using SGSClient.ViewModels;
 using SGSClient.Views;
-using System.Diagnostics;
 
 namespace SGSClient;
 
@@ -45,9 +43,10 @@ public partial class App : Application
 
     public static WindowEx MainWindow { get; } = new MainWindow();
     public static UIElement? AppTitlebar { get; set; }
-
+    private SimpleSplashScreen fss { get; set; } //https://github.com/dotMorten/WinUIEx/blob/main/docs/concepts/Splashscreen.md/
     public App()
     {
+        fss = SimpleSplashScreen.ShowDefaultSplashScreen();
         InitializeComponent();
         //MainWindow.CenterOnScreen();
         Environment.SetEnvironmentVariable("WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS", "--lang=pl-PL");
@@ -57,6 +56,8 @@ public partial class App : Application
         UseContentRoot(AppContext.BaseDirectory).
         ConfigureServices((context, services) =>
         {
+            services.AddSingleton<IAppUser, AppUser>();
+
             // Default Activation Handler
             services.AddTransient<ActivationHandler<LaunchActivatedEventArgs>, DefaultActivationHandler>();
 
@@ -117,23 +118,43 @@ public partial class App : Application
 
     private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
     {
-        // TODO: Log and handle exceptions as appropriate.
-        // https://docs.microsoft.com/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.application.unhandledexception.
+        // Log the exception details (message, stack trace, etc.)
+        LogException(e.Exception);
+
+        // Mark the exception as handled to prevent the application from crashing
+        e.Handled = true;
     }
 
+    private void LogException(Exception ex)
+    {
+        // Simple logging: Log exception details to a file (or use a logging library)
+        string logFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "error_log.txt");
+
+        try
+        {
+            using (StreamWriter writer = new StreamWriter(logFilePath, append: true))
+            {
+                writer.WriteLine("====================================");
+                writer.WriteLine($"Date: {DateTime.Now}");
+                writer.WriteLine($"Message: {ex.Message}");
+                writer.WriteLine($"StackTrace: {ex.StackTrace}");
+                writer.WriteLine("====================================");
+            }
+        }
+        catch (Exception loggingEx)
+        {
+            // If logging fails, we can ignore it for now
+            Debug.WriteLine($"Failed to log exception: {loggingEx.Message}");
+        }
+    }
     protected async override void OnLaunched(LaunchActivatedEventArgs args)
     {
         base.OnLaunched(args);
-
-        //App.GetService<IAppNotificationService>().Show(string.Format("SGSClientWelcomeNotificationPayload".GetLocalized(), AppContext.BaseDirectory));
-
+        var appUser = App.GetService<IAppUser>();
+        appUser.LoadSession();
+        //((Window)sender).Activated -= Window_Activated;
+        fss?.Hide();
+        fss = null;
         await App.GetService<IActivationService>().ActivateAsync(args);
-
-        // Ładowanie sesji
-        var session = SessionManager.LoadSession();
-        if (session != null && session.IsLoggedIn)
-        {
-            AppSession.CurrentUserSession = session;
-        }
     }
 }
