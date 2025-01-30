@@ -3,6 +3,7 @@ using System.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
 using SGSClient.Core.Authorization;
 using SGSClient.Core.Database;
+using SGSClient.Core.Extensions;
 
 namespace SGSClient.ViewModels;
 

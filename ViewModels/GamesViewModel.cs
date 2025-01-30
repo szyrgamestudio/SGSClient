@@ -1,16 +1,14 @@
 ﻿using System.Collections.ObjectModel;
 using System.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
-using SGSClient.Controllers;
 using SGSClient.Core.Database;
+using SGSClient.Core.Extensions;
 
 namespace SGSClient.ViewModels
 {
     public class GamesViewModel : ObservableRecipient
     {
-
-        private readonly ConfigurationManagerSQL _configManagerSQL;
-        public string _gameId;
+        public  string _gameId;
         private string _gameSymbol;
         private string _gameName;
         private string _gameDeveloper;
@@ -27,7 +25,6 @@ namespace SGSClient.ViewModels
         private string _logoPath;
         private string _gameType;
         private string _draftP;
-        private ConfigurationManagerSQL configManagerSQL;
 
         public string GameId
         {
@@ -44,79 +41,66 @@ namespace SGSClient.ViewModels
             get => _gameName;
             set => SetProperty(ref _gameName, value);
         }
-
         public string GameDeveloper
         {
             get => _gameDeveloper;
             set => SetProperty(ref _gameDeveloper, value);
         }
-
         public string GameTitle
         {
             get => _gameTitle;
             set => SetProperty(ref _gameTitle, value);
         }
-
         public Uri ImageSource
         {
             get => _imageSource;
             set => SetProperty(ref _imageSource, value);
         }
-
         public string GameVersion
         {
             get => _gameVersion;
             set => SetProperty(ref _gameVersion, value);
         }
-
         public string GamePayloadName
         {
             get => _gamePayloadName;
             set => SetProperty(ref _gamePayloadName, value);
         }
-
         public string GameExeName
         {
             get => _gameExeName;
             set => SetProperty(ref _gameExeName, value);
         }
-
         public string GameZipLink
         {
             get => _gameZipLink;
             set => SetProperty(ref _gameZipLink, value);
         }
-
         public string GameVersionLink
         {
             get => _gameVersionLink;
             set => SetProperty(ref _gameVersionLink, value);
         }
-
         public string GameDescription
         {
             get => _gameDescription;
             set => SetProperty(ref _gameDescription, value);
         }
-
         public string HardwareRequirements
         {
             get => _hardwareRequirements;
             set => SetProperty(ref _hardwareRequirements, value);
         }
-
         public string OtherInformations
         {
             get => _otherInformations;
             set => SetProperty(ref _otherInformations, value);
         }
-
         public string LogoPath
         {
             get => _logoPath;
             set => SetProperty(ref _logoPath, value);
         }
-
         public string GameType
         {
             get => _gameType;
@@ -146,8 +130,6 @@ namespace SGSClient.ViewModels
             DraftP = draftP;
         }
 
-        private readonly DbContext _dbContext;
-
         private ObservableCollection<GamesViewModel> _gamesList;
         private ObservableCollection<GamesViewModel> _gamesFeaturedList;
 
@@ -156,97 +138,132 @@ namespace SGSClient.ViewModels
             get => _gamesList;
             private set => SetProperty(ref _gamesList, value);
         }
-
         public ObservableCollection<GamesViewModel> GamesFeaturedList
         {
             get => _gamesFeaturedList;
             private set => SetProperty(ref _gamesFeaturedList, value);
         }
 
-        public GamesViewModel(DbContext dbContext)
+        public GamesViewModel()
         {
-            _dbContext = dbContext;
-            GamesList = new ObservableCollection<GamesViewModel>();
-            GamesFeaturedList = new ObservableCollection<GamesViewModel>();
+            GamesList = [];
+            GamesFeaturedList = [];
         }
 
-        public async Task LoadGamesFromDatabaseAsync()
+        public void LoadGamesFromDatabase()
         {
             try
             {
-                GamesList = new ObservableCollection<GamesViewModel>(await LoadGamesFromDatabaseAsync(false));
-                GamesFeaturedList = new ObservableCollection<GamesViewModel>(await LoadFeaturedGamesFromDatabaseAsync(false));
+                GamesList = new ObservableCollection<GamesViewModel>(LoadGamesFromDatabase(false));
+                GamesFeaturedList = new ObservableCollection<GamesViewModel>(LoadFeaturedGamesFromDatabase(false));
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"An error occurred while loading games: {ex.Message}");
             }
         }
-
-        public async Task<List<GamesViewModel>> LoadGamesFromDatabaseAsync(bool bypassDraftP)
+        public static List<GamesViewModel> LoadGamesFromDatabase(bool bypassDraftP)
         {
             List<GamesViewModel> gamesList = [];
-            var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.gamesInfo, bypassDraftP);
-            if (dataSet.Tables[0].Rows.Count > 0)
-            {
-                foreach (DataRow row in dataSet.Tables[0].Rows)
-                {
-                    GamesViewModel game = new GamesViewModel(
-                        gameId: row["GameId"].ToString(),
-                        gameSymbol: row["GameSymbol"].ToString(),
-                        gameTitle: row["Title"].ToString(),
-                        gamePayloadName: row["PayloadName"].ToString(),
-                        gameExeName: row["ExeName"].ToString(),
-                        gameZipLink: row["ZipLink"].ToString(),
-                        gameVersionLink: row["VersionLink"].ToString(),
-                        gameDescription: row["Description"].ToString(),
-                        hardwareRequirements: row["HardwareRequirements"].ToString(),
-                        otherInformations: row["OtherInformation"].ToString(),
-                        gameDeveloper: row["GameDeveloper"].ToString(),
-                        logoPath: row["LogoPath"].ToString(),
-                        gameType: row["GameType"].ToString(),
-                        draftP: row["DraftP"].ToString()
-                    );
 
-                    gamesList.Add(game);
-                }
-                return gamesList;
+            DataSet ds = db.con.select(@"
+select
+  CAST(g.Id as nvarchar(max))       [GameId]
+, g.Title
+, g.Symbol   [GameSymbol]
+, d.Name     [GameDeveloper]
+, l.LogoPath [LogoPath]
+, t.Name	 [GameType]
+, g.PayloadName
+, g.ExeName
+, g.ZipLink
+, g.VersionLink
+, g.Description
+, g.HardwareRequirements
+, g.OtherInformation
+, CAST(g.DraftP as nvarchar(max)) [DraftP]
+from sgsGames g
+inner join sgsDevelopers d on d.Id = g.DeveloperId
+left join sgsGameLogo l on l.GameId = g.Id
+left join sgsGameTypes t on t.Id = g.TypeId
+where g.DraftP = 0 and @p0 = 0 or @p0 = 1
+order by g.Title
+", bypassDraftP);
+
+            foreach (DataRow dr in ds.Tables[0].Rows)
+            {
+                GamesViewModel game = new GamesViewModel
+                {
+                    _gameId = dr.TryGetValue("GameId"),
+                    _gameSymbol = dr.TryGetValue("GameSymbol"),
+                    _gameTitle = dr.TryGetValue("Title"),
+                    _gamePayloadName = dr.TryGetValue("PayloadName"),
+                    _gameExeName = dr.TryGetValue("ExeName"),
+                    _gameZipLink = dr.TryGetValue("ZipLink"),
+                    _gameVersionLink = dr.TryGetValue("VersionLink"),
+                    _gameDescription = dr.TryGetValue("Description"),
+                    _hardwareRequirements = dr.TryGetValue("HardwareRequirements"),
+                    _otherInformations = dr.TryGetValue("OtherInformation"),
+                    _gameDeveloper = dr.TryGetValue("GameDeveloper"),
+                    _logoPath = dr.TryGetValue("LogoPath"),
+                    _gameType = dr.TryGetValue("GameType"),
+                    _draftP = dr.TryGetValue("DraftP"),
+                };
+                gamesList.Add(game);
             }
-            else
-                return gamesList;
+            return gamesList;
+
         }
-        public async Task<List<GamesViewModel>> LoadFeaturedGamesFromDatabaseAsync(bool bypassDraftP)
+        public static List<GamesViewModel> LoadFeaturedGamesFromDatabase(bool bypassDraftP)
         {
             List<GamesViewModel> gamesList = [];
-            var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.gamesFeaturedInfo, bypassDraftP);
-            if (dataSet.Tables[0].Rows.Count > 0)
+
+            DataSet ds = db.con.select(@"
+select
+  CAST(g.Id as nvarchar(max))       [GameId]
+, g.Title
+, g.Symbol   [GameSymbol]
+, d.Name     [GameDeveloper]
+, l.LogoPath [LogoPath]
+, t.Name	 [GameType]
+, g.PayloadName
+, g.ExeName
+, g.ZipLink
+, g.VersionLink
+, g.Description
+, g.HardwareRequirements
+, g.OtherInformation
+, CAST(g.DraftP as nvarchar(max)) [DraftP]
+from sgsGames g
+inner join sgsDevelopers d on d.Id = g.DeveloperId
+left join sgsGameLogo l on l.GameId = g.Id
+left join sgsGameTypes t on t.Id = g.TypeId
+where (g.DraftP = 0 and @p0 = 0 or @p0 = 1) and g.FeaturedP = 1
+order by g.Title
+", bypassDraftP);
+
+            foreach (DataRow dr in ds.Tables[0].Rows)
             {
-                foreach (DataRow row in dataSet.Tables[0].Rows)
+                GamesViewModel game = new GamesViewModel
                 {
-                    GamesViewModel game = new GamesViewModel(
-                        gameId: row["GameId"].ToString(),
-                        gameSymbol: row["GameSymbol"].ToString(),
-                        gameTitle: row["Title"].ToString(),
-                        gamePayloadName: row["PayloadName"].ToString(),
-                        gameExeName: row["ExeName"].ToString(),
-                        gameZipLink: row["ZipLink"].ToString(),
-                        gameVersionLink: row["VersionLink"].ToString(),
-                        gameDescription: row["Description"].ToString(),
-                        hardwareRequirements: row["HardwareRequirements"].ToString(),
-                        otherInformations: row["OtherInformation"].ToString(),
-                        gameDeveloper: row["GameDeveloper"].ToString(),
-                        logoPath: row["LogoPath"].ToString(),
-                        gameType: row["GameType"].ToString(),
-                        draftP: row["DraftP"].ToString()
-                    );
-
-                    gamesList.Add(game);
-                }
-                return gamesList;
+                    _gameId = dr.TryGetValue("GameId"),
+                    _gameSymbol = dr.TryGetValue("GameSymbol"),
+                    _gameTitle = dr.TryGetValue("Title"),
+                    _gamePayloadName = dr.TryGetValue("PayloadName"),
+                    _gameExeName = dr.TryGetValue("ExeName"),
+                    _gameZipLink = dr.TryGetValue("ZipLink"),
+                    _gameVersionLink = dr.TryGetValue("VersionLink"),
+                    _gameDescription = dr.TryGetValue("Description"),
+                    _hardwareRequirements = dr.TryGetValue("HardwareRequirements"),
+                    _otherInformations = dr.TryGetValue("OtherInformation"),
+                    _gameDeveloper = dr.TryGetValue("GameDeveloper"),
+                    _logoPath = dr.TryGetValue("LogoPath"),
+                    _gameType = dr.TryGetValue("GameType"),
+                    _draftP = dr.TryGetValue("DraftP"),
+                };
+                gamesList.Add(game);
             }
-            else
-                return gamesList;
+            return gamesList;
         }
-
     }
 }

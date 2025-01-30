@@ -19,6 +19,7 @@ public partial class SettingsViewModel : ObservableRecipient, INotifyPropertyCha
 {
     private readonly IThemeSelectorService _themeSelectorService;
     private readonly IAppUser _appUser;
+    public bool IsLoggedIn => _appUser.IsLoggedIn;
 
     [ObservableProperty]
     private ElementTheme _elementTheme;
@@ -69,5 +70,11 @@ public partial class SettingsViewModel : ObservableRecipient, INotifyPropertyCha
     public void Logout()
     {
         _appUser.Logout();
+        OnPropertyChanged(nameof(IsLoggedIn));
+    }
+    public void LoadSession()
+    {
+        _appUser.LoadSession();
+        OnPropertyChanged(nameof(IsLoggedIn));
     }
 }

@@ -7,7 +7,7 @@ namespace SGSClient.Views;
 
 public sealed partial class SettingsPage : Page
 {
-    // Property to display the version
+    #region Properties
     public string Version
     {
         get
@@ -16,35 +16,29 @@ public sealed partial class SettingsPage : Page
             return string.Format("{0}.{1}.{2}.{3}", version?.Major, version?.Minor, version?.Build, version?.Revision);
         }
     }
-
-    // ViewModel for SettingsPage
     public SettingsViewModel ViewModel { get; }
+    #endregion
 
-    // Constructor to inject dependencies
+    #region Constructor
     public SettingsPage()
     {
-        // Set the injected IAppUser instance
         ViewModel = App.GetService<SettingsViewModel>();
         InitializeComponent();
 
-        // Load the session
-        //var session = _appUser.LoadSession();
-        //if (session != null && session.IsLoggedIn)
-        //    accountSettings.Visibility = Visibility.Visible;
-        //else
-        //    accountSettings.Visibility = Visibility.Collapsed;
+        ViewModel.LoadSession();
+        accountSettings.Visibility = ViewModel.IsLoggedIn ? Visibility.Visible : Visibility.Collapsed;
     }
+    #endregion
 
-    // Button click event for bug request
+    #region Event Handlers
     private async void bugRequestCard_Click(object sender, RoutedEventArgs e)
     {
         await Launcher.LaunchUriAsync(new Uri("https://github.com/szyrgamestudio/SGSClient/issues/new/choose"));
     }
-
-    // Logout button click event
     private void LogoutButton_Click(object sender, RoutedEventArgs e)
     {
         ViewModel.Logout();
         Frame.Navigate(typeof(LoginPage));
     }
+    #endregion
 }

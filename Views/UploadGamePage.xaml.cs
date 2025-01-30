@@ -7,6 +7,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using SGSClient.Core.Authorization;
 using SGSClient.Core.Database;
+using SGSClient.Core.Extensions;
 using SGSClient.ViewModels;
 
 namespace SGSClient.Views;
@@ -66,34 +67,28 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
     /// </summary>
     private void LoadGameTypes()
     {
-        string query = "SELECT sgsgt.Id, sgsgt.Name FROM sgsGameTypes sgsgt";
-
         try
         {
-            // Użyj metody Connect z klasy db
-            using (SqlConnection connection = db.Connect())
+            DataSet ds = db.con.select("select sgsgt.Id, sgsgt.Name from sgsGameTypes sgsgt");
+
+            List<GameTypeItem> gameTypeList = new List<GameTypeItem>();
+
+            // Sprawdź, czy są jakiekolwiek tabele w DataSet
+            if (ds.Tables.Count > 0)
             {
-                // Użyj metody SelectSQL z klasy db
-                DataSet dataSet = db.SelectSQL(connection, query);
-                List<GameTypeItem> gameTypeList = new List<GameTypeItem>();
-
-                // Sprawdź, czy są jakiekolwiek tabele w DataSet
-                if (dataSet.Tables.Count > 0)
+                foreach (DataRow row in ds.Tables[0].Rows)
                 {
-                    foreach (DataRow row in dataSet.Tables[0].Rows)
-                    {
-                        int typeId = Convert.ToInt32(row["Id"]);
-                        string typeName = row["Name"].ToString();
-                        var pair = new KeyValuePair<int, string>(typeId, typeName);
-                        gameTypeList.Add(new GameTypeItem(typeId, pair));
-                    }
+                    int typeId = Convert.ToInt32(row["Id"]);
+                    string typeName = row["Name"].ToString();
+                    var pair = new KeyValuePair<int, string>(typeId, typeName);
+                    gameTypeList.Add(new GameTypeItem(typeId, pair));
+                }
 
-                    // Wyczyść istniejące elementy ComboBox przed dodaniem nowych
-                    comboBoxGameType.Items.Clear();
-                    foreach (var item in gameTypeList)
-                    {
-                        comboBoxGameType.Items.Add(item);
-                    }
+                // Wyczyść istniejące elementy ComboBox przed dodaniem nowych
+                comboBoxGameType.Items.Clear();
+                foreach (var item in gameTypeList)
+                {
+                    comboBoxGameType.Items.Add(item);
                 }
             }
         }
@@ -112,30 +107,25 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
 
         try
         {
-            // Otwórz połączenie przy użyciu metody z klasy db
-            using (SqlConnection connection = db.Connect())
+            DataSet ds = db.con.select("SELECT sgseg.Id, sgseg.Name FROM sgsGameEngines sgseg");
+            List<GameEngineItem> enginesList = new List<GameEngineItem>();
+
+            // Sprawdź, czy są jakiekolwiek tabele w DataSet
+            if (ds.Tables.Count > 0)
             {
-                // Użyj metody SelectSQL z klasy db
-                DataSet dataSet = db.SelectSQL(connection, query);
-                List<GameEngineItem> enginesList = new List<GameEngineItem>();
-
-                // Sprawdź, czy są jakiekolwiek tabele w DataSet
-                if (dataSet.Tables.Count > 0)
+                foreach (DataRow row in ds.Tables[0].Rows)
                 {
-                    foreach (DataRow row in dataSet.Tables[0].Rows)
-                    {
-                        int engineId = Convert.ToInt32(row["Id"]);
-                        string engineName = row["Name"].ToString();
-                        var pair = new KeyValuePair<int, string>(engineId, engineName);
-                        enginesList.Add(new GameEngineItem(engineId, pair));
-                    }
+                    int engineId = Convert.ToInt32(row["Id"]);
+                    string engineName = row["Name"].ToString();
+                    var pair = new KeyValuePair<int, string>(engineId, engineName);
+                    enginesList.Add(new GameEngineItem(engineId, pair));
+                }
 
-                    // Wyczyść istniejące elementy ComboBox przed dodaniem nowych
-                    comboBoxGameEngine.Items.Clear();
-                    foreach (var item in enginesList)
-                    {
-                        comboBoxGameEngine.Items.Add(item);
-                    }
+                // Wyczyść istniejące elementy ComboBox przed dodaniem nowych
+                comboBoxGameEngine.Items.Clear();
+                foreach (var item in enginesList)
+                {
+                    comboBoxGameEngine.Items.Add(item);
                 }
             }
         }
@@ -264,64 +254,85 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
         var gameEngine = selectedGameEngineId == 0 ? (int?)null : selectedGameEngineId;
         var gameType = selectedGameTypeId == 0 ? (int?)null : selectedGameTypeId;
 
-        string addGameQuery = @"
-    declare @developerId int = (select r.DeveloperId from Registration r where r.Id = @userId)
-    INSERT INTO sgsGames (Title, DeveloperId, PayloadName, ExeName, ZipLink, VersionLink, CurrentVersion, Description, HardwareRequirements, OtherInformation, Symbol, EngineId, TypeId, DraftP)
-    VALUES (@Name, @developerId, NULL, @ExeName, @ZipLink, @currentVersion, @currentVersion, @gameDescriptionParam, @hardwareRequirementsParam, @otherInformationsParam, @Symbol, @GameEngine, @GameType, 1);
-    SELECT SCOPE_IDENTITY();";
-
-        string addImageQuery = "INSERT INTO sgsGameImages (GameId, ImagePath) VALUES (@GameId, @ImageUrl)";
-        string addLogoQuery = "INSERT INTO sgsGameLogo (GameId, LogoPath) VALUES (@GameId, @ImageUrl)";
-
-        using (SqlConnection connection = db.Connect())
+        try
         {
-            try
+            SqlCommand cmd = new SqlCommand(@"
+declare @developerId int = (select r.DeveloperId from Registration r where r.Id = @userId)
+
+insert sgsGames (Title, DeveloperId, PayloadName, ExeName, ZipLink, VersionLink, CurrentVersion, Description, HardwareRequirements, OtherInformation, Symbol, EngineId, TypeId, DraftP)
+select 
+  @Name
+, @developerId
+, null
+, @ExeName
+, @ZipLink
+, @currentVersion
+, @currentVersion
+, @gameDescriptionParam
+, @hardwareRequirementsParam
+, @otherInformationsParam
+, @Symbol
+, @GameEngine
+, @GameType
+, 1
+
+select
+  SCOPE_IDENTITY()
+", db.con);
+
+            cmd.Parameters.AddWithValue("gameName", gameName.ToSqlParameter());
+            cmd.Parameters.AddWithValue("userId", _appUser.UserId.ToSqlParameter());
+            cmd.Parameters.AddWithValue("exeName", exeName.ToSqlParameter());
+            cmd.Parameters.AddWithValue("zipLink", zipLink.ToSqlParameter());
+            cmd.Parameters.AddWithValue("currentVersion", currentVersion.ToSqlParameter());
+            cmd.Parameters.AddWithValue("gameDescriptionParam", gameDescriptionParam.ToSqlParameter());
+            cmd.Parameters.AddWithValue("hardwareRequirementsParam", hardwareRequirementsParam.ToSqlParameter());
+            cmd.Parameters.AddWithValue("otherInformationsParam", otherInformationsParam.ToSqlParameter());
+            cmd.Parameters.AddWithValue("symbol", symbol.ToSqlParameter());
+            cmd.Parameters.AddWithValue("gameEngine", gameEngine.ToSqlParameter());
+            cmd.Parameters.AddWithValue("gameType", gameType.ToSqlParameter());
+
+            int gameId = (int)db.scalarSQL(cmd);
+
+            //-----------------------------------
+            cmd.Parameters.Clear();
+            cmd = new SqlCommand(@"
+insert sgsGameImages (GameId, ImagePath)
+select
+  @GameId
+, @ImageUrl
+", db.con);
+
+            cmd.Parameters.AddWithValue("gameId", gameId.ToSqlParameter());
+            foreach (string imageUrl in galleryImageUrls)
             {
-                // Utwórz nowy obiekt SqlCommand z zapytaniem SQL i połączeniem
-                using (SqlCommand command = db.CommandSQL(connection, addGameQuery, gameName,
-                                                           _appUser.UserId, exeName,
-                                                           zipLink, currentVersion,
-                                                           gameDescriptionParam,
-                                                           hardwareRequirementsParam,
-                                                           otherInformationsParam, symbol,
-                                                           gameEngine, gameType))
-                {
-                    // Otwórz połączenie
-                    connection.Open();
+                cmd.Parameters.AddWithValue("imageUrl", imageUrl.ToSqlParameter());
+                db.execSQL(cmd);
 
-                    // Wykonaj zapytanie i pobierz ID nowej gry
-                    int gameId = Convert.ToInt32(command.ExecuteScalar());
-
-                    // Dodaj obrazy do galerii
-                    foreach (string imageUrl in galleryImageUrls)
-                    {
-                        using (SqlCommand imageCommand = db.CommandSQL(connection, addImageQuery, gameId, imageUrl))
-                        {
-                            imageCommand.ExecuteNonQuery();
-                        }
-                    }
-
-                    // Dodaj logo
-                    using (SqlCommand logoCommand = db.CommandSQL(connection, addLogoQuery, gameId, gameLogo))
-                    {
-                        logoCommand.ExecuteNonQuery();
-                    }
-
-                    // Informacja o pomyślnym dodaniu
-                    if (gameId > 0)
-                    {
-                        Frame.Navigate(typeof(MyGamesPage), new DrillInNavigationTransitionInfo());
-                    }
-                    else
-                    {
-                        System.Windows.MessageBox.Show("Błąd podczas dodawania gry do bazy danych.");
-                    }
-                }
+                cmd.Parameters.Clear();
+                cmd.Parameters.AddWithValue("gameId", gameId.ToSqlParameter());
             }
-            catch (Exception ex)
-            {
-                System.Windows.MessageBox.Show("Błąd: " + ex.Message);
-            }
+            //-----------------------------------
+            cmd.Parameters.Clear();
+            cmd = new SqlCommand(@"
+insert sgsGameLogo (GameId, LogoPath)
+select
+  @GameId
+, @ImageUrl
+", db.con);
+
+            cmd.Parameters.AddWithValue("gameId", gameId.ToSqlParameter());
+            cmd.Parameters.AddWithValue("gameId", gameLogo.ToSqlParameter());
+            db.execSQL(cmd);
+
+            if (gameId > 0)
+                Frame.Navigate(typeof(MyGamesPage), new DrillInNavigationTransitionInfo());
+            else
+                System.Windows.MessageBox.Show("Błąd podczas dodawania gry do bazy danych.");
+        }
+        catch (Exception ex)
+        {
+            System.Windows.MessageBox.Show("Błąd: " + ex.Message);
         }
 
     }

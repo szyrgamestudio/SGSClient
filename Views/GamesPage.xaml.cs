@@ -2,20 +2,12 @@
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
-using SGSClient.Controllers;
-using SGSClient.Core.Database;
 using SGSClient.ViewModels;
 
 namespace SGSClient.Views
 {
     public sealed partial class GamesPage : Page
     {
-        private readonly ConfigurationManagerSQL configManagerSQL;
-        private readonly DbContext _dbContext;
-
-        private List<GamesViewModel> gamesList;
-        private List<GamesViewModel> gamesFeaturedList;
-
         public GamesViewModel ViewModel { get; }
         public GamesPage()
         {
@@ -23,13 +15,11 @@ namespace SGSClient.Views
             DataContext = ViewModel;
             InitializeComponent();
         }
-
-        protected async override void OnNavigatedTo(NavigationEventArgs e)
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            await ViewModel.LoadGamesFromDatabaseAsync();
+            ViewModel.LoadGamesFromDatabase();
         }
-
         private void ButtonGame_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button clickedButton)
@@ -89,7 +79,7 @@ namespace SGSClient.Views
             SearchTextBox.Text = string.Empty;
             SearchAuthorTextBox.Text = string.Empty;
             CategoryComboBox.SelectedIndex = -1;
-            GamesItemsControl.ItemsSource = gamesList;
+            GamesItemsControl.ItemsSource = ViewModel.GamesList;
         }
     }
 }

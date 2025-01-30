@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Configuration;
+using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.UI.Xaml;
@@ -9,6 +10,8 @@ using SGSClient.Core.Contracts.Services;
 using SGSClient.Core.Database;
 using SGSClient.Core.Interface;
 using SGSClient.Core.Services;
+using SGSClient.Core.Utilities;
+using SGSClient.Core.Utilities.AppInfoUtility.Models;
 using SGSClient.Models;
 using SGSClient.Notifications;
 using SGSClient.Services;
@@ -107,11 +110,14 @@ public partial class App : Application
             services.AddTransient<ShellViewModel>();
 
             // Configuration
+            services.Configure<ConnectionStrings>(context.Configuration.GetSection(nameof(ConnectionStrings)));
             services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
         }).
         Build();
 
         App.GetService<IAppNotificationService>().Initialize();
+        ServiceFactory.SetServiceProvider(Host.Services);
+
 
         UnhandledException += App_UnhandledException;
     }

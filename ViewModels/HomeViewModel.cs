@@ -32,7 +32,6 @@ namespace SGSClient.ViewModels
             get => _scrollBackButtonVisibility;
             set => SetProperty(ref _scrollBackButtonVisibility, value);
         }
-
         public Visibility ScrollForwardButtonVisibility
         {
             get => _scrollForwardButtonVisibility;
@@ -48,7 +47,6 @@ namespace SGSClient.ViewModels
         {
             _navigationService.NavigateTo(typeof(GamesViewModel).FullName!);
         }
-
         private void NavigateToLogin()
         {
             _navigationService.NavigateTo(typeof(LoginViewModel).FullName!);
