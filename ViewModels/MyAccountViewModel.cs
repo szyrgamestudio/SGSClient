@@ -3,9 +3,10 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using SGSClient.Contracts.Services;
 using SGSClient.Core.Authorization;
 using SGSClient.Core.Database;
+using SGSClient.Core.Extensions;
 namespace SGSClient.ViewModels
 {
-    public partial class MyAccountViewModel(INavigationService navigationService, DbContext dbContext, IAppUser appUser) : ObservableRecipient
+    public partial class MyAccountViewModel(INavigationService navigationService, IAppUser appUser) : ObservableRecipient
     {
         #region Fields
         private string? _avatarUrl;
@@ -23,25 +24,31 @@ namespace SGSClient.ViewModels
             get => _welcomeText;
             set => SetProperty(ref _welcomeText, value);
         }
-        private readonly DbContext _dbContext = dbContext;
         private readonly INavigationService _navigationService = navigationService;
         private readonly IAppUser _appUser = appUser;
 
         #endregion
 
         #region Methods
-        public async void LoadUserData()
+        public void LoadUserData()
         {
             string? email;
             string? username;
 
-            var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.userDetailsSql, _appUser.UserId);
-            if (dataSet.Tables[0].Rows.Count == 0)
+            DataSet ds = db.con.select(@"
+select
+  r.Email
+, d.Name
+from Registration r
+inner join sgsDevelopers d on d.Id = r.DeveloperId
+where r.Id = @p0
+", _appUser.UserId);
+            if (ds.Tables[0].Rows.Count == 0)
                 return;
 
-            DataRow row = dataSet.Tables[0].Rows[0];
-            email = row["Email"] == DBNull.Value ? string.Empty : row["Email"].ToString();
-            username = row["Name"] == DBNull.Value ? string.Empty : row["Name"].ToString();
+            DataRow dr = ds.Tables[0].Rows[0];
+            email = dr.TryGetValue("Email") == DBNull.Value ? string.Empty : dr.TryGetValue("Email");
+            username = dr.TryGetValue("Name") == DBNull.Value ? string.Empty : dr.TryGetValue("Name");
 
             AvatarUrl = _appUser.GetGravatar(email);
             WelcomeText = "Witaj, " + username + "!";

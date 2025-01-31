@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using SGSClient.Contracts.Services;
 using SGSClient.Core.Authorization;
 using SGSClient.Core.Database;
+using SGSClient.Core.Extensions;
 using SGSClient.Services;
 
 namespace SGSClient.ViewModels
@@ -15,17 +16,15 @@ namespace SGSClient.ViewModels
         public string Password { get; set; }
         public string ErrorMessage { get; set; }
         private readonly INavigationService _navigationService;
-        private readonly DbContext _dbContext;
         private readonly PasswordHasher _passwdHasher;
         private readonly IAppUser _appUser;
 
         #endregion
 
         #region Constructor
-        public LoginViewModel(INavigationService navigationService, DbContext dbContext, PasswordHasher passwordHasher, IAppUser appUser)
+        public LoginViewModel(INavigationService navigationService, PasswordHasher passwordHasher, IAppUser appUser)
         {
             _navigationService = navigationService;
-            _dbContext = dbContext;
             _passwdHasher = passwordHasher;
             _appUser = appUser;
         }
@@ -87,15 +86,20 @@ namespace SGSClient.ViewModels
         #endregion
 
         #region Private Methods
-        private async Task AttemptLoginAsync()
+        private Task AttemptLoginAsync()
         {
-            var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.checkUserSql, Email);
-            if (dataSet.Tables[0].Rows.Count == 0)
-                return;
-
-            DataRow row = dataSet.Tables[0].Rows[0];
-            string userId = row["Id"].ToString();
-            var storedPasswordHash = row["Password"].ToString();
+            DataSet ds = db.con.select(@"
+select
+  r.Id
+, r.Password
+from Registration r
+where r.Email = @p0
+", Email);
+            if (ds.Tables[0].Rows.Count == 0)
+                return Task.CompletedTask;
+            DataRow dr = ds.Tables[0].Rows[0];
+            int userId = dr.TryGetValue("Id");
+            string storedPasswordHash = dr.TryGetValue("Password:");
             var storedSalt = storedPasswordHash[64..];
 
             if (VerifyPassword(Password, storedPasswordHash.Substring(0, 64), storedSalt))
@@ -109,13 +113,14 @@ namespace SGSClient.ViewModels
             {
                 ErrorMessage = "Nieprawidłowe hasło.";
             }
+
+            return Task.CompletedTask;
         }
         private bool VerifyPassword(string password, string storedHash, string storedSalt)
         {
             string hashedPassword = _passwdHasher.HashPasswordWithSalt(password, Convert.FromBase64String(storedSalt));
             return hashedPassword == storedHash;
         }
-
         #endregion
     }
 }

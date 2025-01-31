@@ -1,181 +1,273 @@
 ﻿using System.Data;
 using SGSClient.Core.Authorization;
 using SGSClient.Core.Database;
+using SGSClient.Core.Extensions;
 using SGSClient.Models;
 using SGSClient.ViewModels;
 
 namespace SGSClient.Controllers
 {
-    public class ConfigurationManagerSQL
+    public class ConfigurationManagerSQL(IAppUser appUser)
     {
-        private readonly DbContext _dbContext;
-        private readonly IAppUser _appUser;
-
-        public ConfigurationManagerSQL(DbContext dbContext)
-        {
-            _dbContext = dbContext;
-            //_appUser = appUser;
-        }
+        private readonly IAppUser _appUser = appUser;
         #region Game info
-        public async Task<List<GamesViewModel>> LoadGamesFromDatabaseAsync(bool bypassDraftP)
+        public List<GamesViewModel> LoadGamesFromDatabase(bool bypassDraftP)
         {
-            List<GamesViewModel> gamesList = [];
-            var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.gamesInfo, bypassDraftP);
-            if (dataSet.Tables[0].Rows.Count > 0)
-            {
-                foreach (DataRow row in dataSet.Tables[0].Rows)
-                {
-                    GamesViewModel game = new GamesViewModel(
-                        gameId: row["GameId"].ToString(),
-                        gameSymbol: row["GameSymbol"].ToString(),
-                        gameTitle: row["Title"].ToString(),
-                        gamePayloadName: row["PayloadName"].ToString(),
-                        gameExeName: row["ExeName"].ToString(),
-                        gameZipLink: row["ZipLink"].ToString(),
-                        gameVersionLink: row["VersionLink"].ToString(),
-                        gameDescription: row["Description"].ToString(),
-                        hardwareRequirements: row["HardwareRequirements"].ToString(),
-                        otherInformations: row["OtherInformation"].ToString(),
-                        gameDeveloper: row["GameDeveloper"].ToString(),
-                        logoPath: row["LogoPath"].ToString(),
-                        gameType: row["GameType"].ToString(),
-                        draftP: row["DraftP"].ToString()
-                    );
+            List<GamesViewModel> gamesList = new List<GamesViewModel>();
 
-                    gamesList.Add(game);
-                }
-                return gamesList;
+            DataSet ds = db.con.select(@"
+select
+  CAST(g.Id as nvarchar(max))       [GameId]
+, g.Title
+, g.Symbol   [GameSymbol]
+, d.Name     [GameDeveloper]
+, l.LogoPath [LogoPath]
+, t.Name	 [GameType]
+, g.PayloadName
+, g.ExeName
+, g.ZipLink
+, g.VersionLink
+, g.Description
+, g.HardwareRequirements
+, g.OtherInformation
+, CAST(g.DraftP as nvarchar(max)) [DraftP]
+from sgsGames g
+inner join sgsDevelopers d on d.Id = g.DeveloperId
+left join sgsGameLogo l on l.GameId = g.Id
+left join sgsGameTypes t on t.Id = g.TypeId
+where g.DraftP = 0 and @p0 = 0 or @p0 = 1
+order by g.Title
+", bypassDraftP);
+
+            foreach (DataRow dr in ds.Tables[0].Rows)
+            {
+                GamesViewModel game = new GamesViewModel
+                {
+                    GameId = dr.TryGetValue("GameId"),
+                    GameSymbol = dr.TryGetValue("GameSymbol"),
+                    GameTitle = dr.TryGetValue("Title"),
+                    GamePayloadName = dr.TryGetValue("PayloadName"),
+                    GameExeName = dr.TryGetValue("ExeName"),
+                    GameZipLink = dr.TryGetValue("ZipLink"),
+                    GameVersionLink = dr.TryGetValue("VersionLink"),
+                    GameDescription = dr.TryGetValue("Description"),
+                    HardwareRequirements = dr.TryGetValue("HardwareRequirements"),
+                    OtherInformations = dr.TryGetValue("OtherInformation"),
+                    GameDeveloper = dr.TryGetValue("GameDeveloper"),
+                    LogoPath = dr.TryGetValue("LogoPath"),
+                    GameType = dr.TryGetValue("GameType"),
+                    DraftP = dr.TryGetValue("DraftP"),
+                };
+                gamesList.Add(game);
             }
-            else
-                return gamesList;
+            return gamesList;
         }
-        public async Task<List<GamesViewModel>> LoadFeaturedGamesFromDatabaseAsync(bool bypassDraftP)
+        public List<GamesViewModel> LoadFeaturedGamesFromDatabase(bool bypassDraftP)
         {
-            List<GamesViewModel> gamesList = [];
-            var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.gamesFeaturedInfo, bypassDraftP);
-            if (dataSet.Tables[0].Rows.Count > 0)
-            {
-                foreach (DataRow row in dataSet.Tables[0].Rows)
-                {
-                    GamesViewModel game = new GamesViewModel(
-                        gameId: row["GameId"].ToString(),
-                        gameSymbol: row["GameSymbol"].ToString(),
-                        gameTitle: row["Title"].ToString(),
-                        gamePayloadName: row["PayloadName"].ToString(),
-                        gameExeName: row["ExeName"].ToString(),
-                        gameZipLink: row["ZipLink"].ToString(),
-                        gameVersionLink: row["VersionLink"].ToString(),
-                        gameDescription: row["Description"].ToString(),
-                        hardwareRequirements: row["HardwareRequirements"].ToString(),
-                        otherInformations: row["OtherInformation"].ToString(),
-                        gameDeveloper: row["GameDeveloper"].ToString(),
-                        logoPath: row["LogoPath"].ToString(),
-                        gameType: row["GameType"].ToString(),
-                        draftP: row["DraftP"].ToString()
-                    );
+            List<GamesViewModel> gamesList = new List<GamesViewModel>();
 
-                    gamesList.Add(game);
-                }
-                return gamesList;
+            DataSet ds = db.con.select(@"
+select
+  CAST(g.Id as nvarchar(max))       [GameId]
+, g.Title
+, g.Symbol   [GameSymbol]
+, d.Name     [GameDeveloper]
+, l.LogoPath [LogoPath]
+, t.Name	 [GameType]
+, g.PayloadName
+, g.ExeName
+, g.ZipLink
+, g.VersionLink
+, g.Description
+, g.HardwareRequirements
+, g.OtherInformation
+, CAST(g.DraftP as nvarchar(max)) [DraftP]
+from sgsGames g
+inner join sgsDevelopers d on d.Id = g.DeveloperId
+left join sgsGameLogo l on l.GameId = g.Id
+left join sgsGameTypes t on t.Id = g.TypeId
+where (g.DraftP = 0 and @p0 = 0 or @p0 = 1) and g.FeaturedP = 1
+order by g.Title
+", bypassDraftP);
+
+            foreach (DataRow dr in ds.Tables[0].Rows)
+            {
+                GamesViewModel game = new GamesViewModel
+                {
+                    GameId = dr.TryGetValue("GameId"),
+                    GameSymbol = dr.TryGetValue("GameSymbol"),
+                    GameTitle = dr.TryGetValue("Title"),
+                    GamePayloadName = dr.TryGetValue("PayloadName"),
+                    GameExeName = dr.TryGetValue("ExeName"),
+                    GameZipLink = dr.TryGetValue("ZipLink"),
+                    GameVersionLink = dr.TryGetValue("VersionLink"),
+                    GameDescription = dr.TryGetValue("Description"),
+                    HardwareRequirements = dr.TryGetValue("HardwareRequirements"),
+                    OtherInformations = dr.TryGetValue("OtherInformation"),
+                    GameDeveloper = dr.TryGetValue("GameDeveloper"),
+                    LogoPath = dr.TryGetValue("LogoPath"),
+                    GameType = dr.TryGetValue("GameType"),
+                    DraftP = dr.TryGetValue("DraftP"),
+                };
+                gamesList.Add(game);
             }
-            else
-                return gamesList;
+            return gamesList;
         }
-        public async Task<List<GamesViewModel>> LoadMyGamesFromDatabaseAsync()
+        public List<GamesViewModel> LoadMyGamesFromDatabase()
         {
-            List<GamesViewModel> gamesList = [];
-            var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.gamesUserInfo, _appUser.UserId);
-            if (dataSet.Tables[0].Rows.Count > 0)
-            {
-                foreach (DataRow row in dataSet.Tables[0].Rows)
-                {
-                    GamesViewModel game = new GamesViewModel(
-                        gameId: row["GameId"].ToString(),
-                        gameSymbol: row["GameSymbol"].ToString(),
-                        gameTitle: row["Title"].ToString(),
-                        gamePayloadName: row["PayloadName"].ToString(),
-                        gameExeName: row["ExeName"].ToString(),
-                        gameZipLink: row["ZipLink"].ToString(),
-                        gameVersionLink: row["VersionLink"].ToString(),
-                        gameDescription: row["Description"].ToString(),
-                        hardwareRequirements: row["HardwareRequirements"].ToString(),
-                        otherInformations: row["OtherInformation"].ToString(),
-                        gameDeveloper: row["GameDeveloper"].ToString(),
-                        logoPath: row["LogoPath"].ToString(),
-                        gameType: row["GameType"].ToString(),
-                        draftP: row["DraftP"].ToString()
-                    );
+            List<GamesViewModel> gamesList = new List<GamesViewModel>();
 
-                    gamesList.Add(game);
-                }
-                return gamesList;
+            // Use the asynchronous version of the database query
+            DataSet ds = db.con.select(@"
+select  
+  g.Id       [GameId]
+, g.Title
+, g.Symbol   [GameSymbol]
+, d.Name     [GameDeveloper]
+, l.LogoPath [LogoPath]
+, t.Name     [GameType]
+, g.PayloadName
+, g.ExeName
+, g.ZipLink
+, g.VersionLink
+, g.Description
+, g.HardwareRequirements
+, g.OtherInformation
+, g.DraftP
+from Registration r
+inner join sgsDevelopers d on d.Id = r.DeveloperId
+inner join sgsGames g on g.DeveloperId = d.Id
+left join sgsGameLogo l on l.GameId = g.Id
+left join sgsGameTypes t on t.Id = g.TypeId
+where r.id = @p0
+", _appUser.UserId);
+
+            foreach (DataRow dr in ds.Tables[0].Rows)
+            {
+                GamesViewModel game = new GamesViewModel
+                {
+                    GameId = dr.TryGetValue("GameId"),
+                    GameSymbol = dr.TryGetValue("GameSymbol"),
+                    GameTitle = dr.TryGetValue("Title"),
+                    GamePayloadName = dr.TryGetValue("PayloadName"),
+                    GameExeName = dr.TryGetValue("ExeName"),
+                    GameZipLink = dr.TryGetValue("ZipLink"),
+                    GameVersionLink = dr.TryGetValue("VersionLink"),
+                    GameDescription = dr.TryGetValue("Description"),
+                    HardwareRequirements = dr.TryGetValue("HardwareRequirements"),
+                    OtherInformations = dr.TryGetValue("OtherInformation"),
+                    GameDeveloper = dr.TryGetValue("GameDeveloper"),
+                    LogoPath = dr.TryGetValue("LogoPath"),
+                    GameType = dr.TryGetValue("GameType"),
+                    DraftP = dr.TryGetValue("DraftP"),
+                };
+
+                gamesList.Add(game);
             }
-            else
-                return gamesList;
+
+            return gamesList;
         }
-        public async Task<List<string>> LoadGalleryImagesFromDatabaseAsync(string gameSymbol)
+        public List<string> LoadGalleryImagesFromDatabase(string gameSymbol)
         {
             List<string> galleryImages = [];
-            var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.gameImagesSQL, gameSymbol);
-            if (dataSet.Tables[0].Rows.Count > 0)
-            {
-                foreach (DataRow row in dataSet.Tables[0].Rows)
-                    galleryImages.Add(row["ImagePath"].ToString());
+            var ds = db.con.select(@"
+select
+  i.ImagePath
+from sgsGameImages i
+inner join sgsGames g on g.Id = i.GameId
+where g.Symbol = @p0
+", gameSymbol);
+            foreach (DataRow dr in ds.Tables[0].Rows)
+                galleryImages.Add(dr.TryGetValue("ImagePath").ToString());
 
-                return galleryImages;
-            }
-            else
-                return galleryImages;
+            return galleryImages;
         }
-        public async Task<string> GetGameVersion(string gameIdentifier)
+        public string GetGameVersion(string gameIdentifier)
         {
             List<string> galleryImages = [];
-            var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.gameCurrentVersionSQL, gameIdentifier);
-            if (dataSet.Tables[0].Rows.Count > 0)
-                return dataSet.Tables[0].Rows[0]["GameId"].ToString();
+            var ds = db.con.select(@"
+select
+  g.CurrentVersion
+from sgsGames g
+where g.Symbol = @p0
+", gameIdentifier);
+            if (ds.Tables[0].Rows.Count > 0)
+                return ds.Tables[0].Rows[0].TryGetValue("GameId");
             else
                 return "0.0.0.0";
         }
         #endregion
 
         #region Rating
-        public async Task<List<GameRating>> LoadRatingsFromDB(string gameIdentifier)
+        public List<GameRating> LoadRatingsFromDB(string gameIdentifier)
         {
-            List<GameRating> gameRatings = [];
-            var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.loadRatingsSQL, gameIdentifier);
-            if (dataSet.Tables[0].Rows.Count > 0)
+            List<GameRating> gameRatings = new List<GameRating>();
+
+            DataSet ds = db.con.select(@"
+select
+  gr.Id
+, d.Id [DeveloperId]
+, d.Name
+, gr.Rating
+, gr.Title
+, gr.Review
+from GameRatings gr
+inner join sgsGames g on g.Id = gr.GameId
+inner join Registration r on r.Id = gr.UserId
+inner join sgsDevelopers d on d.Id = r.DeveloperId
+where g.Symbol = @p0
+", gameIdentifier);
+
+            foreach (DataRow dr in ds.Tables[0].Rows)
             {
-                foreach (DataRow row in dataSet.Tables[0].Rows)
+                GameRating rating = new GameRating
                 {
-                    gameRatings.Add(new GameRating
-                    {
-                        RatingId = row.Field<int>("Id"),
-                        UserId = row.Field<int>("DeveloperId"),
-                        Author = row.Field<string>("Name"),
-                        Rating = row.Field<int>("Rating"),
-                        Title = row.Field<string>("Title"),
-                        Review = row.Field<string>("Review")
-                    });
-                }
-
-                return gameRatings;
+                    RatingId = dr.TryGetValue("RatingId"),
+                    UserId = dr.TryGetValue("UserId"),
+                    Author = dr.TryGetValue("Author"),
+                    Rating = dr.TryGetValue("Rating"),
+                    Title = dr.TryGetValue("Title"),
+                    Review = dr.TryGetValue("Review")
+                };
+                gameRatings.Add(rating);
             }
-            else
-                return gameRatings;
+
+            return gameRatings;
+        }
+        public void AddRatingToDB(string gameIdentifier, GameRating gameRating)
+        {
+            db.con.exec(@"
+declare @gameId int = (select g.Id from sgsGames g where g.Symbol = @p0)
+insert into GameRatings (GameId, UserId, Rating, Title, Review, CreationDateTime, ModificationDateTime)
+select
+  @gameId
+, @p1
+, @p2
+, @p3
+, @p4
+, GETDATE()
+, GETDATE()
+", _appUser.UserId, gameRating.Review, gameIdentifier, gameRating.Rating, gameRating.Title);
+        }
+        public void UpdateRatingInDB(GameRating gameRating)
+        {
+            db.con.exec(@"
+update r set
+  r.Rating = @p1
+, r.Title = @p2
+, r.Review = @p3
+, r.ModificationDateTime = GETDATE()
+from GameRatings r
+where r.Id = @p0
+", gameRating.Rating, gameRating.Review, gameRating.Title, gameRating.RatingId);
+        }
+        public void DeleteRatingInDB(GameRating gameRating)
+        {
+            db.con.exec(@"
+delete from GameRatings
+where Id = @p0", gameRating.RatingId);
         }
 
-        public async Task AddRatingToDB(string gameIdentifier, GameRating gameRating)
-        {
-            await _dbContext.ExecuteQueryAsync(SqlQueries.insertRatingSQL, _appUser.UserId, gameRating.Review, gameIdentifier);
-        }
-        public async Task UpdateRatingInDB(GameRating gameRating)
-        {
-            await _dbContext.ExecuteQueryAsync(SqlQueries.updateRatingSQL, gameRating.Rating, gameRating.RatingId);
-        }
-        public async Task DeleteRatingInDB(GameRating gameRating)
-        {
-            await _dbContext.ExecuteQueryAsync(SqlQueries.deleteRatingSQL, gameRating.RatingId);
-        }
         #endregion
     }
 }

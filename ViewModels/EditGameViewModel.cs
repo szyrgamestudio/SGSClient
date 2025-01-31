@@ -15,7 +15,6 @@ namespace SGSClient.ViewModels;
 
 public partial class EditGameViewModel : ObservableRecipient
 {
-    private readonly DbContext _dbContext;
     public ObservableCollection<GameTypeItem> GameTypes { get; set; } = new ObservableCollection<GameTypeItem>();
     public ObservableCollection<GameEngineItem> GameEngines { get; set; } = new ObservableCollection<GameEngineItem>();
 
@@ -95,9 +94,8 @@ public partial class EditGameViewModel : ObservableRecipient
     public ObservableCollection<string> GameImagePaths { get; set; } = new ObservableCollection<string>();
     #endregion
 
-    public EditGameViewModel(DbContext dbContext)
+    public EditGameViewModel()
     {
-        _dbContext = dbContext;
         GameLogos = new ObservableCollection<GameImage>();
         GameImages = new ObservableCollection<GameImage>();
     }
@@ -127,8 +125,8 @@ public partial class EditGameViewModel : ObservableRecipient
             SelectedGameType = GameTypes.FirstOrDefault(g => g.Id == gameTypeId);
             SelectedGameEngine = GameEngines.FirstOrDefault(g => g.Id == gameEngineId);
 
-            var logoData = await _dbContext.ExecuteQueryAsync(SqlQueries.gameLogoSQL, gameId);
-            var imagesData = await _dbContext.ExecuteQueryAsync(SqlQueries.gameImagesByIdSQL, gameId);
+            var logoData = db.ExecuteQueryAsync(SqlQueries.gameLogoSQL, gameId);
+            var imagesData = _dbContext.ExecuteQueryAsync(SqlQueries.gameImagesByIdSQL, gameId);
 
             GameLogos.Clear();
             foreach (DataRow logoRow in logoData.Tables[0].Rows)
