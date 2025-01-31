@@ -7,6 +7,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
 using SGSClient.Core.Database;
+using SGSClient.Core.Extensions;
 using SGSClient.Core.Helpers;
 using Windows.Storage;
 using static SGSClient.Views.EditGamePage;
@@ -105,7 +106,7 @@ public partial class EditGameViewModel : ObservableRecipient
 
     public async Task LoadGameData(int gameId)
     {
-        var gameData = await _dbContext.ExecuteQueryAsync(SqlQueries.gameInfoSQL, gameId);
+        var gameData = db.con.select(SqlQueries.gameInfoSQL, gameId);
         if (gameData.Tables[0].Rows.Count > 0)
         {
             var row = gameData.Tables[0].Rows[0];
@@ -125,8 +126,8 @@ public partial class EditGameViewModel : ObservableRecipient
             SelectedGameType = GameTypes.FirstOrDefault(g => g.Id == gameTypeId);
             SelectedGameEngine = GameEngines.FirstOrDefault(g => g.Id == gameEngineId);
 
-            var logoData = db.ExecuteQueryAsync(SqlQueries.gameLogoSQL, gameId);
-            var imagesData = _dbContext.ExecuteQueryAsync(SqlQueries.gameImagesByIdSQL, gameId);
+            var logoData = db.con.select(SqlQueries.gameLogoSQL, gameId);
+            var imagesData = db.con.select(SqlQueries.gameImagesByIdSQL, gameId);
 
             GameLogos.Clear();
             foreach (DataRow logoRow in logoData.Tables[0].Rows)
@@ -210,7 +211,7 @@ public partial class EditGameViewModel : ObservableRecipient
     {
         try
         {
-            var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.gameTypesSQL);
+            var dataSet = db.con.select(SqlQueries.gameTypesSQL);
             if (dataSet.Tables.Count > 0)
             {
                 GameTypes.Clear(); // Wyczyść istniejące elementy
@@ -234,7 +235,7 @@ public partial class EditGameViewModel : ObservableRecipient
     {
         try
         {
-            var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.gameEnginesSQL);
+            var dataSet = db.con.select(SqlQueries.gameEnginesSQL);
             if (dataSet.Tables.Count > 0)
             {
                 GameEngines.Clear();
@@ -279,7 +280,7 @@ public partial class EditGameViewModel : ObservableRecipient
             string hardwareRequirementsParam = string.Join(Environment.NewLine, HardwareRequirements.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
             string otherInfoParam = string.Join(Environment.NewLine, OtherInfo.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
 
-            await _dbContext.ExecuteQueryAsync(SqlQueries.updateGameDetailsSQL, GameName, Symbol, CurrentVersion, ZipLink, ExeName, gameDescriptionParam, hardwareRequirementsParam, otherInfoParam, SelectedGameTypeId, SelectedGameEngineId, gameId);
+            db.con.select(SqlQueries.updateGameDetailsSQL, GameName, Symbol, CurrentVersion, ZipLink, ExeName, gameDescriptionParam, hardwareRequirementsParam, otherInfoParam, SelectedGameTypeId, SelectedGameEngineId, gameId);
         }
         catch (Exception ex)
         {
@@ -291,7 +292,7 @@ public partial class EditGameViewModel : ObservableRecipient
     }
     private async Task UpdateGameLogo(int gameId)
     {
-        await _dbContext.ExecuteQueryAsync(SqlQueries.deleteLogoSQL, gameId);
+        db.con.select(SqlQueries.deleteLogoSQL, gameId);
         var uploader = new NextcloudUploader("https://cloud.m455yn.dev/", "sgsclient", "yGnxE-Tykxe-SwjwW-NooLc-xSwPT");
 
         foreach (var logo in GameLogos)
@@ -308,12 +309,12 @@ public partial class EditGameViewModel : ObservableRecipient
                     imageUrl = uploadedUrl;
                 }
             }
-            await _dbContext.ExecuteQueryAsync(SqlQueries.insertLogoSQL, gameId, imageUrl);
+            db.con.select(SqlQueries.insertLogoSQL, gameId, imageUrl);
         }
     }
     private async Task UpdateGameImages(int gameId)
     {
-        await _dbContext.ExecuteQueryAsync(SqlQueries.deleteImagesSQL, gameId);
+        db.con.select(SqlQueries.deleteImagesSQL, gameId);
         var uploader = new NextcloudUploader("https://cloud.m455yn.dev/", "sgsclient", "yGnxE-Tykxe-SwjwW-NooLc-xSwPT");
 
         foreach (var image in GameImages)
@@ -334,7 +335,7 @@ public partial class EditGameViewModel : ObservableRecipient
             }
 
             // Insert the URL (which may now be from Nextcloud) into the database
-            await _dbContext.ExecuteQueryAsync(SqlQueries.insertImageSQL, gameId, imageUrl);
+            db.con.select(SqlQueries.insertImageSQL, gameId, imageUrl);
         }
     }
 

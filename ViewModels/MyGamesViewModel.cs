@@ -9,7 +9,6 @@ namespace SGSClient.ViewModels;
 
 public partial class MyGamesViewModel : ObservableRecipient
 {
-    private readonly DbContext _dbContext;
     private ObservableCollection<GamesViewModel> _gamesList;
     private readonly IAppUser _appUser;
 
@@ -18,9 +17,8 @@ public partial class MyGamesViewModel : ObservableRecipient
         get => _gamesList;
         private set => SetProperty(ref _gamesList, value);
     }
-    public MyGamesViewModel(DbContext dbContext, IAppUser appUser)
+    public MyGamesViewModel(IAppUser appUser)
     {
-        _dbContext = dbContext;
         GamesList = new ObservableCollection<GamesViewModel>();
         _appUser = appUser;
     }
@@ -40,7 +38,7 @@ public partial class MyGamesViewModel : ObservableRecipient
     public async Task<List<GamesViewModel>> LoadMyGamesFromDBAsync()
     {
         List<GamesViewModel> gamesList = [];
-        var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.gamesUserInfo, _appUser.UserId);
+        var dataSet = db.con.select(SqlQueries.gamesUserInfo, _appUser.UserId);
         if (dataSet.Tables[0].Rows.Count > 0)
         {
             foreach (DataRow row in dataSet.Tables[0].Rows)

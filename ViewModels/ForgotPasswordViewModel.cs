@@ -5,6 +5,7 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SGSClient.Core.Database;
+using SGSClient.Core.Extensions;
 using SGSClient.Core.Interface;
 
 namespace SGSClient.ViewModels;
@@ -16,7 +17,6 @@ public partial class ForgotPasswordViewModel : ObservableRecipient
     private string _repeatPassword;
     private string _errorMessage;
     private readonly IPasswordHasher _passwordHasher;
-    private readonly DbContext _dbContext;
     private bool _isTokenValid;
 
     public string Email
@@ -51,11 +51,10 @@ public partial class ForgotPasswordViewModel : ObservableRecipient
 
     public ICommand SendResetCodeCommand { get; }
 
-    public ForgotPasswordViewModel(IPasswordHasher passwordHasher, DbContext dbContext)
+    public ForgotPasswordViewModel(IPasswordHasher passwordHasher)
     {
         SendResetCodeCommand = new RelayCommand<string>(SendResetCode);
         _passwordHasher = passwordHasher;
-        _dbContext = dbContext;
     }
 
     private bool IsValidEmail(string email)
@@ -72,7 +71,7 @@ public partial class ForgotPasswordViewModel : ObservableRecipient
     }
     public async Task TokenValidation(string email, string token)
     {
-        var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.userCheckToken, email);
+        var dataSet = db.con.select(SqlQueries.userCheckToken, email);
         if (dataSet.Tables[0].Rows.Count > 0)
         {
             string hashedPasswordWithSalt = dataSet.Tables[0].Rows[0]["AccessToken"].ToString();
@@ -105,13 +104,13 @@ public partial class ForgotPasswordViewModel : ObservableRecipient
 
     public async Task UpdateTokenInDatabaseAsync(string email, string accessToken)
     {
-        var existingUserDataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.checkUserSql, email);
+        var existingUserDataSet = db.con.select(SqlQueries.checkUserSql, email);
         if (existingUserDataSet.Tables[0].Rows.Count == 0)
             return;
 
         try
         {
-            await _dbContext.ExecuteNonQueryAsync(SqlQueries.userUpdateToken, accessToken, email);
+            db.con.select(SqlQueries.userUpdateToken, accessToken, email);
         }
         catch (Exception ex)
         {
@@ -121,12 +120,12 @@ public partial class ForgotPasswordViewModel : ObservableRecipient
     }
     public async Task UpdatePasswordInDatabase(string email, string newPassword)
     {
-        var existingUserDataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.checkUserSql, email);
+        var existingUserDataSet = db.con.select(SqlQueries.checkUserSql, email);
         if (existingUserDataSet.Tables[0].Rows.Count == 0) return;
 
         try
         {
-            await _dbContext.ExecuteNonQueryAsync(SqlQueries.userUpdatePass, newPassword, email);
+            db.con.select(SqlQueries.userUpdatePass, newPassword, email);
         }
         catch (Exception ex)
         {

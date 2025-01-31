@@ -3,6 +3,7 @@ using System.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
 using SGSClient.Core.Authorization;
 using SGSClient.Core.Database;
+using SGSClient.Core.Extensions;
 using SGSClient.Models;
 
 namespace SGSClient.ViewModels
@@ -11,7 +12,6 @@ namespace SGSClient.ViewModels
     {
         private readonly IAppUser _appUser;
         private ObservableCollection<GameRating> _allRatings;
-        private readonly DbContext _dbContext;
         private const int PageSize = 2;
 
         [ObservableProperty]
@@ -43,7 +43,7 @@ namespace SGSClient.ViewModels
         [ObservableProperty]
         private int count5;
 
-        public GameBaseViewModel(DbContext dbContext, IAppUser appUser)
+        public GameBaseViewModel(IAppUser appUser)
         {
             ratingCount = 0;
             avgRating = "5.0";
@@ -53,26 +53,25 @@ namespace SGSClient.ViewModels
             count4 = 0;
             count5 = 0;
 
-            _dbContext = dbContext;
             _allRatings = new ObservableCollection<GameRating>();
 
             Ratings = new ObservableCollection<GameRating>();
             CurrentPage = 0;
             _appUser = appUser;
         }
-        public async Task<bool> UserRatingP()
+        public bool UserRatingP()
         {
-            var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.userRatingSQL, _appUser.UserId);
+            var dataSet = db.con.select(SqlQueries.userRatingSQL, _appUser.UserId);
             if (dataSet.Tables[0].Rows.Count > 0)
                 return true;
             else
                 return false;
         }
-        public async Task LoadRatings(string gameIdentifier)
+        public void LoadRatings(string gameIdentifier)
         {
             _allRatings.Clear();
             List<GameRating> gameRatings = [];
-            var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.loadRatingsSQL, gameIdentifier);
+            var dataSet = db.con.select(SqlQueries.loadRatingsSQL, gameIdentifier);
             if (dataSet.Tables[0].Rows.Count > 0)
             {
                 foreach (DataRow row in dataSet.Tables[0].Rows)
@@ -90,9 +89,9 @@ namespace SGSClient.ViewModels
             }
             LoadPage(0);
         }
-        public async Task LoadGameRatingsStats(string gameIdentifier)
+        public void LoadGameRatingsStats(string gameIdentifier)
         {
-            var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.loadGameRatingStatsSQL, gameIdentifier);
+            var dataSet = db.con.select(SqlQueries.loadGameRatingStatsSQL, gameIdentifier);
             if (dataSet.Tables[0].Rows.Count > 0)
             {
                 foreach (DataRow row in dataSet.Tables[0].Rows)
@@ -107,29 +106,27 @@ namespace SGSClient.ViewModels
                 }
             }
         }
-        public async Task<DataSet> ReturnUserRating(string gameIdentifier)
+        public DataSet ReturnUserRating(string gameIdentifier)
         {
-            var dataSet = await _dbContext.ExecuteQueryAsync(SqlQueries.loadRatingSQL, gameIdentifier, _appUser.UserId);
-            return dataSet;
+            return db.con.select(SqlQueries.loadRatingSQL, gameIdentifier, _appUser.UserId);;
         }
 
-        public async void AddRating(string gameIdentifier, GameRating gameRating)
+        public void AddRating(string gameIdentifier, GameRating gameRating)
         {
             if (gameRating.RatingId > 0)
                 UpdateRating(gameRating, gameIdentifier);
             else
-                await _dbContext.ExecuteQueryAsync(SqlQueries.insertRatingSQL, gameIdentifier, _appUser.UserId, gameRating.Rating, gameRating.Title, gameRating.Review);
+                db.con.exec(SqlQueries.insertRatingSQL, gameIdentifier, _appUser.UserId, gameRating.Rating, gameRating.Title, gameRating.Review);
 
-            await LoadGameRatingsStats(gameIdentifier);
+            LoadGameRatingsStats(gameIdentifier);
             LoadPage(CurrentPage);
         }
-        public async void UpdateRating(GameRating gameRating, string gameIdentifier)
+        public void UpdateRating(GameRating gameRating, string gameIdentifier)
         {
-            await _dbContext.ExecuteQueryAsync(SqlQueries.updateRatingSQL, gameRating.RatingId, gameRating.Rating, gameRating.Title, gameRating.Review);
-            await LoadGameRatingsStats(gameIdentifier);
+            db.con.exec(SqlQueries.updateRatingSQL, gameRating.RatingId, gameRating.Rating, gameRating.Title, gameRating.Review);
+            LoadGameRatingsStats(gameIdentifier);
             LoadPage(CurrentPage);
         }
-
         public void LoadPage(int pageNumber)
         {
             Ratings.Clear();

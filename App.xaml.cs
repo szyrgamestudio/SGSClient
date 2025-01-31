@@ -80,7 +80,6 @@ public partial class App : Application
             // Core Services
             services.AddSingleton<IFileService, FileService>();
             services.AddSingleton<IPasswordHasher, PasswordHasher>();
-            services.AddSingleton<DbContext, DbContext>();
             services.AddSingleton<PasswordHasher, PasswordHasher>();
 
             // Views and ViewModels

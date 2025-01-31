@@ -8,6 +8,7 @@ using Microsoft.UI.Xaml.Navigation;
 using SevenZipExtractor;
 using SGSClient.Controllers;
 using SGSClient.Core.Database;
+using SGSClient.Core.Extensions;
 using SGSClient.Helpers;
 using SGSClient.Models;
 using SGSClient.ViewModels;
@@ -25,7 +26,7 @@ public sealed partial class GameBasePage : Page
     private string? versionFile;
     private string? gameZip;
     private string? gameExe;
-    private string gameIdentifier;
+    private string? gameIdentifier;
     private string? gameZipLink;
     private string? gameVersionLink;
     private string? gameTitle;
@@ -33,9 +34,8 @@ public sealed partial class GameBasePage : Page
     private string? gameDescription;
     private string? hardwareRequirements;
     private string? otherInformations;
-    private Comment _selectedComment;
+    //private Comment? _selectedComment;
     private GameRating? _gameRating;
-    private readonly ConfigurationManagerSQL configManagerSQL;
     private readonly HttpClient httpClient = new();
     public GameBaseViewModel ViewModel { get; }
 
@@ -48,14 +48,14 @@ public sealed partial class GameBasePage : Page
             LauncherStatusHelper.UpdateStatus(PlayButton, CheckUpdateButton, UninstallButton, DownloadProgressBorder, _status, gameZip ?? "");
         }
     }
-    protected override async void OnNavigatedTo(NavigationEventArgs e)
+    protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         DataContext = ViewModel;
         if (e.Parameter is string parameterString && !string.IsNullOrWhiteSpace(parameterString))
         {
             gameIdentifier = parameterString;
 
-            var gamesData = await configManagerSQL.LoadGamesFromDatabaseAsync(true);
+            var gamesData = LoadGamesFromDatabase(true);
             var gameData = gamesData.Find(g => g.GameSymbol == gameIdentifier);
 
             if (gameData != null)
@@ -69,11 +69,11 @@ public sealed partial class GameBasePage : Page
                 otherInformations = gameData.OtherInformations;
                 gameExe = gameData.GameExeName;
 
-                await LoadImagesFromDatabaseAsync(gameIdentifier);
-                await LoadLogoFromDatabaseAsync(gameIdentifier);
+                LoadImagesFromDatabase(gameIdentifier);
+                LoadLogoFromDatabase(gameIdentifier);
 
-                await ViewModel.LoadRatings(gameIdentifier);
-                await ViewModel.LoadGameRatingsStats(gameIdentifier);
+                ViewModel.LoadRatings(gameIdentifier);
+                ViewModel.LoadGameRatingsStats(gameIdentifier);
             }
         }
 
@@ -94,9 +94,75 @@ public sealed partial class GameBasePage : Page
     }
 
     #region DB Handling
-    private async Task LoadImagesFromDatabaseAsync(string gameName)
+    public static List<GamesViewModel> LoadGamesFromDatabase(bool bypassDraftP)
     {
-        var gameImages = await configManagerSQL.LoadGalleryImagesFromDatabaseAsync(gameName);
+        List<GamesViewModel> gamesList = [];
+
+        DataSet ds = db.con.select(@"
+select
+  CAST(g.Id as nvarchar(max))       [GameId]
+, g.Title
+, g.Symbol   [GameSymbol]
+, d.Name     [GameDeveloper]
+, l.LogoPath [LogoPath]
+, t.Name	 [GameType]
+, g.PayloadName
+, g.ExeName
+, g.ZipLink
+, g.VersionLink
+, g.Description
+, g.HardwareRequirements
+, g.OtherInformation
+, CAST(g.DraftP as nvarchar(max)) [DraftP]
+from sgsGames g
+inner join sgsDevelopers d on d.Id = g.DeveloperId
+left join sgsGameLogo l on l.GameId = g.Id
+left join sgsGameTypes t on t.Id = g.TypeId
+where g.DraftP = 0 and @p0 = 0 or @p0 = 1
+order by g.Title
+", bypassDraftP);
+
+        foreach (DataRow dr in ds.Tables[0].Rows)
+        {
+            GamesViewModel game = new GamesViewModel
+            {
+                GameId = dr.TryGetValue("GameId"),
+                GameSymbol = dr.TryGetValue("GameSymbol"),
+                GameTitle = dr.TryGetValue("Title"),
+                GamePayloadName = dr.TryGetValue("PayloadName"),
+                GameExeName = dr.TryGetValue("ExeName"),
+                GameZipLink = dr.TryGetValue("ZipLink"),
+                GameVersionLink = dr.TryGetValue("VersionLink"),
+                GameDescription = dr.TryGetValue("Description"),
+                HardwareRequirements = dr.TryGetValue("HardwareRequirements"),
+                OtherInformations = dr.TryGetValue("OtherInformation"),
+                GameDeveloper = dr.TryGetValue("GameDeveloper"),
+                LogoPath = dr.TryGetValue("LogoPath"),
+                GameType = dr.TryGetValue("GameType"),
+                DraftP = dr.TryGetValue("DraftP"),
+            };
+            gamesList.Add(game);
+        }
+        return gamesList;
+    }
+    public static List<string> LoadGalleryImagesFromDatabase(string gameSymbol)
+    {
+        List<string> galleryImages = [];
+        var ds = db.con.select(@"
+select
+  i.ImagePath
+from sgsGameImages i
+inner join sgsGames g on g.Id = i.GameId
+where g.Symbol = @p0
+", gameSymbol);
+        foreach (DataRow dr in ds.Tables[0].Rows)
+            galleryImages.Add(dr.TryGetValue("ImagePath").ToString());
+
+        return galleryImages;
+    }
+    private void LoadImagesFromDatabase(string gameName)
+    {
+        var gameImages = LoadGalleryImagesFromDatabase(gameName);
 
         if (gameImages == null || gameImages.Count == 0)
         {
@@ -124,9 +190,9 @@ public sealed partial class GameBasePage : Page
             }
         }
     }
-    private async Task LoadLogoFromDatabaseAsync(string gameName)
+    private void LoadLogoFromDatabase(string gameName)
     {
-        var games = await configManagerSQL.LoadGamesFromDatabaseAsync(true);
+        var games = LoadGamesFromDatabase(true);
         var gameData = games.Find(g => g.GameSymbol == gameName);
 
         if (gameData == null || string.IsNullOrEmpty(gameData.LogoPath))
@@ -187,27 +253,26 @@ public sealed partial class GameBasePage : Page
     #endregion
 
     #region Rating
-    private void RatingRatingControl_ValueChanged(RatingControl sender, object args)
+    private static void RatingRatingControl_ValueChanged(RatingControl sender, object args)
     {
-        if (sender is null)
-        {
-            throw new ArgumentNullException(nameof(sender));
-        }
+        ArgumentNullException.ThrowIfNull(sender);
     }
     private async void AddRatingButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
-        bool hasUserRated = await ViewModel.UserRatingP();
+        bool hasUserRated = ViewModel.UserRatingP();
 
         if (hasUserRated)
         {
             List<GameRating> gameRatings = [];
-            var dataSet = await ViewModel.ReturnUserRating(gameIdentifier);
-            if (dataSet.Tables[0].Rows.Count > 0)
+            DataSet ds = ViewModel.ReturnUserRating(gameIdentifier);
+            if (ds.Tables[0].Rows.Count > 0)
             {
-                foreach (DataRow row in dataSet.Tables[0].Rows)
+                foreach (DataRow row in ds.Tables[0].Rows)
                 {
-                    _gameRating = new GameRating();
-                    _gameRating.RatingId = row.Field<int>("Id");
+                    _gameRating = new GameRating
+                    {
+                        RatingId = row.Field<int>("Id")
+                    };
                     RatingTitleTextBox.Text = row.Field<string>("Title");
                     RatingRatingControl.Value = row.Field<int>("Rating");
                     RatingReviewTextBox.Text = row.Field<string>("Review");
@@ -227,11 +292,11 @@ public sealed partial class GameBasePage : Page
             await AddRatingDetailsDialog.ShowAsync();
         }
     }
-    private async void AddRatingButton_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+    private void AddRatingButton_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
     {
         GameRating gameRating = new();
         _gameRating = gameRating;
-        var dataSet = await ViewModel.ReturnUserRating(gameIdentifier);
+        var dataSet = ViewModel.ReturnUserRating(gameIdentifier);
         if (dataSet.Tables[0].Rows.Count > 0)
         {
             foreach (DataRow row in dataSet.Tables[0].Rows)
@@ -243,20 +308,22 @@ public sealed partial class GameBasePage : Page
         _gameRating.Rating = (int)RatingRatingControl.Value;
         _gameRating.Review = RatingReviewTextBox.Text;
         ViewModel.AddRating(gameIdentifier, _gameRating);
-        await ViewModel.LoadRatings(gameIdentifier);
+        ViewModel.LoadRatings(gameIdentifier);
 
         AddRatingDetailsDialog.Hide();
+    }
+    private void ShowAllReviewsButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+
     }
     #endregion
 
     public GameBasePage()
     {
-        configManagerSQL = new ConfigurationManagerSQL(new DbContext());
         ViewModel = App.GetService<GameBaseViewModel>();
         InitializeComponent();
         Status = LauncherStatus.pageLauched;
     }
-
 
     private void IsUpdated()
     {
@@ -294,7 +361,7 @@ public sealed partial class GameBasePage : Page
     {
         try
         {
-            var onlineVersionString = configManagerSQL.GetGameVersion(gameIdentifier);
+            var onlineVersionString = GetGameVersion(gameIdentifier);
             return new SGSVersion.Version(onlineVersionString);
         }
         catch (Exception ex)
@@ -303,6 +370,21 @@ public sealed partial class GameBasePage : Page
             throw;
         }
     }
+    public string GetGameVersion(string gameIdentifier)
+    {
+        List<string> galleryImages = [];
+        var ds = db.con.select(@"
+select
+  g.CurrentVersion
+from sgsGames g
+where g.Symbol = @p0
+", gameIdentifier);
+        if (ds.Tables[0].Rows.Count > 0)
+            return ds.Tables[0].Rows[0].TryGetValue("CurrentVersion");
+        else
+            return "0.0.0.0";
+    }
+
     private void CheckForUpdates()
     {
         try
@@ -465,9 +547,5 @@ public sealed partial class GameBasePage : Page
     }
     #endregion
 
-    private void ShowAllReviewsButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
-    {
-
-    }
 
 }
