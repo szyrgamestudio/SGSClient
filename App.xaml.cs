@@ -1,8 +1,10 @@
 ﻿using System.Configuration;
 using System.Diagnostics;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.UI.Xaml;
+
 using SGSClient.Activation;
 using SGSClient.Contracts.Services;
 using SGSClient.Core.Authorization;
@@ -83,6 +85,8 @@ public partial class App : Application
             services.AddSingleton<PasswordHasher, PasswordHasher>();
 
             // Views and ViewModels
+            services.AddTransient<SettingsUserViewModel>();
+            services.AddTransient<SettingsUserPage>();
             services.AddTransient<EditGameViewModel>();
             services.AddTransient<EditGamePage>();
             services.AddTransient<MyGamesViewModel>();

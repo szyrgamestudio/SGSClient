@@ -253,7 +253,7 @@ where g.Symbol = @p0
     #endregion
 
     #region Rating
-    private static void RatingRatingControl_ValueChanged(RatingControl sender, object args)
+    private void RatingRatingControl_ValueChanged(RatingControl sender, object args)
     {
         ArgumentNullException.ThrowIfNull(sender);
     }

@@ -402,4 +402,7 @@
   <data name="Shell_UserAccount.Content" xml:space="preserve">
     <value>Moje konto</value>
   </data>
+  <data name="Shell_SettingsUser.Content" xml:space="preserve">
+    <value>Ustawienia — twoje informacje</value>
+  </data>
 </root>
