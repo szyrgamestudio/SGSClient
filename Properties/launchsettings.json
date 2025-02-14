@@ -1,0 +1,12 @@
+﻿{
+    "profiles": {
+      "SGSClient (Package)": {
+        "commandName": "MsixPackage",
+        "nativeDebugging": false
+      },
+      "SGSClient (Unpackaged)": {
+        "commandName": "Project",
+        "nativeDebugging": false
+      }
+    }
+}

@@ -1,0 +1,248 @@
+﻿<Page
+    x:Class="SGSClient.Views.MyAccountPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:behaviors="using:SGSClient.Behaviors"
+    xmlns:controls="using:SGSClient.Controls"
+    xmlns:core="using:Microsoft.Xaml.Interactions.Core"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+    xmlns:local="using:SGSClient.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="using:SGSClient.ViewModels" d:DataContext="{d:DesignInstance Type=vm:MyAccountViewModel}"
+    mc:Ignorable="d"
+    behaviors:NavigationViewHeaderBehavior.HeaderMode="Never">
+    <Grid x:Name="ContentArea">
+        <GridView
+            x:Name="itemGridView"
+            Padding="24,0,24,0"
+            AutomationProperties.AutomationId="ItemGridView"
+            AutomationProperties.Name="Items In Group"
+            IsItemClickEnabled="True"
+            IsSwipeEnabled="False">
+            <GridView.Header>
+                <Grid x:Name="HeaderGrid" Margin="-24,0,-24,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="204" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Ellipse Width="50" Height="50" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,12,12,0">
+                        <Ellipse.Fill>
+                            <ImageBrush ImageSource="{Binding AvatarUrl}" Stretch="UniformToFill"/>
+                        </Ellipse.Fill>
+                    </Ellipse>
+                    <TextBlock AutomationProperties.AutomationId="__ClickableAreaTextBlock" />
+                    <StackPanel
+                        Margin="36,0,0,0"
+                        VerticalAlignment="Center"
+                        Orientation="Vertical">
+                        <TextBlock
+                            x:Name="smallHeaderSubtitleText"
+                            FontSize="48"
+                            FontWeight="Bold"
+                            Text="Moje konto" />
+                        <TextBlock
+                            x:Name="smallHeaderText"
+                            FontSize="24"
+                            FontWeight="Light"
+                            Text="{Binding WelcomeText}" />
+                    </StackPanel>
+                    <ScrollViewer
+                        x:Name="scroller"
+                        Grid.Row="1"
+                        HorizontalScrollBarVisibility="Hidden"
+                        HorizontalScrollMode="Enabled"
+                        SizeChanged="Scroller_SizeChanged"
+                        VerticalScrollMode="Disabled"
+                        ViewChanging="Scroller_ViewChanging">
+                        <Grid x:Name="ContentGrid" Margin="36,0,36,0">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <Grid
+                                    Width="198"
+                                    Height="220"
+                                    Background="{ThemeResource AcrylicBackgroundFillColorBaseBrush}"
+                                    BorderBrush="{ThemeResource SurfaceStrokeColorFlyoutBrush}"
+                                    CornerRadius="8">
+                                    <Grid.Resources>
+                                        <ResourceDictionary>
+                                            <ResourceDictionary.ThemeDictionaries>
+                                                <ResourceDictionary x:Key="Light">
+                                                    <SolidColorBrush x:Key="ButtonBorderBrush" Color="{ThemeResource ControlStrokeColorDefault}" />
+                                                    <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="{ThemeResource ControlStrokeColorSecondary}" />
+                                                    <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="{ThemeResource ControlStrokeColorDefault}" />
+                                                    <SolidColorBrush x:Key="ButtonBorderBrushDisabled" Color="{ThemeResource ControlStrokeColorDefault}" />
+                                                </ResourceDictionary>
+                                                <ResourceDictionary x:Key="Dark">
+                                                    <SolidColorBrush x:Key="ButtonBorderBrush" Color="{ThemeResource ControlStrokeColorDefault}" />
+                                                    <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="{ThemeResource ControlStrokeColorSecondary}" />
+                                                    <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="{ThemeResource ControlStrokeColorDefault}" />
+                                                    <SolidColorBrush x:Key="ButtonBorderBrushDisabled" Color="{ThemeResource ControlStrokeColorDefault}" />
+                                                </ResourceDictionary>
+                                                <ResourceDictionary x:Key="HighContrast">
+                                                    <SolidColorBrush x:Key="ButtonBorderBrush" Color="{ThemeResource SystemColorButtonTextColor}" />
+                                                    <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="{ThemeResource SystemColorButtonTextColor}" />
+                                                    <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="{ThemeResource SystemColorButtonTextColor}" />
+                                                    <SolidColorBrush x:Key="ButtonBorderBrushDisabled" Color="{ThemeResource SystemColorButtonTextColor}" />
+                                                </ResourceDictionary>
+                                            </ResourceDictionary.ThemeDictionaries>
+                                        </ResourceDictionary>
+                                    </Grid.Resources>
+                                    <!--Button 2-->
+                                    <Button
+                                        Padding="-1"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Stretch"
+                                        HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        AutomationProperties.LabeledBy="{Binding ElementName=TitleText}"
+                                        Click="MyGamesButton_Click"
+                                        CornerRadius="{StaticResource OverlayCornerRadius}">
+                                        <Grid
+                                            Padding="24"
+                                            VerticalAlignment="Stretch"
+                                            RowSpacing="16">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="56" />
+                                                <RowDefinition Height="*" />
+                                            </Grid.RowDefinitions>
+                                            <FontIcon
+                                                Grid.RowSpan="3"
+                                                Margin="-12"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Bottom"
+                                                FontSize="16"
+                                                Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                                Glyph="&#xE8A7;" />
+                                            <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Top">
+                                                <ContentPresenter.Content>
+                                                    <FontIcon FontSize="48" Glyph="&#xE7FC;" />
+                                                </ContentPresenter.Content>
+                                            </ContentPresenter>
+                                            <StackPanel
+                                                Grid.Row="1"
+                                                Orientation="Vertical"
+                                                Spacing="4">
+                                                <TextBlock
+                                                    x:Name="TitleText2"
+                                                    FontSize="18"
+                                                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                                    Style="{StaticResource BodyTextBlockStyle}"
+                                                    Text="Moje gry" />
+                                                <TextBlock
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Style="{StaticResource CaptionTextBlockStyle}"
+                                                    Text="Zarządzaj swoimi grami." />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Button>
+                                </Grid>
+                                <Grid
+                                    Width="198"
+                                    Height="220"
+                                    Background="{ThemeResource AcrylicBackgroundFillColorBaseBrush}"
+                                    BorderBrush="{ThemeResource SurfaceStrokeColorFlyoutBrush}"
+                                    CornerRadius="8">
+                                    <Grid.Resources>
+                                        <ResourceDictionary>
+                                            <ResourceDictionary.ThemeDictionaries>
+                                                <ResourceDictionary x:Key="Light">
+                                                    <SolidColorBrush x:Key="ButtonBorderBrush" Color="{ThemeResource ControlStrokeColorDefault}" />
+                                                    <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="{ThemeResource ControlStrokeColorSecondary}" />
+                                                    <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="{ThemeResource ControlStrokeColorDefault}" />
+                                                    <SolidColorBrush x:Key="ButtonBorderBrushDisabled" Color="{ThemeResource ControlStrokeColorDefault}" />
+                                                </ResourceDictionary>
+                                                <ResourceDictionary x:Key="Dark">
+                                                    <SolidColorBrush x:Key="ButtonBorderBrush" Color="{ThemeResource ControlStrokeColorDefault}" />
+                                                    <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="{ThemeResource ControlStrokeColorSecondary}" />
+                                                    <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="{ThemeResource ControlStrokeColorDefault}" />
+                                                    <SolidColorBrush x:Key="ButtonBorderBrushDisabled" Color="{ThemeResource ControlStrokeColorDefault}" />
+                                                </ResourceDictionary>
+                                                <ResourceDictionary x:Key="HighContrast">
+                                                    <SolidColorBrush x:Key="ButtonBorderBrush" Color="{ThemeResource SystemColorButtonTextColor}" />
+                                                    <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="{ThemeResource SystemColorButtonTextColor}" />
+                                                    <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="{ThemeResource SystemColorButtonTextColor}" />
+                                                    <SolidColorBrush x:Key="ButtonBorderBrushDisabled" Color="{ThemeResource SystemColorButtonTextColor}" />
+                                                </ResourceDictionary>
+                                            </ResourceDictionary.ThemeDictionaries>
+                                        </ResourceDictionary>
+                                    </Grid.Resources>
+                                    <!--Button 1-->
+                                    <Button
+                                        Padding="-1"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Stretch"
+                                        HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        AutomationProperties.LabeledBy="{Binding ElementName=TitleText}"
+                                        Click="UploadButton_Click"
+                                        CornerRadius="{StaticResource OverlayCornerRadius}">
+                                        <Grid
+                                            Padding="24"
+                                            VerticalAlignment="Stretch"
+                                            RowSpacing="16">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="56" />
+                                                <RowDefinition Height="*" />
+                                            </Grid.RowDefinitions>
+                                            <FontIcon
+                                                Grid.RowSpan="3"
+                                                Margin="-12"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Bottom"
+                                                FontSize="16"
+                                                Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                                Glyph="&#xE8A7;" />
+                                            <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Top">
+                                                <ContentPresenter.Content>
+                                                    <FontIcon FontSize="48" Glyph="&#xE898;" />
+                                                </ContentPresenter.Content>
+                                            </ContentPresenter>
+                                            <StackPanel
+                                                Grid.Row="1"
+                                                Orientation="Vertical"
+                                                Spacing="4">
+                                                <TextBlock
+                                                    x:Name="TitleText"
+                                                    FontSize="18"
+                                                    Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                                    Style="{StaticResource BodyTextBlockStyle}"
+                                                    Text="Dodaj grę" />
+                                                <TextBlock
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Style="{StaticResource CaptionTextBlockStyle}"
+                                                    Text="Zgłoś swoją nową grę." />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Button>
+                                </Grid>
+                            </StackPanel>
+                            <Button
+                                x:Name="ScrollBackBtn"
+                                Width="16"
+                                Height="38"
+                                Margin="8,-16,0,0"
+                                AutomationProperties.Name="Scroll left"
+                                Click="ScrollBackBtn_Click"
+                                ToolTipService.ToolTip="Scroll left"
+                                Visibility="Collapsed">
+                                <FontIcon FontSize="{ThemeResource FlipViewButtonFontSize}" Glyph="&#xedd9;" />
+                            </Button>
+                            <Button
+                                x:Name="ScrollForwardBtn"
+                                Width="16"
+                                Height="38"
+                                Margin="0,-16,8,0"
+                                HorizontalAlignment="Right"
+                                AutomationProperties.Name="Scroll right"
+                                Click="ScrollForwardBtn_Click"
+                                ToolTipService.ToolTip="Scroll right">
+                                <FontIcon FontSize="{ThemeResource FlipViewButtonFontSize}" Glyph="&#xEDDA;" />
+                            </Button>
+                        </Grid>
+                    </ScrollViewer>
+                </Grid>
+            </GridView.Header>
+        </GridView>
+    </Grid>
+</Page>

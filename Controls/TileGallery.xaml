@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<UserControl
+    x:Class="SGSClient.Controls.TileGallery"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:SGSClient.Controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid>
+        <ScrollViewer
+            x:Name="scroller"
+            HorizontalScrollBarVisibility="Hidden"
+            HorizontalScrollMode="Enabled"
+            SizeChanged="scroller_SizeChanged"
+            VerticalScrollMode="Disabled"
+            ViewChanging="scroller_ViewChanging">
+            <Grid x:Name="ContentGrid" Margin="36,0,36,0">
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <local:HeaderTile
+                        Title="Sklep"
+                        Description="Przeglądaj wszysztkie dostępne gry."
+                        Link="https://docs.microsoft.com/windows/apps/get-started/">
+                        <local:HeaderTile.Source>
+                            <FontIcon FontSize="48" Glyph="&#xE7BF;" />
+                        </local:HeaderTile.Source>
+                    </local:HeaderTile>
+                    <local:HeaderTile
+                        Title="Dodaj grę."
+                        Description="Złóż wniosek o dodanie własnej produkcji do SGSClienta."
+                        Link="https://docs.microsoft.com/windows/apps/design/">
+                        <local:HeaderTile.Source>
+                            <FontIcon FontSize="48" Glyph="&#xE898;" />
+                        </local:HeaderTile.Source>
+                    </local:HeaderTile>
+                    <!--<local:HeaderTile
+                        Title="Community Toolkit"
+                        Description="A collection of helper functions, custom controls, and app services."
+                        Link="https://apps.microsoft.com/store/detail/windows-community-toolkit-sample-app/9NBLGGH4TLCQ">
+                        <local:HeaderTile.Source>
+                            <Image Source="/Assets/HomeHeaderTiles/Header-Toolkit.png" />
+                        </local:HeaderTile.Source>
+                    </local:HeaderTile>-->
+                </StackPanel>
+                <Button
+                    x:Name="ScrollBackBtn"
+                    Width="16"
+                    Height="38"
+                    Margin="8,-16,0,0"
+                    AutomationProperties.Name="Scroll left"
+                    Click="ScrollBackBtn_Click"
+                    ToolTipService.ToolTip="Scroll left"
+                    Visibility="Collapsed">
+                    <FontIcon FontSize="{ThemeResource FlipViewButtonFontSize}" Glyph="&#xedd9;" />
+                </Button>
+                <Button
+                    x:Name="ScrollForwardBtn"
+                    Width="16"
+                    Height="38"
+                    Margin="0,-16,8,0"
+                    HorizontalAlignment="Right"
+                    AutomationProperties.Name="Scroll right"
+                    Click="ScrollForwardBtn_Click"
+                    ToolTipService.ToolTip="Scroll right">
+                    <FontIcon FontSize="{ThemeResource FlipViewButtonFontSize}" Glyph="&#xEDDA;" />
+                </Button>
+            </Grid>
+
+
+        </ScrollViewer>
+    </Grid>
+</UserControl>

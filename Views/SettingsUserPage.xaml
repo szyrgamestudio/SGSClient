@@ -1,0 +1,39 @@
+﻿<Page
+    x:Class="SGSClient.Views.SettingsUserPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:helpers="using:SGSClient.Helpers"
+    xmlns:xaml="using:Microsoft.UI.Xaml"
+    xmlns:labs="using:CommunityToolkit.Labs.WinUI"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <helpers:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
+    </Page.Resources>
+
+    <Grid x:Name="ContentArea">
+        <StackPanel>
+            <StackPanel>
+                <TextBlock Text="Ustawienia konta" Margin="{StaticResource SettingsPageHeaderTextBox}" />
+            </StackPanel>
+
+            <!-- Akcje konta -->
+            <labs:SettingsExpander Description="Zarządzaj ustawieniami swojego konta" Header="Ustawienia konta" IsExpanded="True">
+                <TextBlock
+                        Margin="0,-2,0,0"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        IsTextSelectionEnabled="True" />
+                <labs:SettingsExpander.Items>
+                    <labs:SettingsCard Description="Zmień ustawienia konta" Header="Resetowanie hasła" x:Name="accountResetPasswd">
+                        <Button x:Name="resetPasswdButton" Content="Zmień hasło" Style="{StaticResource AccentButtonStyle}" Click="ChangePasswordButton_Click" />
+                    </labs:SettingsCard>
+                    <labs:SettingsCard Description="Zarządzaj sesją konta" Header="Wylogowanie" x:Name="accountSettings">
+                        <Button x:Name="accountButton" Content="Wyloguj się" Style="{StaticResource AccentButtonStyle}" Click="LogoutButton_Click" />
+                    </labs:SettingsCard>
+                </labs:SettingsExpander.Items>
+            </labs:SettingsExpander>
+        </StackPanel>
+    </Grid>
+</Page>
