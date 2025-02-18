@@ -4,68 +4,83 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using SGSClient.Core.Authorization;
 using SGSClient.Core.Database;
 using SGSClient.Core.Extensions;
+using SGSClient.Models;
 
-namespace SGSClient.ViewModels;
-
-public partial class MyGamesViewModel : ObservableRecipient
+namespace SGSClient.ViewModels
 {
-    private ObservableCollection<GamesViewModel> _gamesList;
-    private readonly IAppUser _appUser;
-
-    public ObservableCollection<GamesViewModel> GamesList
+    public partial class MyGamesViewModel : ObservableRecipient
     {
-        get => _gamesList;
-        private set => SetProperty(ref _gamesList, value);
-    }
-    public MyGamesViewModel(IAppUser appUser)
-    {
-        GamesList = new ObservableCollection<GamesViewModel>();
-        _appUser = appUser;
-    }
-
-    public async Task LoadMyGamesFromDatabaseAsync()
-    {
-        try
+        #region Constructors and Properties
+        private readonly IAppUser _appUser;
+        public ObservableCollection<Game> MyGamesList { get; private set; } = new();
+        public MyGamesViewModel(IAppUser appUser)
         {
-            GamesList = new ObservableCollection<GamesViewModel>(await LoadMyGamesFromDBAsync());
+            _appUser = appUser;
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"An error occurred while loading games: {ex.Message}");
-        }
-    }
+        #endregion
 
-    public async Task<List<GamesViewModel>> LoadMyGamesFromDBAsync()
-    {
-        List<GamesViewModel> gamesList = [];
-        var dataSet = db.con.select(SqlQueries.gamesUserInfo, _appUser.UserId);
-        if (dataSet.Tables[0].Rows.Count > 0)
+        #region Public Methods
+        public void LoadMyGamesFromDatabase()
         {
-            foreach (DataRow row in dataSet.Tables[0].Rows)
+            try
             {
-                GamesViewModel game = new GamesViewModel(
-                    gameId: row["GameId"].ToString(),
-                    gameSymbol: row["GameSymbol"].ToString(),
-                    gameTitle: row["Title"].ToString(),
-                    gamePayloadName: row["PayloadName"].ToString(),
-                    gameExeName: row["ExeName"].ToString(),
-                    gameZipLink: row["ZipLink"].ToString(),
-                    gameVersionLink: row["VersionLink"].ToString(),
-                    gameDescription: row["Description"].ToString(),
-                    hardwareRequirements: row["HardwareRequirements"].ToString(),
-                    otherInformations: row["OtherInformation"].ToString(),
-                    gameDeveloper: row["GameDeveloper"].ToString(),
-                    logoPath: row["LogoPath"].ToString(),
-                    gameType: row["GameType"].ToString(),
-                    draftP: row["DraftP"].ToString()
-                );
-
-                gamesList.Add(game);
+                MyGamesList = new ObservableCollection<Game>(FetchMyGamesFromDatabase());
             }
-            return gamesList;
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading my games: {ex.Message}");
+            }
         }
-        else
-            return gamesList;
-    }
+        #endregion
 
+        #region Private or Protected Methods
+        private IEnumerable<Game> FetchMyGamesFromDatabase()
+        {
+            DataSet ds = db.con.select(@"
+select
+  g.Id       [GameId]
+, g.Title
+, g.Symbol   [GameSymbol]
+, d.Name     [GameDeveloper]
+, l.LogoPath [LogoPath]
+, t.Name	 [GameType]
+, g.PayloadName
+, g.ExeName
+, g.ZipLink
+, g.VersionLink
+, g.Description
+, g.HardwareRequirements
+, g.OtherInformation
+, g.DraftP
+from sgsGames g
+inner join sgsDevelopers d on d.Id = g.DeveloperId
+left join sgsGameLogo l on l.GameId = g.Id
+left join sgsGameTypes t on t.Id = g.TypeId
+inner join sgsUserGames ug on ug.GameId = g.Id
+where ug.UserId = @p0
+order by g.Title", _appUser.UserId);
+
+            return ds.Tables[0].AsEnumerable().Select(dr => new Game
+            {
+                GameId = dr.TryGetValue<int>("GameId"),
+                GameSymbol = dr.TryGetValue<string>("GameSymbol"),
+                GameName = dr.TryGetValue<string>("Title"),
+                GameDeveloper = dr.TryGetValue<string>("GameDeveloper"),
+                GameTitle = dr.TryGetValue<string>("Title"),
+                ImageSource = new Uri(dr.TryGetValue<string>("LogoPath") ?? "about:blank"),
+                GameVersion = string.Empty,
+                GamePayloadName = dr.TryGetValue<string>("PayloadName"),
+                GameExeName = dr.TryGetValue<string>("ExeName"),
+                GameZipLink = dr.TryGetValue<string>("ZipLink"),
+                GameVersionLink = dr.TryGetValue<string>("VersionLink"),
+                GameDescription = dr.TryGetValue<string>("Description"),
+                HardwareRequirements = dr.TryGetValue<string>("HardwareRequirements"),
+                OtherInformations = dr.TryGetValue<string>("OtherInformation"),
+                LogoPath = dr.TryGetValue<string>("LogoPath"),
+                GameType = dr.TryGetValue<string>("GameType"),
+                DraftP = dr.TryGetValue<bool>("DraftP")
+            });
+        }
+        #endregion
+    }
 }

@@ -8,6 +8,7 @@ namespace SGSClient.Views
 {
     public sealed partial class GamesPage : Page
     {
+        #region Constructors and properties
         public GamesViewModel ViewModel { get; }
         public GamesPage()
         {
@@ -15,6 +16,9 @@ namespace SGSClient.Views
             DataContext = ViewModel;
             InitializeComponent();
         }
+        #endregion
+
+        #region Private or protected methods
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
@@ -31,10 +35,8 @@ namespace SGSClient.Views
                 }
             }
         }
-        private void FilterButton_Click(object sender, RoutedEventArgs e)
-        {
-            ApplyFilters();
-        }
+
+        #region Filters
         private void SearchTextBox_KeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
         {
             if (e.Key == Windows.System.VirtualKey.Enter)
@@ -56,23 +58,9 @@ namespace SGSClient.Views
                 ApplyFilters();
             }
         }
-        private void ApplyFilters()
+        private void FilterButton_Click(object sender, RoutedEventArgs e)
         {
-            string searchTitleText = SearchTextBox.Text.ToLower();
-            string searchAuthorText = SearchAuthorTextBox.Text.ToLower();
-            string? selectedCategory = (CategoryComboBox.SelectedItem as ComboBoxItem)?.Content.ToString();
-
-            try
-            {
-                var filteredGames = ViewModel.GamesList.Where(game =>
-    (string.IsNullOrEmpty(searchTitleText) || game.GameTitle.ToLower().Contains(searchTitleText))
-    && (string.IsNullOrEmpty(searchAuthorText) || game.GameDeveloper.ToLower().Contains(searchAuthorText))
-    /*&& (selectedCategory == "Wszystkie" || string.IsNullOrEmpty(selectedCategory) || game.GameType == selectedCategory)*/).ToList();
-
-                GamesItemsControl.ItemsSource = filteredGames;
-
-            }
-            catch (Exception ex) { }
+            ApplyFilters();
         }
         private void ClearFilterButton_Click(object sender, RoutedEventArgs e)
         {
@@ -81,5 +69,21 @@ namespace SGSClient.Views
             CategoryComboBox.SelectedIndex = -1;
             GamesItemsControl.ItemsSource = ViewModel.GamesList;
         }
+        private void ApplyFilters()
+        {
+            string searchTitleText = SearchTextBox.Text.ToLower();
+            string searchAuthorText = SearchAuthorTextBox.Text.ToLower();
+            string? selectedCategory = (CategoryComboBox.SelectedItem as ComboBoxItem)?.Content.ToString();
+
+            var filteredGames = ViewModel.GamesList.Where(game =>
+(string.IsNullOrEmpty(searchTitleText) || game.GameTitle.ToLower().Contains(searchTitleText))
+&& (string.IsNullOrEmpty(searchAuthorText) || game.GameDeveloper.ToLower().Contains(searchAuthorText))
+).ToList();
+
+            GamesItemsControl.ItemsSource = filteredGames;
+        }
+        #endregion
+
+        #endregion
     }
 }

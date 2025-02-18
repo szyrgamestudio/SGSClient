@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
+using SGSClient.Models;
 using SGSClient.ViewModels;
 
 namespace SGSClient.Views
@@ -11,6 +12,7 @@ namespace SGSClient.Views
     {
         public ObservableCollection<Game> Games { get; set; }
         public MyGamesViewModel ViewModel { get; }
+
         public MyGamesPage()
         {
             ViewModel = App.GetService<MyGamesViewModel>();
@@ -19,30 +21,23 @@ namespace SGSClient.Views
             InitializeComponent();
         }
 
-        protected async override void OnNavigatedTo(NavigationEventArgs e)
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
 
-            await ViewModel.LoadMyGamesFromDatabaseAsync();
+            // Ładowanie gier użytkownika z bazy danych
+            ViewModel.LoadMyGamesFromDatabase();
 
-            if (ViewModel.GamesList == null)
+            if (ViewModel.MyGamesList == null || !ViewModel.MyGamesList.Any())
                 return;
 
-            foreach (var gameViewModel in ViewModel.GamesList)
+            // Dodanie gier do lokalnej kolekcji
+            foreach (var game in ViewModel.MyGamesList)
             {
-                if (gameViewModel != null)
-                {
-                    Games.Add(new Game
-                    {
-                        GameId = gameViewModel.GameId,
-                        Title = gameViewModel.GameTitle,
-                        Genre = !string.IsNullOrEmpty(gameViewModel.GameType) ? gameViewModel.GameType : "-",
-                        DraftP = Convert.ToBoolean(gameViewModel.DraftP) ? "Oczekuje na wydanie" : "Tak",
-                        gameSymbol = gameViewModel.GameSymbol
-                    });
-                }
+                Games.Add(game);
             }
         }
+
         private void Action_Click(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;
@@ -51,38 +46,14 @@ namespace SGSClient.Views
             if (game != null)
                 Frame.Navigate(typeof(EditGamePage), game.GameId, new DrillInNavigationTransitionInfo());
         }
+
         private void Preview_Click(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;
             var game = button?.DataContext as Game;
 
             if (game != null)
-                Frame.Navigate(typeof(GameBasePage), game.gameSymbol, new DrillInNavigationTransitionInfo());
+                Frame.Navigate(typeof(GameBasePage), game.GameSymbol, new DrillInNavigationTransitionInfo());
         }
-    }
-
-    public class Game
-    {
-        public string GameId
-        {
-            get; set;
-        }
-        public string Title
-        {
-            get; set;
-        }
-        public string Genre
-        {
-            get; set;
-        }
-        public string DraftP
-        {
-            get; set;
-        }
-        public string gameSymbol
-        {
-            get; set;
-        }
-        // Dodaj inne właściwości gry, jeśli są potrzebne
     }
 }

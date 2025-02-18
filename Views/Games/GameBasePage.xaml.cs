@@ -15,6 +15,7 @@ using SGSClient.ViewModels;
 using Windows.ApplicationModel.Core;
 using Windows.Storage;
 using File = System.IO.File;
+using SGSClient.DataAccess.Repositories;
 
 namespace SGSClient.Views;
 
@@ -28,16 +29,11 @@ public sealed partial class GameBasePage : Page
     private string? gameExe;
     private string? gameIdentifier;
     private string? gameZipLink;
-    private string? gameVersionLink;
-    private string? gameTitle;
-    private string? gameDeveloper;
-    private string? gameDescription;
-    private string? hardwareRequirements;
-    private string? otherInformations;
-    //private Comment? _selectedComment;
+
     private GameRating? _gameRating;
     private readonly HttpClient httpClient = new();
     public GameBaseViewModel ViewModel { get; }
+    public GamesViewModel GamesViewModel { get; }
 
     internal LauncherStatus Status
     {
@@ -51,100 +47,66 @@ public sealed partial class GameBasePage : Page
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         DataContext = ViewModel;
+        var game = new Game();
+
         if (e.Parameter is string parameterString && !string.IsNullOrWhiteSpace(parameterString))
         {
             gameIdentifier = parameterString;
 
-            var gamesData = LoadGamesFromDatabase(true);
-            var gameData = gamesData.Find(g => g.GameSymbol == gameIdentifier);
+            var gamesData = GamesRepository.FetchGames(true);
+            var gameData = gamesData.FirstOrDefault(g => g.GameSymbol == gameIdentifier);
 
             if (gameData != null)
             {
-                gameTitle = gameData.GameTitle;
-                gameZipLink = gameData.GameZipLink;
-                gameVersionLink = gameData.GameVersionLink;
-                gameDescription = gameData.GameDescription;
-                gameDeveloper = gameData.GameDeveloper;
-                hardwareRequirements = gameData.HardwareRequirements;
-                otherInformations = gameData.OtherInformations;
-                gameExe = gameData.GameExeName;
+                game = new Game
+                {
+                    GameId = gameData.GameId,
+                    GameSymbol = gameData.GameSymbol,
+                    GameName = gameData.GameName,
+                    GameDeveloper = gameData.GameDeveloper,
+                    GameTitle = gameData.GameTitle,
+                    ImageSource = gameData.ImageSource,
+                    GameVersion = gameData.GameVersion,
+                    GamePayloadName = gameData.GamePayloadName,
+                    GameExeName = gameData.GameExeName,
+                    GameZipLink = gameData.GameZipLink,
+                    GameVersionLink = gameData.GameVersionLink,
+                    GameDescription = gameData.GameDescription,
+                    HardwareRequirements = gameData.HardwareRequirements,
+                    OtherInformations = gameData.OtherInformations,
+                    LogoPath = gameData.LogoPath,
+                    GameType = gameData.GameType,
+                    DraftP = gameData.DraftP
+                };
 
-                LoadImagesFromDatabase(gameIdentifier);
-                LoadLogoFromDatabase(gameIdentifier);
 
-                ViewModel.LoadRatings(gameIdentifier);
-                ViewModel.LoadGameRatingsStats(gameIdentifier);
+                LoadImagesFromDatabase(game.GameSymbol);
+                LoadLogoFromDatabase(game.GameSymbol);
+
+                ViewModel.LoadRatings(game.GameSymbol);
+                ViewModel.LoadGameRatingsStats(game.GameSymbol);
             }
         }
 
         base.OnNavigatedTo(e);
 
+        // Ścieżki do plików lokalnych
         var location = Path.Combine(ApplicationData.Current.LocalFolder.Path, "LocalState");
         rootPath = Path.GetDirectoryName(location) ?? string.Empty;
 
-        #region
+        #region Ścieżki plików
         versionFile = Path.Combine(rootPath, "versions.xml");
         gameZip = Path.Combine(rootPath, $"{gameIdentifier}ARCHIVE");
         gameExe = Path.Combine(rootPath, gameIdentifier ?? "", $"{gameExe}.exe");
         gamepath = Path.Combine(rootPath, gameIdentifier ?? "");
         #endregion
 
-        UpdateUI();
+        // Aktualizacja interfejsu użytkownika i sprawdzenie wersji
+        UpdateUI(game);
         IsUpdated();
     }
 
     #region DB Handling
-    public static List<GamesViewModel> LoadGamesFromDatabase(bool bypassDraftP)
-    {
-        List<GamesViewModel> gamesList = [];
-
-        DataSet ds = db.con.select(@"
-select
-  CAST(g.Id as nvarchar(max))       [GameId]
-, g.Title
-, g.Symbol   [GameSymbol]
-, d.Name     [GameDeveloper]
-, l.LogoPath [LogoPath]
-, t.Name	 [GameType]
-, g.PayloadName
-, g.ExeName
-, g.ZipLink
-, g.VersionLink
-, g.Description
-, g.HardwareRequirements
-, g.OtherInformation
-, CAST(g.DraftP as nvarchar(max)) [DraftP]
-from sgsGames g
-inner join sgsDevelopers d on d.Id = g.DeveloperId
-left join sgsGameLogo l on l.GameId = g.Id
-left join sgsGameTypes t on t.Id = g.TypeId
-where g.DraftP = 0 and @p0 = 0 or @p0 = 1
-order by g.Title
-", bypassDraftP);
-
-        foreach (DataRow dr in ds.Tables[0].Rows)
-        {
-            GamesViewModel game = new GamesViewModel
-            {
-                GameId = dr.TryGetValue("GameId"),
-                GameSymbol = dr.TryGetValue("GameSymbol"),
-                GameTitle = dr.TryGetValue("Title"),
-                GamePayloadName = dr.TryGetValue("PayloadName"),
-                GameExeName = dr.TryGetValue("ExeName"),
-                GameZipLink = dr.TryGetValue("ZipLink"),
-                GameVersionLink = dr.TryGetValue("VersionLink"),
-                GameDescription = dr.TryGetValue("Description"),
-                HardwareRequirements = dr.TryGetValue("HardwareRequirements"),
-                OtherInformations = dr.TryGetValue("OtherInformation"),
-                GameDeveloper = dr.TryGetValue("GameDeveloper"),
-                LogoPath = dr.TryGetValue("LogoPath"),
-                GameType = dr.TryGetValue("GameType"),
-                DraftP = dr.TryGetValue("DraftP"),
-            };
-            gamesList.Add(game);
-        }
-        return gamesList;
-    }
     public static List<string> LoadGalleryImagesFromDatabase(string gameSymbol)
     {
         List<string> galleryImages = [];
@@ -190,10 +152,10 @@ where g.Symbol = @p0
             }
         }
     }
-    private void LoadLogoFromDatabase(string gameName)
+    private void LoadLogoFromDatabase(string gameSymbol)
     {
-        var games = LoadGamesFromDatabase(true);
-        var gameData = games.Find(g => g.GameSymbol == gameName);
+        var games = GamesRepository.FetchGames(true);
+        var gameData = games.FirstOrDefault(g => g.GameSymbol == gameSymbol);
 
         if (gameData == null || string.IsNullOrEmpty(gameData.LogoPath))
         {
@@ -203,14 +165,17 @@ where g.Symbol = @p0
 
         try
         {
-            Uri logoImageUri = new Uri(gameData.LogoPath);
+            Uri logoImageUri = new Uri(gameData.LogoPath, UriKind.Absolute);
             Image? gameLogoImage = FindName("GameLogoImage") as Image;
+
             if (gameLogoImage != null)
+            {
                 gameLogoImage.Source = new BitmapImage(logoImageUri);
+            }
         }
         catch (Exception ex)
         {
-            Debug.WriteLine("Błąd wczytywania obrazu: " + ex.Message);
+            Debug.WriteLine($"Błąd wczytywania obrazu: {ex.Message}");
             SetDefaultLogoImage();
         }
     }
@@ -223,14 +188,14 @@ where g.Symbol = @p0
         if (gameLogoImage != null)
             gameLogoImage.Source = new BitmapImage(new Uri("ms-appx:///Assets/placeholder.png"));
     }
-    private void UpdateUI()
+    private void UpdateUI(Game game)
     {
-        GameNameTextBlock.Text = gameTitle ?? "Brak dostępnych informacji.";
-        GameDeveloperTextBlock.Text = gameDeveloper ?? "Brak dostępnych informacji.";
-        GameDescriptionTextBlock.Text = gameDescription ?? "Brak dostępnych informacji.";
-        HardwareRequirementsTextBlock.Text = hardwareRequirements ?? "Brak dostępnych informacji.";
+        GameNameTextBlock.Text = game.GameName ?? "Brak dostępnych informacji.";
+        GameDeveloperTextBlock.Text = game.GameDeveloper ?? "Brak dostępnych informacji.";
+        GameDescriptionTextBlock.Text = game.GameDescription ?? "Brak dostępnych informacji.";
+        HardwareRequirementsTextBlock.Text = game.HardwareRequirements ?? "Brak dostępnych informacji.";
 
-        if (string.IsNullOrWhiteSpace(otherInformations))
+        if (string.IsNullOrWhiteSpace(game.OtherInformations))
         {
             OtherInformationsTextBlock.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
             OtherInformationsStackPanel.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
@@ -238,7 +203,7 @@ where g.Symbol = @p0
         else
         {
             OtherInformationsTextBlock.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-            OtherInformationsTextBlock.Text = otherInformations;
+            OtherInformationsTextBlock.Text = game.OtherInformations;
         }
 
         if (string.IsNullOrWhiteSpace(HardwareRequirementsTextBlock.Text))
