@@ -50,7 +50,7 @@ where r.Id = @p0
             email = dr.TryGetValue("Email") == DBNull.Value ? string.Empty : dr.TryGetValue("Email");
             username = dr.TryGetValue("Name") == DBNull.Value ? string.Empty : dr.TryGetValue("Name");
 
-            AvatarUrl = _appUser.GetGravatar(email);
+            //AvatarUrl = _appUser.GetGravatar(email);
             WelcomeText = "Witaj, " + username + "!";
         }
         public void NavigateToUpload()

@@ -12,11 +12,6 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
@@ -25,43 +20,38 @@
         </Grid.ColumnDefinitions>
 
         <!-- Logo -->
-        <Image Grid.Row="0" Grid.Column="0" Grid.RowSpan="1" Source="/Assets/SGSLOGO.png" HorizontalAlignment="Center" VerticalAlignment="Center" Height="60" Width="60" Margin="0,0,10,0"/>
+        <Image Grid.Row="0" Grid.Column="0" Grid.RowSpan="1" Source="/Assets/SGSLOGO.png"
+               HorizontalAlignment="Center" VerticalAlignment="Center" Height="60" Width="60"
+               Margin="0,0,10,0"/>
 
         <!-- Nagłówek "Login" -->
-        <TextBlock x:Uid="LoginPage_Login" Grid.Row="0" Grid.Column="1" Height="50" Margin="0,10,0,0" Name="LoginHeading" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="24" FontWeight="Bold"/>
+        <TextBlock Grid.Row="0" Grid.Column="1" Height="50" Margin="0,10,0,0"
+                   Name="LoginHeading" VerticalAlignment="Center" HorizontalAlignment="Left"
+                   FontSize="24" FontWeight="Bold" Text="Logowanie"/>
 
-        <!-- Etykieta "Email" -->
-        <TextBlock Grid.Row="1" Grid.Column="1" Height="23" Margin="0,10,0,0" Name="textBlock1" Text="Email" VerticalAlignment="Top" FontSize="16" Foreground="Gray"/>
-
-        <!-- Pole tekstowe dla adresu e-mail -->
-        <TextBox Grid.Row="2" Grid.Column="1" Height="40" Margin="0,5,0,0" Name="textBoxEmail" VerticalAlignment="Top" FontSize="16" Padding="10" BorderThickness="1"/>
-
-        <!-- Etykieta "Password" -->
-        <TextBlock x:Uid="LoginPage_Password" Grid.Row="3" Grid.Column="1" Height="23" Margin="0,10,0,0" Name="textBlock2" VerticalAlignment="Top" FontSize="16" Foreground="Gray"/>
-
-        <!-- Pole tekstowe dla hasła -->
-        <PasswordBox Grid.Row="4" Grid.Column="1" Height="40" Margin="0,5,0,0" Name="passwordBox1" VerticalAlignment="Top" FontSize="16" Padding="10" BorderThickness="1"/>
-
-        <!-- Przycisk "Login" -->
-        <Button Grid.Row="5" Grid.Column="1" Content="Zaloguj" Height="40" Margin="0,20,0,0" Name="button1" VerticalAlignment="Top" Click="ButtonLogin_Click" FontSize="16" Style="{StaticResource AccentButtonStyle}" BorderThickness="0" Width="120"/>
-
-        <!-- Komunikat o błędzie -->
-        <TextBlock Grid.Row="6" Grid.Column="1" Height="23" HorizontalAlignment="Left" x:Name="errormessage" Margin="0,10,0,0" Foreground="#FF0000" FontSize="14" TextWrapping="Wrap"/>
+        <!-- Przycisk "Zaloguj przez Entra ID" -->
+        <Button Grid.Row="1" Grid.Column="1" Content="Zaloguj przez Entra ID"
+                Height="40" Margin="0,20,0,0" Name="buttonLogin" VerticalAlignment="Top"
+                Click="ButtonLogin_Click" FontSize="16" Style="{StaticResource AccentButtonStyle}"
+                BorderThickness="0" Width="220"/>
 
         <!-- Link do rejestracji -->
-        <TextBlock Grid.Row="7" Grid.Column="1" Height="25" Margin="0,20,0,0" Name="textBlockHeading" VerticalAlignment="Top" FontSize="16" FontStyle="Italic" Padding="5">
-        <Run Text="Nie masz konta? "/>
-        <Hyperlink Click="ButtonRegister_Click" FontSize="16" FontStyle="Normal" Foreground="#0078D4">
-            <Run x:Uid="LoginPage_RegisterBtn"/>
-        </Hyperlink>
+        <TextBlock Grid.Row="2" Grid.Column="1" Height="25" Margin="0,20,0,0"
+                   VerticalAlignment="Top" FontSize="16" FontStyle="Italic" Padding="5">
+            <Run Text="Nie masz konta? "/>
+            <Hyperlink Click="ButtonRegister_Click" FontSize="16" FontStyle="Normal"
+                       Foreground="#0078D4">
+                <Run Text="Zarejestruj się"/>
+            </Hyperlink>
         </TextBlock>
 
         <!-- Link "Zapomniałem hasła" -->
-        <TextBlock Grid.Row="8" Grid.Column="1" Height="50" Margin="0,20,0,0" Name="textBlockForgotPassword" VerticalAlignment="Top" FontSize="16" FontStyle="Italic" Padding="5">
-            <Hyperlink Click="HyperlinkForgotPassword_Click" FontSize="16" FontStyle="Normal" Foreground="#0078D4">
-                <Run x:Uid="LoginPage_ForgotPasswdBtn"/>
+        <TextBlock Grid.Row="3" Grid.Column="1" Height="50" Margin="0,20,0,0"
+                   VerticalAlignment="Top" FontSize="16" FontStyle="Italic" Padding="5">
+            <Hyperlink Click="HyperlinkForgotPassword_Click" FontSize="16"
+                       FontStyle="Normal" Foreground="#0078D4">
+                <Run Text="Zapomniałem hasła"/>
             </Hyperlink>
         </TextBlock>
     </Grid>
-
 </Page>

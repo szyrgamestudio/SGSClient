@@ -160,7 +160,7 @@ public partial class App : Application
     {
         base.OnLaunched(args);
         var appUser = App.GetService<IAppUser>();
-        appUser.LoadSession();
+        //appUser.LoadSession();
         //((Window)sender).Activated -= Window_Activated;
         fss?.Hide();
         fss = null;

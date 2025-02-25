@@ -2,38 +2,32 @@
 using Microsoft.UI.Xaml.Controls;
 using SGSClient.ViewModels;
 
-namespace SGSClient.Views;
-
-public sealed partial class LoginPage : Page
+namespace SGSClient.Views
 {
-    #region Fields
-    public LoginViewModel ViewModel { get; }
-    #endregion
+    public sealed partial class LoginPage : Page
+    {
+        public LoginViewModel ViewModel { get; }
 
-    #region Constructor
-    public LoginPage()
-    {
-        ViewModel = App.GetService<LoginViewModel>();
-        InitializeComponent();
-        Loaded += async (s, e) => await ViewModel.CheckUserSessionAsync();
-    }
-    #endregion
+        public LoginPage()
+        {
+            ViewModel = App.GetService<LoginViewModel>();
+            InitializeComponent();
+            Loaded += async (s, e) => await ViewModel.CheckUserSessionAsync();
+        }
 
-    #region Event Handlers
-    private async void ButtonLogin_Click(object sender, RoutedEventArgs e)
-    {
-        ViewModel.Email = textBoxEmail.Text;
-        ViewModel.Password = passwordBox1.Password;
-        await ViewModel.LoginAsync();
-        errormessage.Text = ViewModel.ErrorMessage;
+        private async void ButtonLogin_Click(object sender, RoutedEventArgs e)
+        {
+            await ViewModel.LoginAsync();
+        }
+
+        private void ButtonRegister_Click(object sender, RoutedEventArgs e)
+        {
+            //ViewModel.NavigateToRegister();
+        }
+
+        private void HyperlinkForgotPassword_Click(object sender, RoutedEventArgs e)
+        {
+            //ViewModel.NavigateToForgotPassword();
+        }
     }
-    private void ButtonRegister_Click(object sender, RoutedEventArgs e)
-    {
-        ViewModel.NavigateToRegister();
-    }
-    private void HyperlinkForgotPassword_Click(object sender, RoutedEventArgs e)
-    {
-        ViewModel.NavigateToForgotPassword();
-    }
-    #endregion
 }

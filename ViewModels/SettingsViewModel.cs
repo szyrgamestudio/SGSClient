@@ -69,12 +69,12 @@ public partial class SettingsViewModel : ObservableRecipient, INotifyPropertyCha
     }
     public void Logout()
     {
-        _appUser.Logout();
+        //_appUser.Logout();
         OnPropertyChanged(nameof(IsLoggedIn));
     }
     public void LoadSession()
     {
-        _appUser.LoadSession();
+        //_appUser.LoadSession();
         OnPropertyChanged(nameof(IsLoggedIn));
     }
 }
