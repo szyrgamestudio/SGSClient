@@ -28,7 +28,7 @@
         <Image Grid.Row="0" Grid.Column="0" Grid.RowSpan="1" Source="/Assets/SGSLOGO.png" HorizontalAlignment="Center" VerticalAlignment="Center" Height="60" Width="60" Margin="0,0,10,0"/>
 
         <!-- Nagłówek "Login" -->
-        <TextBlock Grid.Row="0" Grid.Column="1" Height="50" Margin="0,10,0,0" Name="LoginHeading" Text="Zaloguj się do swojego konta" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="24" FontWeight="Bold"/>
+        <TextBlock x:Uid="LoginPage_Login" Grid.Row="0" Grid.Column="1" Height="50" Margin="0,10,0,0" Name="LoginHeading" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="24" FontWeight="Bold"/>
 
         <!-- Etykieta "Email" -->
         <TextBlock Grid.Row="1" Grid.Column="1" Height="23" Margin="0,10,0,0" Name="textBlock1" Text="Email" VerticalAlignment="Top" FontSize="16" Foreground="Gray"/>
@@ -37,7 +37,7 @@
         <TextBox Grid.Row="2" Grid.Column="1" Height="40" Margin="0,5,0,0" Name="textBoxEmail" VerticalAlignment="Top" FontSize="16" Padding="10" BorderThickness="1"/>
 
         <!-- Etykieta "Password" -->
-        <TextBlock Grid.Row="3" Grid.Column="1" Height="23" Margin="0,10,0,0" Name="textBlock2" Text="Hasło" VerticalAlignment="Top" FontSize="16" Foreground="Gray"/>
+        <TextBlock x:Uid="LoginPage_Password" Grid.Row="3" Grid.Column="1" Height="23" Margin="0,10,0,0" Name="textBlock2" VerticalAlignment="Top" FontSize="16" Foreground="Gray"/>
 
         <!-- Pole tekstowe dla hasła -->
         <PasswordBox Grid.Row="4" Grid.Column="1" Height="40" Margin="0,5,0,0" Name="passwordBox1" VerticalAlignment="Top" FontSize="16" Padding="10" BorderThickness="1"/>
@@ -52,14 +52,14 @@
         <TextBlock Grid.Row="7" Grid.Column="1" Height="25" Margin="0,20,0,0" Name="textBlockHeading" VerticalAlignment="Top" FontSize="16" FontStyle="Italic" Padding="5">
         <Run Text="Nie masz konta? "/>
         <Hyperlink Click="ButtonRegister_Click" FontSize="16" FontStyle="Normal" Foreground="#0078D4">
-            <Run Text="Zarejestruj się teraz"/>
+            <Run x:Uid="LoginPage_RegisterBtn"/>
         </Hyperlink>
         </TextBlock>
 
         <!-- Link "Zapomniałem hasła" -->
         <TextBlock Grid.Row="8" Grid.Column="1" Height="50" Margin="0,20,0,0" Name="textBlockForgotPassword" VerticalAlignment="Top" FontSize="16" FontStyle="Italic" Padding="5">
             <Hyperlink Click="HyperlinkForgotPassword_Click" FontSize="16" FontStyle="Normal" Foreground="#0078D4">
-                <Run Text="Zapomniałeś hasła?"/>
+                <Run x:Uid="LoginPage_ForgotPasswdBtn"/>
             </Hyperlink>
         </TextBlock>
     </Grid>

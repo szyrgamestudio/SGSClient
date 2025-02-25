@@ -122,15 +122,14 @@
                                                 Orientation="Vertical"
                                                 Spacing="4">
                                                 <TextBlock
-                                                    x:Name="TitleText2"
+                                                    x:Uid="HomePage_MyAccountBtn"
                                                     FontSize="18"
                                                     Foreground="{ThemeResource TextFillColorPrimaryBrush}"
-                                                    Style="{StaticResource BodyTextBlockStyle}"
-                                                    Text="Moje konto" />
+                                                    Style="{StaticResource BodyTextBlockStyle}"/>
                                                 <TextBlock
+                                                    x:Uid="HomePage_MyAccountBtnDesc"
                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                    Style="{StaticResource CaptionTextBlockStyle}"
-                                                    Text="Zaloguj się lub zarejestruj, a następnie złóż wniosek o dodanie własnej gry do SGSClienta." />
+                                                    Style="{StaticResource CaptionTextBlockStyle}"/>
                                             </StackPanel>
                                         </Grid>
                                     </Button>
@@ -201,15 +200,14 @@
                                                 Orientation="Vertical"
                                                 Spacing="4">
                                                 <TextBlock
-                                                    x:Name="TitleText"
+                                                    x:Uid="HomePage_GamesBtn"
                                                     FontSize="18"
                                                     Foreground="{ThemeResource TextFillColorPrimaryBrush}"
-                                                    Style="{StaticResource BodyTextBlockStyle}"
-                                                    Text="Gry" />
+                                                    Style="{StaticResource BodyTextBlockStyle}" />
                                                 <TextBlock
+                                                    x:Uid="HomePage_GamesBtnDesc"
                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                    Style="{StaticResource CaptionTextBlockStyle}"
-                                                    Text="Przeglądaj wszystkie dostępne gry." />
+                                                    Style="{StaticResource CaptionTextBlockStyle}" />
                                             </StackPanel>
                                         </Grid>
                                     </Button>
@@ -247,13 +245,13 @@
                                     <!--Button 2-->
                                     <HyperlinkButton
                                         Padding="-1"
+                                        x:Uid="HomePage_BugBtnTooltip"
                                         HorizontalAlignment="Stretch"
                                         VerticalAlignment="Stretch"
                                         HorizontalContentAlignment="Stretch"
                                         VerticalContentAlignment="Stretch"
                                         AutomationProperties.LabeledBy="{Binding ElementName=TitleText}"
                                         NavigateUri="https://github.com/szyrgamestudio/SGSClient/issues"
-                                        ToolTipService.ToolTip="Alternatywnie, możesz zgłosić wystąpienie błędu, przechodząc na serwer DEVSZYR i tam napisać na właściwym kanale."
                                         CornerRadius="{StaticResource OverlayCornerRadius}">
                                         <Grid
                                             Background="{ThemeResource ControlFillColorDefaultBrush}"
@@ -282,16 +280,15 @@
                                                 Orientation="Vertical"
                                                 Spacing="4">
                                                 <TextBlock
-                                                    x:Name="TitleText3"
+                                                    x:Uid="HomePage_BugBtn"
                                                     FontSize="18"
                                                     Foreground="{ThemeResource TextFillColorPrimaryBrush}"
-                                                    Style="{StaticResource BodyTextBlockStyle}"
-                                                    Text="Zgłoś błąd" />
+                                                    Style="{StaticResource BodyTextBlockStyle}"/>
                                                 <TextBlock
+                                                    x:Uid="HomePage_BugBtnDesc"
                                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                     Style="{StaticResource CaptionTextBlockStyle}"
-                                                    FontSize="11"
-                                                    Text="Przejdź do repozytorium GitHub SGSClietna, gdzie będziesz mógł zgłosić znalezioną nieprawidłowość." />
+                                                    FontSize="11"/>
                                             </StackPanel>
                                         </Grid>
                                     </HyperlinkButton>
@@ -324,13 +321,9 @@
                             </Button>
                         </Grid>
                     </ScrollViewer>
-                    <!--<controls:TileGallery IsEnabled="True"
-                        x:Name="headerTileGallery"
-                        Grid.Row="1"
-                        Margin="0,0,0,0" />-->
                 </Grid>
             </GridView.Header>
         </GridView>
-        <!--<InfoBar IsOpen="True" Width="800px" IsClosable="False" Severity="Error" Title="Uwaga" Message="Używasz wersję testową SGSClienta. Prosimy o zgłaszanie błedów na adres kontakt@szyrgamestudio.com." />-->
+        <InfoBar x:Uid="HomePage_DevWarning" IsOpen="True" Width="800px" IsClosable="False" Severity="Error" Title="Uwaga" />
     </Grid>
 </Page>

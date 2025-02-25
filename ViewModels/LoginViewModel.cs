@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using System.Net.Mail;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Windows.ApplicationModel.Resources;
 using SGSClient.Contracts.Services;
 using SGSClient.Core.Authorization;
 using SGSClient.Core.Database;
@@ -43,21 +44,23 @@ namespace SGSClient.ViewModels
         }
         public async Task LoginAsync()
         {
+            var resourceLoader = new ResourceLoader();
+
             if (string.IsNullOrWhiteSpace(Email))
             {
-                ErrorMessage = "Adres e-mail jest wymagany.";
+                ErrorMessage = resourceLoader.GetString("LoginPage_Error_EmailReq");
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(Password))
             {
-                ErrorMessage = "Hasło jest wymagane.";
+                ErrorMessage = resourceLoader.GetString("LoginPage_Error_PasswdReq");
                 return;
             }
 
             if (!IsValidEmail(Email))
             {
-                ErrorMessage = "Wprowadź prawidłowy adres e-mail.";
+                ErrorMessage = resourceLoader.GetString("LoginPage_Error_EmailInvalid");
                 return;
             }
 

@@ -117,11 +117,44 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AppDisplayName" xml:space="preserve">
+    <value>SGSClient</value>
+  </data>
   <data name="AppDescription" xml:space="preserve">
     <value>SGSClient</value>
   </data>
-  <data name="AppDisplayName" xml:space="preserve">
-    <value>SGSClient</value>
+  <data name="Shell_Home.Content" xml:space="preserve">
+    <value>Strona Główna</value>
+  </data>
+  <data name="Shell_Games.Content" xml:space="preserve">
+    <value>Gry</value>
+  </data>
+  <data name="Settings_Personalization.Text" xml:space="preserve">
+    <value>Personalizacja</value>
+  </data>
+  <data name="Settings_Theme.Text" xml:space="preserve">
+    <value>Motyw</value>
+  </data>
+  <data name="Settings_Theme_Light.Content" xml:space="preserve">
+    <value>Jasny</value>
+  </data>
+  <data name="Settings_Theme_Dark.Content" xml:space="preserve">
+    <value>Ciemny</value>
+  </data>
+  <data name="Settings_Theme_Default.Content" xml:space="preserve">
+    <value>Domyślny</value>
+  </data>
+  <data name="Settings_About.Text" xml:space="preserve">
+    <value>Informacje o aplikacji</value>
+  </data>
+  <data name="Settings_AboutDescription.Text" xml:space="preserve">
+    <value>TODO: Replace with your app description.</value>
+  </data>
+  <data name="SettingsPage_PrivacyTermsLink.Content" xml:space="preserve">
+    <value>Polityka prywatności</value>
+  </data>
+  <data name="SettingsPage_PrivacyTermsLink.NavigateUri" xml:space="preserve">
+    <value>https://massyn.dev/privacypolicy</value>
   </data>
   <data name="AppNotificationSamplePayload" xml:space="preserve">
     <value>&lt;toast launch="action=ToastClick"&gt;
@@ -137,56 +170,62 @@
   &lt;/actions&gt;
 &lt;/toast&gt;</value>
   </data>
-  <data name="BrowserBackButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
-    <value>Kliknij, aby wrócić</value>
+  <data name="Shell_Atorth_TalesOfUlkimond.Content" xml:space="preserve">
+    <value>Atorth: Tales of Ulkimonds</value>
+  </data>
+  <data name="Shell_Doddani.Content" xml:space="preserve">
+    <value>Doddani</value>
+  </data>
+  <data name="Shell_CastlelineEvil.Content" xml:space="preserve">
+    <value>Castleline Evil</value>
+  </data>
+  <data name="Shell_TurboNinja2D.Content" xml:space="preserve">
+    <value>Turbo Ninja 2D</value>
+  </data>
+  <data name="Shell_StaffOfHell.Content" xml:space="preserve">
+    <value>Staff Of Hell</value>
+  </data>
+  <data name="Shell_SciezkaBohatera.Content" xml:space="preserve">
+    <value>Scieżka Bohatera</value>
+  </data>
+  <data name="Shell_Zacmienie.Content" xml:space="preserve">
+    <value>Zaćmienie</value>
+  </data>
+  <data name="WebView_Loading.Text" xml:space="preserve">
+    <value>Ładowanie...</value>
+  </data>
+  <data name="WebView_FailedMessage.Text" xml:space="preserve">
+    <value>Nie udało się załadować strony. Sprawdź połączenie i załaduj ponownie.</value>
   </data>
   <data name="BrowserBackButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Kliknij, aby wrócić</value>
   </data>
-  <data name="BrowserForwardButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
-    <value>Kliknij, aby przejść do przodu</value>
+  <data name="BrowserBackButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Kliknij, aby wrócić</value>
   </data>
   <data name="BrowserForwardButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Kliknij, aby przejść do przodu</value>
   </data>
-  <data name="OpenInBrowserButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
-    <value>Otwórz w przeglądarce</value>
+  <data name="BrowserForwardButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Kliknij, aby przejść do przodu</value>
   </data>
-  <data name="OpenInBrowserButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Otwórz w przeglądarce</value>
-  </data>
-  <data name="ReloadButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+  <data name="WebView_Reload.Content" xml:space="preserve">
     <value>Odśwież</value>
   </data>
   <data name="ReloadButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Odśwież</value>
   </data>
-  <data name="Settings_About.Text" xml:space="preserve">
-    <value>Informacje o aplikacji</value>
+  <data name="ReloadButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Odśwież</value>
   </data>
-  <data name="Settings_AboutDescription.Text" xml:space="preserve">
-    <value>TODO: Replace with your app description.</value>
+  <data name="OpenInBrowserButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Otwórz w przeglądarce</value>
   </data>
-  <data name="Settings_Personalization.Text" xml:space="preserve">
-    <value>Personalizacja</value>
+  <data name="OpenInBrowserButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Otwórz w przeglądarce</value>
   </data>
-  <data name="Settings_Theme.Text" xml:space="preserve">
-    <value>Motyw</value>
-  </data>
-  <data name="Settings_Theme_Dark.Content" xml:space="preserve">
-    <value>Ciemny</value>
-  </data>
-  <data name="Settings_Theme_Default.Content" xml:space="preserve">
-    <value>Domyślny</value>
-  </data>
-  <data name="Settings_Theme_Light.Content" xml:space="preserve">
-    <value>Jasny</value>
-  </data>
-  <data name="SettingsPage_PrivacyTermsLink.Content" xml:space="preserve">
-    <value>Polityka prywatności</value>
-  </data>
-  <data name="SettingsPage_PrivacyTermsLink.NavigateUri" xml:space="preserve">
-    <value>https://massyn.dev/privacypolicy</value>
+  <data name="Shell_UploadGame.Content" xml:space="preserve">
+    <value>Formularz przesłania gry</value>
   </data>
   <data name="SGSClientWelcomeNotificationPayload" xml:space="preserve">
     <value>&lt;toast launch="SGSClientWelcomeNotificationPayload"&gt;
@@ -200,86 +239,17 @@
 &lt;/toast&gt;</value>
     <comment>Witamy w SGSClient - nowa wersja</comment>
   </data>
-  <data name="Shell_Atorth_TalesOfUlkimond.Content" xml:space="preserve">
-    <value>Atorth: Tales of Ulkimonds</value>
+  <data name="Shell_Klikacz24H.Content" xml:space="preserve">
+    <value>Klikacz24H</value>
   </data>
   <data name="Shell_BlackWhiteJump.Content" xml:space="preserve">
     <value>BlackWhiteJump</value>
   </data>
-  <data name="Shell_CastlelineEvil.Content" xml:space="preserve">
-    <value>Castleline Evil</value>
-  </data>
-  <data name="Shell_Doddani.Content" xml:space="preserve">
-    <value>Doddani</value>
-  </data>
-  <data name="Shell_EditGame.Content" xml:space="preserve">
-    <value>EditGame</value>
-  </data>
-  <data name="Shell_ForgotPassword.Content" xml:space="preserve">
-    <value>ForgotPassword</value>
-  </data>
-  <data name="Shell_GameBase.Content" xml:space="preserve">
-    <value>GameBase</value>
-  </data>
-  <data name="Shell_Games.Content" xml:space="preserve">
-    <value>Gry</value>
-  </data>
-  <data name="Shell_Home.Content" xml:space="preserve">
-    <value>Strona Główna</value>
-  </data>
-  <data name="Shell_Klikacz24H.Content" xml:space="preserve">
-    <value>Klikacz24H</value>
-  </data>
-  <data name="Shell_Login.Content" xml:space="preserve">
-    <value>Login</value>
-  </data>
-  <data name="Shell_MyAccount.Content" xml:space="preserve">
-    <value>Dodaj grę</value>
-  </data>
-  <data name="Shell_MyGames.Content" xml:space="preserve">
-    <value>Moje gry</value>
-  </data>
-  <data name="Shell_MyGamesGrid.Content" xml:space="preserve">
-    <value>MyGamesGrid</value>
-  </data>
-  <data name="Shell_Register.Content" xml:space="preserve">
-    <value>Register</value>
-  </data>
-  <data name="Shell_SciezkaBohatera.Content" xml:space="preserve">
-    <value>Scieżka Bohatera</value>
-  </data>
-  <data name="Shell_SettingsUser.Content" xml:space="preserve">
-    <value>Ustawienia — twoje informacje</value>
-  </data>
-  <data name="Shell_ShadowSquad.Content" xml:space="preserve">
-    <value>ShadowSquad</value>
-  </data>
-  <data name="Shell_StaffOfHell.Content" xml:space="preserve">
-    <value>Staff Of Hell</value>
-  </data>
   <data name="Shell_StarmanSystem.Content" xml:space="preserve">
     <value>StarmanSystem</value>
   </data>
-  <data name="Shell_TurboNinja2D.Content" xml:space="preserve">
-    <value>Turbo Ninja 2D</value>
-  </data>
-  <data name="Shell_UploadGame.Content" xml:space="preserve">
-    <value>Formularz przesłania gry</value>
-  </data>
-  <data name="Shell_UserAccount.Content" xml:space="preserve">
-    <value>Moje konto</value>
-  </data>
-  <data name="Shell_Zacmienie.Content" xml:space="preserve">
-    <value>Zaćmienie</value>
-  </data>
-  <data name="WebView_FailedMessage.Text" xml:space="preserve">
-    <value>Nie udało się załadować strony. Sprawdź połączenie i załaduj ponownie.</value>
-  </data>
-  <data name="WebView_Loading.Text" xml:space="preserve">
-    <value>Ładowanie...</value>
-  </data>
-  <data name="WebView_Reload.Content" xml:space="preserve">
-    <value>Odśwież</value>
+  <data name="Shell_ShadowSquad.Content" xml:space="preserve">
+    <value>ShadowSquad</value>
   </data>
   <data name="ZacmienieNotificationPayload" xml:space="preserve">
     <value>&lt;toast launch="ZacmienieNotificationPayload"&gt;
@@ -292,10 +262,82 @@
 &lt;/toast&gt;</value>
     <comment>Zainstalowano Zaćmienie</comment>
   </data>
+  <data name="Shell_GameBase.Content" xml:space="preserve">
+    <value>GameBase</value>
+  </data>
+  <data name="Shell_Login.Content" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="Shell_Register.Content" xml:space="preserve">
+    <value>Register</value>
+  </data>
+  <data name="Shell_MyAccount.Content" xml:space="preserve">
+    <value>Dodaj grę</value>
+  </data>
+  <data name="Shell_ForgotPassword.Content" xml:space="preserve">
+    <value>ForgotPassword</value>
+  </data>
+  <data name="Shell_MyGamesGrid.Content" xml:space="preserve">
+    <value>MyGamesGrid</value>
+  </data>
+  <data name="Shell_MyGames.Content" xml:space="preserve">
+    <value>Moje gry</value>
+  </data>
+  <data name="Shell_EditGame.Content" xml:space="preserve">
+    <value>EditGame</value>
+  </data>
+  <data name="Shell_UserAccount.Content" xml:space="preserve">
+    <value>Moje konto</value>
+  </data>
+  <data name="Shell_SettingsUser.Content" xml:space="preserve">
+    <value>Ustawienia — twoje informacje</value>
+  </data>
   <data name="HomePage_MyAccountBtn.Text" xml:space="preserve">
-    <value>My Account</value>
+    <value>Moje konto</value>
   </data>
   <data name="HomePage_MyAccountBtnDesc.Text" xml:space="preserve">
     <value>Zaloguj się lub zarejestruj, a następnie złóż wniosek o dodanie własnej gry do SGSClienta.</value>
+  </data>
+  <data name="HomePage_GamesBtn.Text" xml:space="preserve">
+    <value>Gry</value>
+  </data>
+  <data name="HomePage_GamesBtnDesc.Text" xml:space="preserve">
+    <value>Przeglądaj wszystkie dostępne gry.</value>
+  </data>
+  <data name="HomePage_BugBtn.Text" xml:space="preserve">
+    <value>Zgłoś błąd</value>
+  </data>
+  <data name="HomePage_BugBtnDesc.Text" xml:space="preserve">
+    <value>Przejdź do repozytorium GitHub SGSClietna, gdzie będziesz mógł zgłosić znalezioną nieprawidłowość.</value>
+  </data>
+  <data name="HomePage_BugBtnTooltip.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Alternatywnie, możesz zgłosić wystąpienie błędu, przechodząc na serwer DEVSZYR i tam napisać na właściwym kanale.</value>
+  </data>
+  <data name="HomePage_DevWarning.Message" xml:space="preserve">
+    <value>Używasz wersję testową SGSClienta. Prosimy o zgłaszanie błedów na adres kontakt@szyrgamestudio.com.</value>
+  </data>
+  <data name="HomePage_DevWarning.Title" xml:space="preserve">
+    <value>Uwaga!</value>
+  </data>
+  <data name="LoginPage_Login.Text" xml:space="preserve">
+    <value>Zaloguj się do swojego konta</value>
+  </data>
+  <data name="LoginPage_Password.Text" xml:space="preserve">
+    <value>Hasło</value>
+  </data>
+  <data name="LoginPage_RegisterBtn.Text" xml:space="preserve">
+    <value>Zarejestruj się</value>
+  </data>
+  <data name="LoginPage_ForgotPasswdBtn.Text" xml:space="preserve">
+    <value>Zapomniałeś hasła?</value>
+  </data>
+  <data name="LoginPage_Error_EmailReq" xml:space="preserve">
+    <value>Adres e-mail jest wymagany.</value>
+  </data>
+  <data name="LoginPage_Error_PasswdReq" xml:space="preserve">
+    <value>Hasło jest wymagane.</value>
+  </data>
+  <data name="LoginPage_Error_EmailInvalid" xml:space="preserve">
+    <value>Wprowadź prawidłowy adres e-mail.</value>
   </data>
 </root>

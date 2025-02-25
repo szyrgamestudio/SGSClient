@@ -28,8 +28,8 @@
 	</Dependencies>
 
   <Resources>
-    <!--<Resource Language="x-generate"/>-->
     <Resource Language="pl-PL"/>
+    <Resource Language="en-US"/>
   </Resources>
 
   <Applications>

@@ -29,7 +29,7 @@
     <Version>$(VersionPrefix)</Version>
     <FileVersion>3.0.0.0</FileVersion>
     <AssemblyVersion>3.0.0.0</AssemblyVersion>
-    <DefaultLanguage>en-US</DefaultLanguage>
+    <DefaultLanguage>pl-pl</DefaultLanguage>
     <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <IncludeSymbols>True</IncludeSymbols>
