@@ -340,4 +340,25 @@
   <data name="LoginPage_Error_EmailInvalid" xml:space="preserve">
     <value>Wprowadź prawidłowy adres e-mail.</value>
   </data>
+  <data name="RegisterPage_Register.Text" xml:space="preserve">
+    <value>Utwórz nowe konto</value>
+  </data>
+  <data name="RegisterPage_AccountName.Text" xml:space="preserve">
+    <value>Nazwa konta</value>
+  </data>
+  <data name="RegisterPage_Passwd.Text" xml:space="preserve">
+    <value>Hasło</value>
+  </data>
+  <data name="RegisterPage_PasswdConfirm.Text" xml:space="preserve">
+    <value>Potwierdź hasło</value>
+  </data>
+  <data name="RegisterPage_RegisterBtn.Content" xml:space="preserve">
+    <value>Zarejestruj się</value>
+  </data>
+  <data name="RegisterPage_Error_PasswdConfirmReq" xml:space="preserve">
+    <value>Potwiedź hasło</value>
+  </data>
+  <data name="RegisterPage_Error_PasswdDiff" xml:space="preserve">
+    <value>Wprowadzone hasła różnią się od siebie</value>
+  </data>
 </root>

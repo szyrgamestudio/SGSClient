@@ -6,7 +6,7 @@ using SGSClient.Contracts.Services;
 using SGSClient.Core.Authorization;
 using SGSClient.Core.Database;
 using SGSClient.Core.Extensions;
-using SGSClient.Services;
+using SGSClient.Core.Interface;
 
 namespace SGSClient.ViewModels
 {
@@ -17,13 +17,13 @@ namespace SGSClient.ViewModels
         public string Password { get; set; }
         public string ErrorMessage { get; set; }
         private readonly INavigationService _navigationService;
-        private readonly PasswordHasher _passwdHasher;
+        private readonly IPasswordHasher _passwdHasher;
         private readonly IAppUser _appUser;
 
         #endregion
 
         #region Constructor
-        public LoginViewModel(INavigationService navigationService, PasswordHasher passwordHasher, IAppUser appUser)
+        public LoginViewModel(INavigationService navigationService, IPasswordHasher passwordHasher, IAppUser appUser)
         {
             _navigationService = navigationService;
             _passwdHasher = passwordHasher;
@@ -66,6 +66,17 @@ namespace SGSClient.ViewModels
 
             await AttemptLoginAsync();
         }
+        public void NavigateToRegister()
+        {
+            _navigationService.NavigateTo(typeof(RegisterViewModel).FullName!);
+        }
+        public void NavigateToForgotPassword()
+        {
+            _navigationService.NavigateTo(typeof(ForgotPasswordViewModel).FullName!);
+        }
+        #endregion
+
+        #region Private Methods
         private static bool IsValidEmail(string email)
         {
             try
@@ -78,17 +89,6 @@ namespace SGSClient.ViewModels
                 return false;
             }
         }
-        public void NavigateToRegister()
-        {
-            _navigationService.NavigateTo(typeof(RegisterViewModel).FullName!);
-        }
-        public void NavigateToForgotPassword()
-        {
-            _navigationService.NavigateTo(typeof(ForgotPasswordViewModel).FullName!);
-        }
-        #endregion
-
-        #region Private Methods
         private Task AttemptLoginAsync()
         {
             DataSet ds = db.con.select(@"
