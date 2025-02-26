@@ -115,6 +115,7 @@ public partial class App : Application
             // Configuration
             services.Configure<ConnectionStrings>(context.Configuration.GetSection(nameof(ConnectionStrings)));
             services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
+            services.Configure<AzureADSettings>(context.Configuration.GetSection(nameof(AzureADSettings)));
         }).
         Build();
 

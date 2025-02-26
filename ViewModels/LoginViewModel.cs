@@ -27,7 +27,7 @@ namespace SGSClient.ViewModels
         public async Task LoginAsync()
         {
             IntPtr hwnd = WindowNative.GetWindowHandle(App.MainWindow);
-            bool loginSuccess = await _appUser.LoginAsync(hwnd);
+            bool loginSuccess = await _appUser.LoginAsync(hwnd, false);
 
             if (loginSuccess)
             {
