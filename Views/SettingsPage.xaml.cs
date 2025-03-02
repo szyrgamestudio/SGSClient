@@ -38,7 +38,6 @@ public sealed partial class SettingsPage : Page
     private void LogoutButton_Click(object sender, RoutedEventArgs e)
     {
         ViewModel.Logout();
-        Frame.Navigate(typeof(LoginPage));
     }
     #endregion
 }

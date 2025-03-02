@@ -80,7 +80,9 @@
                 </DataTemplate>
             </NavigationView.HeaderTemplate>
             <NavigationView.FooterMenuItems>
-                <NavigationViewItem x:Uid="Shell_UserAccount" helpers:NavigationHelper.NavigateTo="SGSClient.ViewModels.LoginViewModel">
+                <NavigationViewItem x:Name="UserAccountItem"
+                        Content="{x:Bind ViewModel.UserMenuText, Mode=OneWay}"
+                        Tapped="UserAccountItem_Tapped">
                     <NavigationViewItem.Icon>
                         <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}" Glyph="&#xEE57;" />
                     </NavigationViewItem.Icon>

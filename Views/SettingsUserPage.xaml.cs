@@ -20,11 +20,11 @@ public sealed partial class SettingsUserPage : Page
 
     private void LogoutButton_Click(object sender, RoutedEventArgs e)
     {
-        Frame.Navigate(typeof(LoginPage));
+        //Frame.Navigate(typeof(LoginPage));
     }
     private void ChangePasswordButton_Click(object sender, RoutedEventArgs e)
     {
-        Frame.Navigate(typeof(LoginPage));
+        //Frame.Navigate(typeof(LoginPage));
     }
 
 }

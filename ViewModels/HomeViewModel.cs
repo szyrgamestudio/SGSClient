@@ -49,7 +49,7 @@ namespace SGSClient.ViewModels
         }
         private void NavigateToLogin()
         {
-            _navigationService.NavigateTo(typeof(LoginViewModel).FullName!);
+            //_navigationService.NavigateTo(typeof(LoginViewModel).FullName!);
         }
         #endregion
     }

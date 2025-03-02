@@ -19,10 +19,6 @@ public class PageService : IPageService
         Configure<UploadGameViewModel, UploadGamePage>();
         Configure<SettingsViewModel, SettingsPage>();
         Configure<GameBaseViewModel, GameBasePage>();
-        Configure<LoginViewModel, LoginPage>();
-        Configure<RegisterViewModel, RegisterPage>();
-        Configure<MyAccountViewModel, MyAccountPage>();
-        Configure<ForgotPasswordViewModel, ForgotPasswordPage>();
         Configure<MyGamesViewModel, MyGamesPage>();
         Configure<EditGameViewModel, EditGamePage>();
         Configure<SettingsUserViewModel, SettingsUserPage>();

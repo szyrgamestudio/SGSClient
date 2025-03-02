@@ -91,14 +91,6 @@ public partial class App : Application
             services.AddTransient<EditGamePage>();
             services.AddTransient<MyGamesViewModel>();
             services.AddTransient<MyGamesPage>();
-            services.AddTransient<ForgotPasswordViewModel>();
-            services.AddTransient<ForgotPasswordPage>();
-            services.AddTransient<MyAccountViewModel>();
-            services.AddTransient<MyAccountPage>();
-            services.AddTransient<RegisterViewModel>();
-            services.AddTransient<RegisterPage>();
-            services.AddTransient<LoginViewModel>();
-            services.AddTransient<LoginPage>();
             services.AddTransient<GameBaseViewModel>();
             services.AddTransient<GameBasePage>();
             services.AddTransient<UploadGameViewModel>();

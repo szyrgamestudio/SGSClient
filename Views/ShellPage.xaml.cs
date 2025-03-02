@@ -101,4 +101,24 @@ public sealed partial class ShellPage : Page
         }
     }
 
+    private void UserAccountItem_Tapped(object sender, TappedRoutedEventArgs e)
+    {
+        var flyout = new MenuFlyout();
+
+        if (ViewModel.IsUserLoggedIn)
+        {
+            flyout.Items.Add(new MenuFlyoutItem { Text = ViewModel.UserMenuText, IsEnabled = false });
+            flyout.Items.Add(new MenuFlyoutSeparator());
+            flyout.Items.Add(new MenuFlyoutItem { Text = "Dodaj grę", Command = ViewModel.AddGameCommand });
+            flyout.Items.Add(new MenuFlyoutItem { Text = "Moja biblioteka", Command = ViewModel.MyGamesCommand });
+            flyout.Items.Add(new MenuFlyoutItem { Text = "Wyloguj się", Command = ViewModel.LogoutCommand });
+        }
+        else
+        {
+            flyout.Items.Add(new MenuFlyoutItem { Text = "Zaloguj się", Command = ViewModel.LoginCommand });
+        }
+
+        flyout.ShowAt((FrameworkElement)sender);
+    }
+
 }
