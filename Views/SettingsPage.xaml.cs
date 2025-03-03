@@ -26,7 +26,8 @@ public sealed partial class SettingsPage : Page
         InitializeComponent();
 
         ViewModel.LoadSession();
-        accountSettings.Visibility = ViewModel.IsLoggedIn ? Visibility.Visible : Visibility.Collapsed;
+        accountSettingsSP.Visibility = ViewModel.IsLoggedIn ? Visibility.Visible : Visibility.Collapsed;
+        accountSettingsCard.Visibility = ViewModel.IsLoggedIn ? Visibility.Visible : Visibility.Collapsed;
     }
     #endregion
 
@@ -35,9 +36,9 @@ public sealed partial class SettingsPage : Page
     {
         await Launcher.LaunchUriAsync(new Uri("https://github.com/szyrgamestudio/SGSClient/issues/new/choose"));
     }
-    private void LogoutButton_Click(object sender, RoutedEventArgs e)
+    private void SettingsCard_Click(object sender, RoutedEventArgs e)
     {
-        ViewModel.Logout();
+        ViewModel.SettingsCard_Click();
     }
     #endregion
 }

@@ -17,12 +17,14 @@
             <!-- App settings Section -->
             <!--<TextBlock x:Uid="Settings_About" Style="{StaticResource BodyStrongTextBlockStyle}" />-->
             <StackPanel>
-                <TextBlock Text="Ustawienia konta" Margin="{StaticResource SettingsPageHeaderTextBox}" />
+                <TextBlock x:Name="accountSettingsSP" Text="Ustawienia konta" Margin="{StaticResource SettingsPageHeaderTextBox}" />
             </StackPanel>
             <labs:SettingsCard
                 Description="Ustaw podstawowe informację jak hasło, email."
                 Header="Twoje informacje"
-                IsClickEnabled="True">
+                IsClickEnabled="True"
+                Click="SettingsCard_Click"
+                x:Name="accountSettingsCard">
                 <labs:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE779;" />
                 </labs:SettingsCard.HeaderIcon>
@@ -75,10 +77,6 @@
 
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
-                <!-- Account Management Section -->
-                <labs:SettingsCard Description="Zarządzaj kontem" Header="Konto" x:Name="accountSettings">
-                    <Button x:Name="accountButton" Content="Wyloguj" Style="{StaticResource AccentButtonStyle}" Click="LogoutButton_Click" />
-                </labs:SettingsCard>
                 <!-- About Section -->
                 <labs:SettingsExpander Description="© 2024 SzyrGameStudio. All rights reserved." Header="SGSClient">
                     <TextBlock

@@ -18,8 +18,9 @@ namespace SGSClient.ViewModels;
 public partial class SettingsViewModel : ObservableRecipient, INotifyPropertyChanged
 {
     private readonly IThemeSelectorService _themeSelectorService;
+    private INavigationService _navigationService;
     private readonly IAppUser _appUser;
-    public bool IsLoggedIn => _appUser.IsLoggedIn;
+    public bool IsLoggedIn;
 
     [ObservableProperty]
     private ElementTheme _elementTheme;
@@ -32,11 +33,12 @@ public partial class SettingsViewModel : ObservableRecipient, INotifyPropertyCha
         get;
     }
 
-    public SettingsViewModel(IThemeSelectorService themeSelectorService, IAppUser appUser)
+    public SettingsViewModel(IThemeSelectorService themeSelectorService, IAppUser appUser, INavigationService navigationService)
     {
         _themeSelectorService = themeSelectorService;
         _elementTheme = _themeSelectorService.Theme;
         _versionDescription = GetVersionDescription();
+        _navigationService = navigationService;
 
         SwitchThemeCommand = new RelayCommand<ElementTheme>(
             async (param) =>
@@ -67,14 +69,14 @@ public partial class SettingsViewModel : ObservableRecipient, INotifyPropertyCha
 
         return $"{"AppDisplayName".GetLocalized()} - {version.Major}.{version.Minor}.{version.Build}.{version.Revision}";
     }
-    public void Logout()
-    {
-        //_appUser.Logout();
-        OnPropertyChanged(nameof(IsLoggedIn));
-    }
     public void LoadSession()
     {
-        //_appUser.LoadSession();
+        IsLoggedIn = _appUser.IsLoggedIn;
         OnPropertyChanged(nameof(IsLoggedIn));
+    }
+    public void SettingsCard_Click()
+    {
+        //_appUser.LoadSession();
+        _navigationService.NavigateTo(typeof(SettingsUserViewModel).FullName!);
     }
 }
