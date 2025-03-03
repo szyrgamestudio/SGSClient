@@ -48,14 +48,12 @@ public partial class ShellViewModel : ObservableRecipient
         MyGamesCommand = new RelayCommand(NavigateToMyGames);
         AddGameCommand = new RelayCommand(NavigateToUpload);
 
+        _appUser.TrySilentLoginAsync();
         UpdateUserData();
     }
 
     private void OnNavigated(object sender, NavigationEventArgs e)
     {
-        _appUser.TrySilentLoginAsync();
-        UpdateUserData();
-
         IsBackEnabled = NavigationService.CanGoBack;
 
         if (e.SourcePageType == typeof(SGSClient.Views.SettingsPage))
