@@ -596,7 +596,7 @@ where g.Id = @GameId";
         }
         private void gotoSGSClientWWW_Click(object sender, RoutedEventArgs e)
         {
-            var URL = "https://sgsclient.massyn.dev/upload";
+            var URL = "https://sgsclient.m455yn.dev/upload";
             try
             {
                 Process.Start(new ProcessStartInfo

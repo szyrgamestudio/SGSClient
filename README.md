@@ -1,7 +1,7 @@
 ﻿![SGSClient LOGO](https://user-images.githubusercontent.com/51244922/174903969-d59b1dc3-1b2c-4cc5-ad1f-8ef89a5086c6.png)
 
 # SGS CLIENT
-##### [Created by DEVMASSYN using Windows UI Library in the Windows App SDK. (WinUI 3)](https://massyn.dev/)
+##### [Created by DEVMASSYN using Windows UI Library in the Windows App SDK. (WinUI 3)](https://m455yn.dev/)
 ##### Application available for download from the Microsoft Store.
 
 Już jest - nowy, przebudowany, nasz własny launcher.

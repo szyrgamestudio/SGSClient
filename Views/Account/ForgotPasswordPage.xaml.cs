@@ -273,11 +273,11 @@ public sealed partial class ForgotPasswordPage : Page
         // Ustawienia serwera SMTP
         string smtpServer = "smtppro.zoho.eu";
         int smtpPort = 587;
-        string smtpUsername = "sgsclient@massyn.dev";
+        string smtpUsername = "sgsclient@m455yn.dev";
         string smtpPassword = "EcM74if.!864Ps!";
 
         // Adres e-mail nadawcy
-        string fromEmail = "sgsclient@massyn.dev";
+        string fromEmail = "sgsclient@m455yn.dev";
 
         // Tworzenie klienta SMTP
         using (SmtpClient smtpClient = new SmtpClient(smtpServer, smtpPort))

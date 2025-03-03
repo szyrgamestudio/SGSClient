@@ -409,7 +409,7 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
     }
     private void gotoSGSClientWWW_Click(object sender, RoutedEventArgs e)
     {
-        var URL = "https://sgsclient.massyn.dev/upload";
+        var URL = "https://sgsclient.m455yn.dev/upload";
         try
         {
             Process.Start(new ProcessStartInfo
