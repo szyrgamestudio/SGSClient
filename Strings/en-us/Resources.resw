@@ -186,7 +186,7 @@
     <value>Polityka prywatności</value>
   </data>
   <data name="SettingsPage_PrivacyTermsLink.NavigateUri" xml:space="preserve">
-    <value>https://massyn.dev/privacypolicy</value>
+    <value>https://m455yn.dev/privacypolicy</value>
   </data>
   <data name="SGSClientWelcomeNotificationPayload" xml:space="preserve">
     <value>&lt;toast launch="SGSClientWelcomeNotificationPayload"&gt;
