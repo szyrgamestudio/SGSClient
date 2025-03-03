@@ -24,6 +24,7 @@ public sealed partial class SettingsUserPage : Page
     }
     private void ChangePasswordButton_Click(object sender, RoutedEventArgs e)
     {
+        ViewModel.ChangePasswordCommand();
         //Frame.Navigate(typeof(LoginPage));
     }
 

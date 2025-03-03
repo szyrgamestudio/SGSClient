@@ -43,7 +43,6 @@ public partial class ShellViewModel : ObservableRecipient
         NavigationViewService = navigationViewService;
 
         _appUser = appUser; // Dependency Injection zamiast AppUser.Current
-
         LoginCommand = new AsyncRelayCommand(ExecuteLoginAsync);
         LogoutCommand = new AsyncRelayCommand(ExecuteLogoutAsync);
         MyGamesCommand = new RelayCommand(NavigateToMyGames);
@@ -54,6 +53,9 @@ public partial class ShellViewModel : ObservableRecipient
 
     private void OnNavigated(object sender, NavigationEventArgs e)
     {
+        _appUser.TrySilentLoginAsync();
+        UpdateUserData();
+
         IsBackEnabled = NavigationService.CanGoBack;
 
         if (e.SourcePageType == typeof(SGSClient.Views.SettingsPage))

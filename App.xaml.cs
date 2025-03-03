@@ -7,6 +7,7 @@ using Microsoft.UI.Xaml;
 
 using SGSClient.Activation;
 using SGSClient.Contracts.Services;
+using SGSClient.Core;
 using SGSClient.Core.Authorization;
 using SGSClient.Core.Contracts.Services;
 using SGSClient.Core.Database;
@@ -108,6 +109,7 @@ public partial class App : Application
             services.Configure<ConnectionStrings>(context.Configuration.GetSection(nameof(ConnectionStrings)));
             services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
             services.Configure<AzureADSettings>(context.Configuration.GetSection(nameof(AzureADSettings)));
+            services.Configure<DiscordSettings>(context.Configuration.GetSection(nameof(DiscordSettings)));
         }).
         Build();
 
@@ -152,11 +154,9 @@ public partial class App : Application
     protected async override void OnLaunched(LaunchActivatedEventArgs args)
     {
         base.OnLaunched(args);
-        var appUser = App.GetService<IAppUser>();
-        //appUser.LoadSession();
-        //((Window)sender).Activated -= Window_Activated;
         fss?.Hide();
         fss = null;
+        DiscordManager.Initialize();
         await App.GetService<IActivationService>().ActivateAsync(args);
     }
 }
