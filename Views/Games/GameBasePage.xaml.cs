@@ -79,6 +79,10 @@ public sealed partial class GameBasePage : Page
                     DraftP = gameData.DraftP
                 };
 
+                gameZip = gameData.GameZipLink;
+                gameExe = gameData.GameExeName;
+                gameIdentifier = gameData.GameName;
+                gameZipLink = game.GameZipLink;
 
                 LoadImagesFromDatabase(game.GameSymbol);
                 LoadLogoFromDatabase(game.GameSymbol);
