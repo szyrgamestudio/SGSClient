@@ -27,8 +27,8 @@
     <AppxBundlePlatforms>x64</AppxBundlePlatforms>
     <AppInstallerUri>d:\s</AppInstallerUri>
     <Version>$(VersionPrefix)</Version>
-    <FileVersion>2.5.7.0</FileVersion>
-    <AssemblyVersion>2.5.7.0</AssemblyVersion>
+    <FileVersion>2.5.7.1</FileVersion>
+    <AssemblyVersion>2.5.7.1</AssemblyVersion>
     <DefaultLanguage>en-US</DefaultLanguage>
     <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
