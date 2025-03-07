@@ -15,6 +15,7 @@ using SGSClient.Core.Interface;
 using SGSClient.Core.Services;
 using SGSClient.Core.Utilities;
 using SGSClient.Core.Utilities.AppInfoUtility.Models;
+using SGSClient.Core.Utilities.LogUtility;
 using SGSClient.Models;
 using SGSClient.Notifications;
 using SGSClient.Services;
@@ -131,6 +132,7 @@ public partial class App : Application
 
     private void LogException(Exception ex)
     {
+        _ = Log.ErrorAsync("Unhandled exception", ex); 
         // Simple logging: Log exception details to a file (or use a logging library)
         string logFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "error_log.txt");
 
