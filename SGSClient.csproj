@@ -18,7 +18,7 @@
     <RepositoryUrl>https://github.com/szyrgamestudio/SGSClient</RepositoryUrl>
     <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
-    <PackageCertificateThumbprint>F7BE86A32381E57EB32A6D008C310A95405EB8AF</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>6D349B53CF5A6C1142AE235CCF59866BF2559427</PackageCertificateThumbprint>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <AppxSymbolPackageEnabled>True</AppxSymbolPackageEnabled>
@@ -36,6 +36,7 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <UseWindowsForms>False</UseWindowsForms>
     <SignAssembly>False</SignAssembly>
+    <AppxPackageDir>C:\Users\m455y\Downloads\</AppxPackageDir>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Views\GamesPage.xaml — kopia.cs" />
