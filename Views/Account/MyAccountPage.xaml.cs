@@ -10,7 +10,7 @@ using System.Data.SqlClient;
 using SGSClient.Core.Authorization;
 
 namespace SGSClient.Views;
-public sealed partial class MyAccountPage : Page, INotifyPropertyChanged
+public sealed partial class MyAccountPage : Page
 {
     public event PropertyChangedEventHandler PropertyChanged;
 

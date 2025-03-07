@@ -34,7 +34,7 @@ public sealed partial class LoginPage : Page
     {
         if (AppSession.CurrentUserSession.IsLoggedIn == true)
         {
-            Frame.Navigate(typeof(MyAccountPage), null, new DrillInNavigationTransitionInfo());
+            Frame.Navigate(typeof(MyAccountPage), new DrillInNavigationTransitionInfo());
         }
     }
     public string HashPasswordWithSalt(string password, byte[] salt)
