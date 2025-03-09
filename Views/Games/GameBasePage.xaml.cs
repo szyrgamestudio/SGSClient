@@ -16,6 +16,8 @@ using Windows.ApplicationModel.Core;
 using Windows.Storage;
 using File = System.IO.File;
 using SGSClient.DataAccess.Repositories;
+using Microsoft.Data.SqlClient;
+using SGSClient.Core.Utilities.AppInfoUtility.Models;
 
 namespace SGSClient.Views;
 
@@ -24,6 +26,7 @@ public sealed partial class GameBasePage : Page
     private LauncherStatus _status;
     private string? rootPath;
     private string? gamepath;
+    private int? gameId;
     private string? versionFile;
     private string? gameZip;
     private string? gameExe;
@@ -79,6 +82,7 @@ public sealed partial class GameBasePage : Page
                     DraftP = gameData.DraftP
                 };
 
+                gameId = gameData.GameId;
                 gameZip = gameData.GameZipLink;
                 gameExe = gameData.GameExeName;
                 gameIdentifier = gameData.GameName;
@@ -467,7 +471,45 @@ where g.Symbol = @p0
                 {
                     WorkingDirectory = Path.Combine(rootPath ?? "")
                 };
-                Process.Start(startInfo);
+
+                DateTime startTime = DateTime.Now;
+                Process process = Process.Start(startInfo);
+                process.WaitForExit();
+
+                TimeSpan elapsedTime = DateTime.Now - startTime;
+
+                int dbTime = db.con.scalar<int>(@"
+select
+  ugt.TotalTime
+from sgsUsersGameTime ugt
+where ugt.GameId = @p0 and ugt.UserId = @p1", gameId, 0) ?? -1;
+
+                double totalTime = 0;
+                totalTime = Convert.ToDouble(dbTime < 0 ? 0 : dbTime);
+                totalTime += elapsedTime.TotalSeconds;
+
+                if (dbTime >= 0)
+                {
+                    db.con.exec(@"
+update ugt set 
+  ugt.TotalTime = @p0
+, ugt.LastPlayed = @p1
+from sgsUsersGameTime ugt
+where ugt.GameId = @p2 and ugt.UserId = @p3", totalTime, DateTime.Now, gameId, 0);
+                }
+                else
+                {
+                    db.con.exec(@"
+insert sgsUsersGameTime (UserId, GameId, LastPlayed, TotalTime)
+select
+  @p0
+, @p1
+, @p2
+, @p3", 0, gameId, DateTime.Now, totalTime);
+                }
+
+                MessageBox.Show($"Łączny czas działania: {TimeSpan.FromSeconds(totalTime)}");
+
                 CoreApplication.Exit();
             }
             catch (Exception ex)
