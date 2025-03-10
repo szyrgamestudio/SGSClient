@@ -482,7 +482,8 @@ where g.Symbol = @p0
 select
   ugt.TotalTime
 from sgsUsersGameTime ugt
-where ugt.GameId = @p0 and ugt.UserId = @p1", gameId, 0) ?? -1;
+inner join Registration r on r.Id = ugt.UserId
+where ugt.GameId = @p0 and r.UserId = @p1", gameId, "a8fcd7ae-2410-46f4-9943-fc790905d9bb") ?? -1;
 
                 double totalTime = 0;
                 totalTime = Convert.ToDouble(dbTime < 0 ? 0 : dbTime);
@@ -495,17 +496,27 @@ update ugt set
   ugt.TotalTime = @p0
 , ugt.LastPlayed = @p1
 from sgsUsersGameTime ugt
-where ugt.GameId = @p2 and ugt.UserId = @p3", totalTime, DateTime.Now, gameId, 0);
+inner join Registration r on r.Id = ugt.UserId
+where ugt.GameId = @p2 and r.UserId = @p3", totalTime, DateTime.Now, gameId, "a8fcd7ae-2410-46f4-9943-fc790905d9bb");
                 }
                 else
                 {
                     db.con.exec(@"
+declare @userId int = 
+(
+  select
+    r.Id
+  from Registration r
+  where r.UserId = @p0
+)
+
 insert sgsUsersGameTime (UserId, GameId, LastPlayed, TotalTime)
 select
-  @p0
+  @userId
 , @p1
 , @p2
-, @p3", 0, gameId, DateTime.Now, totalTime);
+, @p3
+", "a8fcd7ae-2410-46f4-9943-fc790905d9bb", gameId, DateTime.Now, totalTime);
                 }
 
                 MessageBox.Show($"Łączny czas działania: {TimeSpan.FromSeconds(totalTime)}");

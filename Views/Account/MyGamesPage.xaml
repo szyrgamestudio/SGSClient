@@ -31,8 +31,8 @@
                 <SolidColorBrush x:Key="DataGridColumnHeaderBackgroundColor" Color="Transparent"/>
             </controls:DataGrid.Resources>
             <controls:DataGrid.Columns>
-                <controls:DataGridTextColumn Header="Nazwa gry" Binding="{Binding Title}" Width="*" />
-                <controls:DataGridTextColumn Header="Gatunek" Binding="{Binding Genre}" Width="*" />
+                <controls:DataGridTextColumn Header="Nazwa gry" Binding="{Binding GameTitle}" Width="*" />
+                <controls:DataGridTextColumn Header="Gatunek" Binding="{Binding GameType}" Width="*" />
                 <controls:DataGridTextColumn Header="Dostępna w sklepie?" Binding="{Binding DraftP}" Width="*" />
                 <controls:DataGridTemplateColumn Width="Auto">
                     <controls:DataGridTemplateColumn.CellTemplate>

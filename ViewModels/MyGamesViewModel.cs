@@ -24,7 +24,7 @@ namespace SGSClient.ViewModels
         {
             try
             {
-                MyGamesList = new ObservableCollection<Game>(FetchMyGamesFromDatabase());
+                MyGamesList = new ObservableCollection<Game>(FetchMyGamesFromDatabase);
             }
             catch (Exception ex)
             {
@@ -34,9 +34,11 @@ namespace SGSClient.ViewModels
         #endregion
 
         #region Private or Protected Methods
-        private IEnumerable<Game> FetchMyGamesFromDatabase()
+        private IEnumerable<Game> FetchMyGamesFromDatabase
         {
-            DataSet ds = db.con.select(@"
+            get
+            {
+                DataSet ds = db.con.select(@"
 select
   g.Id       [GameId]
 , g.Title
@@ -54,32 +56,33 @@ select
 , g.DraftP
 from sgsGames g
 inner join sgsDevelopers d on d.Id = g.DeveloperId
+inner join Registration r on r.DeveloperId = d.Id
 left join sgsGameLogo l on l.GameId = g.Id
 left join sgsGameTypes t on t.Id = g.TypeId
-inner join sgsUserGames ug on ug.GameId = g.Id
-where ug.UserId = @p0
+where r.UserId = @p0
 order by g.Title", _appUser.UserId);
 
-            return ds.Tables[0].AsEnumerable().Select(dr => new Game
-            {
-                GameId = dr.TryGetValue<int>("GameId"),
-                GameSymbol = dr.TryGetValue<string>("GameSymbol"),
-                GameName = dr.TryGetValue<string>("Title"),
-                GameDeveloper = dr.TryGetValue<string>("GameDeveloper"),
-                GameTitle = dr.TryGetValue<string>("Title"),
-                ImageSource = new Uri(dr.TryGetValue<string>("LogoPath") ?? "about:blank"),
-                GameVersion = string.Empty,
-                GamePayloadName = dr.TryGetValue<string>("PayloadName"),
-                GameExeName = dr.TryGetValue<string>("ExeName"),
-                GameZipLink = dr.TryGetValue<string>("ZipLink"),
-                GameVersionLink = dr.TryGetValue<string>("VersionLink"),
-                GameDescription = dr.TryGetValue<string>("Description"),
-                HardwareRequirements = dr.TryGetValue<string>("HardwareRequirements"),
-                OtherInformations = dr.TryGetValue<string>("OtherInformation"),
-                LogoPath = dr.TryGetValue<string>("LogoPath"),
-                GameType = dr.TryGetValue<string>("GameType"),
-                DraftP = dr.TryGetValue<bool>("DraftP")
-            });
+                return ds.Tables[0].AsEnumerable().Select(dr => new Game
+                {
+                    GameId = dr.TryGetValue<int>("GameId"),
+                    GameSymbol = dr.TryGetValue<string>("GameSymbol"),
+                    GameName = dr.TryGetValue<string>("Title"),
+                    GameDeveloper = dr.TryGetValue<string>("GameDeveloper"),
+                    GameTitle = dr.TryGetValue<string>("Title"),
+                    ImageSource = new Uri(dr.TryGetValue<string>("LogoPath") ?? "about:blank"),
+                    GameVersion = string.Empty,
+                    GamePayloadName = dr.TryGetValue<string>("PayloadName"),
+                    GameExeName = dr.TryGetValue<string>("ExeName"),
+                    GameZipLink = dr.TryGetValue<string>("ZipLink"),
+                    GameVersionLink = dr.TryGetValue<string>("VersionLink"),
+                    GameDescription = dr.TryGetValue<string>("Description"),
+                    HardwareRequirements = dr.TryGetValue<string>("HardwareRequirements"),
+                    OtherInformations = dr.TryGetValue<string>("OtherInformation"),
+                    LogoPath = dr.TryGetValue<string>("LogoPath"),
+                    GameType = dr.TryGetValue<string>("GameType"),
+                    DraftP = dr.TryGetValue<bool>("DraftP")
+                });
+            }
         }
         #endregion
     }
