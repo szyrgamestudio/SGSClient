@@ -10,6 +10,7 @@ namespace SGSClient.ViewModels
 {
     public partial class GameBaseViewModel : ObservableRecipient
     {
+        #region Constructors and Properties
         private readonly IAppUser _appUser;
         private ObservableCollection<GameRating> _allRatings;
         private const int PageSize = 2;
@@ -59,10 +60,19 @@ namespace SGSClient.ViewModels
             CurrentPage = 0;
             _appUser = appUser;
         }
+
+        #endregion
         public bool UserRatingP()
         {
-            var dataSet = db.con.select(SqlQueries.userRatingSQL, _appUser.UserId);
-            if (dataSet.Tables[0].Rows.Count > 0)
+            DataSet ds = db.con.select(@"
+select
+  gr.Id
+from GameRatings gr
+inner join Registration r on r.Id = gr.UserId
+where r.UserId = @p0
+", _appUser.UserId);
+
+            if (ds.Tables[0].Rows.Count > 0)
                 return true;
             else
                 return false;
@@ -70,45 +80,82 @@ namespace SGSClient.ViewModels
         public void LoadRatings(string gameIdentifier)
         {
             _allRatings.Clear();
-            List<GameRating> gameRatings = [];
-            var dataSet = db.con.select(SqlQueries.loadRatingsSQL, gameIdentifier);
-            if (dataSet.Tables[0].Rows.Count > 0)
+
+            DataSet ds = db.con.select(@"
+select
+  gr.Id
+, d.Id [DeveloperId]
+, d.Name
+, gr.Rating
+, gr.Title
+, gr.Review
+from GameRatings gr
+inner join sgsGames g on g.Id = gr.GameId
+inner join Registration r on r.Id = gr.UserId
+inner join sgsDevelopers d on d.Id = r.DeveloperId
+where g.Symbol = @p0
+", gameIdentifier);
+
+            foreach (DataRow dr in ds.Tables[0].Rows)
             {
-                foreach (DataRow row in dataSet.Tables[0].Rows)
+                _allRatings.Add(new GameRating
                 {
-                    _allRatings.Add(new GameRating
-                    {
-                        RatingId = row.Field<int>("Id"),
-                        UserId = row.Field<int>("DeveloperId"),
-                        Author = row.Field<string>("Name"),
-                        Rating = row.Field<int>("Rating"),
-                        Title = row.Field<string>("Title"),
-                        Review = row.Field<string>("Review")
-                    });
-                }
+                    RatingId = dr.TryGetValue("Id"),
+                    UserId = dr.TryGetValue("DeveloperId"),
+                    Author = dr.TryGetValue("Name"),
+                    Rating = dr.TryGetValue("Rating"),
+                    Title = dr.TryGetValue("Title"),
+                    Review = dr.TryGetValue("Review")
+                });
             }
+
             LoadPage(0);
         }
         public void LoadGameRatingsStats(string gameIdentifier)
         {
-            var dataSet = db.con.select(SqlQueries.loadGameRatingStatsSQL, gameIdentifier);
-            if (dataSet.Tables[0].Rows.Count > 0)
+            DataSet ds = db.con.select(@"
+select 
+  COUNT(gr.Id) RatingCount
+, CAST(ROUND(CAST(AVG(gr.Rating) AS DECIMAL(10, 1)), 1) as nvarchar) AvgRating
+, SUM(CASE WHEN gr.Rating = 1 THEN 1 ELSE 0 END) * 100 / COUNT(gr.Id) Count1
+, SUM(CASE WHEN gr.Rating = 2 THEN 1 ELSE 0 END) * 100 / COUNT(gr.Id) Count2
+, SUM(CASE WHEN gr.Rating = 3 THEN 1 ELSE 0 END) * 100 / COUNT(gr.Id) Count3
+, SUM(CASE WHEN gr.Rating = 4 THEN 1 ELSE 0 END) * 100 / COUNT(gr.Id) Count4
+, SUM(CASE WHEN gr.Rating = 5 THEN 1 ELSE 0 END) * 100 / COUNT(gr.Id) Count5
+from GameRatings gr
+inner join sgsGames g on g.Id = gr.GameId
+where g.Symbol = @p0
+group by gr.GameId
+", gameIdentifier);
+
+            foreach (DataRow dr in ds.Tables[0].Rows)
             {
-                foreach (DataRow row in dataSet.Tables[0].Rows)
-                {
-                    RatingCount = row.Field<int>("RatingCount");
-                    AvgRating = row.Field<string>("AvgRating");
-                    Count1 = row.Field<int>("Count1");
-                    Count2 = row.Field<int>("Count2");
-                    Count3 = row.Field<int>("Count3");
-                    Count4 = row.Field<int>("Count4");
-                    Count5 = row.Field<int>("Count5");
-                }
+                RatingCount = dr.TryGetValue("RatingCount");
+                AvgRating = dr.TryGetValue("AvgRating");
+                Count1 = dr.TryGetValue("Count1");
+                Count2 = dr.TryGetValue("Count2");
+                Count3 = dr.TryGetValue("Count3");
+                Count4 = dr.TryGetValue("Count4");
+                Count5 = dr.TryGetValue("Count5");
             }
+
         }
         public DataSet ReturnUserRating(string gameIdentifier)
         {
-            return db.con.select(SqlQueries.loadRatingSQL, gameIdentifier, _appUser.UserId);;
+            return db.con.select(@"
+select
+  gr.Id
+, d.Id [DeveloperId]
+, d.Name
+, gr.Rating
+, gr.Title
+, gr.Review
+from GameRatings gr
+inner join sgsGames g on g.Id = gr.GameId
+inner join Registration r on r.Id = gr.UserId
+inner join sgsDevelopers d on d.Id = r.DeveloperId
+where g.Symbol = @p0 and r.UserId = @p1
+", gameIdentifier, _appUser.UserId);
         }
 
         public void AddRating(string gameIdentifier, GameRating gameRating)
@@ -116,14 +163,48 @@ namespace SGSClient.ViewModels
             if (gameRating.RatingId > 0)
                 UpdateRating(gameRating, gameIdentifier);
             else
-                db.con.exec(SqlQueries.insertRatingSQL, gameIdentifier, _appUser.UserId, gameRating.Rating, gameRating.Title, gameRating.Review);
+                db.con.exec(@"
+declare @gameId int =
+(
+  select
+    g.Id
+  from sgsGames g
+  where g.Symbol = @p0
+)
+
+declare @userId int = 
+(
+  select
+    r.Id
+  from Registration r
+  where  r.UserId = @p1
+)
+
+insert into GameRatings (GameId, UserId, Rating, Title, Review, CreationDateTime, ModificationDateTime)
+select
+  @gameId
+, @userId
+, @p2
+, @p3
+, @p4
+, GETDATE()
+, GETDATE()
+", gameIdentifier, _appUser.UserId, gameRating.Rating, gameRating.Title, gameRating.Review);
 
             LoadGameRatingsStats(gameIdentifier);
             LoadPage(CurrentPage);
         }
         public void UpdateRating(GameRating gameRating, string gameIdentifier)
         {
-            db.con.exec(SqlQueries.updateRatingSQL, gameRating.RatingId, gameRating.Rating, gameRating.Title, gameRating.Review);
+            db.con.exec(@"
+update r set
+  r.Rating = @p1
+, r.Title = @p2
+, r.Review = @p3
+, r.ModificationDateTime = GETDATE()
+from GameRatings r
+where r.Id = @p0
+", gameRating.RatingId, gameRating.Rating, gameRating.Title, gameRating.Review);
             LoadGameRatingsStats(gameIdentifier);
             LoadPage(CurrentPage);
         }
