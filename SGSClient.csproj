@@ -47,6 +47,7 @@
     <None Remove="Assets\GalleryHeaderImage.png" />
     <None Remove="Assets\Games\AtorthTalesOfUlkimond\Atorth_Logo - kopiować.png" />
     <None Remove="Assets\Games\Zacmienie\Zacmienie_Logo - kopiować.png" />
+    <None Remove="Controls\DownloadBar.xaml" />
     <None Remove="Views\GamesPage — kopia.xaml" />
     <None Remove="Views\Games\Games.rar" />
   </ItemGroup>
@@ -82,6 +83,9 @@
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Page Update="Controls\DownloadBar.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
     <ProjectCapability Include="Msix" />

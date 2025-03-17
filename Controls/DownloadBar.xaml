@@ -1,0 +1,25 @@
+<UserControl
+    x:Class="SGSClient.Controls.DownloadBar"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:model="using:SGSClient.Models"
+    xmlns:vm="using:SGSClient.ViewModels">
+
+    <UserControl.DataContext>
+        <vm:DownloadViewModel/>
+    </UserControl.DataContext>
+
+    <StackPanel Orientation="Vertical">
+        <TextBlock Text="Aktywne pobierania" FontSize="16" Margin="5"/>
+        <ItemsControl ItemsSource="{x:Bind ViewModel.ActiveDownloads, Mode=OneWay}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="model:DownloadItem">
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <TextBlock Text="{x:Bind GameName}" Width="200"/>
+                        <ProgressBar Value="{x:Bind Progress}" Width="150"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </StackPanel>
+</UserControl>

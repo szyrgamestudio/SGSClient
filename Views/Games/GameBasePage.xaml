@@ -104,7 +104,11 @@
                 ClickMode="Press"
                 Content="Zainstaluj"
                 Style="{StaticResource AccentButtonStyle}" />
+                        
                     </StackPanel>
+
+                    <Button Content="Pobierz" Click="DownloadButton_Click"/>
+
 
                     <!--  5 - Przycisk aktualizuj  -->
                     <StackPanel
