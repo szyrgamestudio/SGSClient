@@ -1,15 +1,147 @@
 ﻿using System.Collections.ObjectModel;
 using System.Data;
+using System.Diagnostics;
+using System.Windows.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using SGSClient.Core.Authorization;
 using SGSClient.Core.Database;
 using SGSClient.Core.Extensions;
+using SGSClient.DataAccess.Repositories;
 using SGSClient.Models;
+using Windows.Storage;
 
 namespace SGSClient.ViewModels
 {
     public partial class GameBaseViewModel : ObservableRecipient
     {
+        private string? rootPath;
+        private string? gamepath;
+        private int? gameId;
+        private string? versionFile;
+        private string? gameZip;
+        private string? gameExe;
+        private string? gameIdentifier;
+        private string? gameZipLink;
+        private readonly HttpClient httpClient = new();
+
+        public ObservableCollection<BitmapImage> GameImages { get; } = new();
+        public string? GameLogo { get; private set; }
+        public string? GameName { get; private set; }
+        public string? GameDeveloper { get; private set; }
+        public string? GameDescription { get; private set; }
+        public string? HardwareRequirements { get; private set; }
+        public string? OtherInformations { get; private set; }
+        public bool IsOtherInformationsVisible { get; private set; }
+        public bool IsHardwareRequirementsVisible { get; private set; }
+
+        public void InitializeGame(string gameSymbol)
+        {
+            var gamesData = GamesRepository.FetchGames(true);
+            var gameData = gamesData.FirstOrDefault(g => g.GameSymbol == gameSymbol);
+
+            if (gameData != null)
+            {
+                gameId = gameData.GameId;
+                gameZip = gameData.GameZipLink;
+                gameExe = gameData.GameExeName;
+                gameIdentifier = gameData.GameName;
+                gameZipLink = gameData.GameZipLink;
+                LoadRatings(gameData.GameSymbol);
+                LoadGameRatingsStats(gameData.GameSymbol);
+                LoadImagesFromDatabase(gameData.GameSymbol);
+                LoadLogoFromDatabase(gameData.GameSymbol);
+                UpdateUI(gameData);
+            }
+
+            var location = Path.Combine(ApplicationData.Current.LocalFolder.Path, "LocalState");
+            rootPath = Path.GetDirectoryName(location) ?? string.Empty;
+
+            versionFile = Path.Combine(rootPath, "versions.xml");
+            gameZip = Path.Combine(rootPath, $"{gameIdentifier}ARCHIVE");
+            gameExe = Path.Combine(rootPath, gameIdentifier ?? "", $"{gameExe}.exe");
+            gamepath = Path.Combine(rootPath, gameIdentifier ?? "");
+        }
+
+
+
+
+        #region UI
+        private void UpdateUI(Game game)
+        {
+            GameName = game.GameName ?? "Brak dostępnych informacji.";
+            GameDeveloper = game.GameDeveloper ?? "Brak dostępnych informacji.";
+            GameDescription = game.GameDescription ?? "Brak dostępnych informacji.";
+            HardwareRequirements = game.HardwareRequirements ?? "Brak dostępnych informacji.";
+            OtherInformations = string.IsNullOrWhiteSpace(game.OtherInformations) ? null : game.OtherInformations;
+            IsOtherInformationsVisible = !string.IsNullOrWhiteSpace(game.OtherInformations);
+            IsHardwareRequirementsVisible = !string.IsNullOrWhiteSpace(game.HardwareRequirements);
+
+            OnPropertyChanged(nameof(GameName));
+            OnPropertyChanged(nameof(GameDeveloper));
+            OnPropertyChanged(nameof(GameDescription));
+            OnPropertyChanged(nameof(HardwareRequirements));
+            OnPropertyChanged(nameof(OtherInformations));
+            OnPropertyChanged(nameof(IsOtherInformationsVisible));
+            OnPropertyChanged(nameof(IsHardwareRequirementsVisible));
+        }
+        public static List<string> LoadGalleryImagesFromDatabase(string gameSymbol)
+        {
+            List<string> galleryImages = [];
+            var ds = db.con.select(@"
+select
+  i.ImagePath
+from sgsGameImages i
+inner join sgsGames g on g.Id = i.GameId
+where g.Symbol = @p0
+", gameSymbol);
+            foreach (DataRow dr in ds.Tables[0].Rows)
+                galleryImages.Add(dr.TryGetValue("ImagePath").ToString());
+
+            return galleryImages;
+        }
+        public void LoadImagesFromDatabase(string gameSymbol)
+        {
+            GameImages.Clear();
+            var gameImages = LoadGalleryImagesFromDatabase(gameSymbol);
+
+            if (gameImages == null || gameImages.Count == 0)
+            {
+                Debug.WriteLine("Brak obrazów galerii w bazie danych dla tej gry.");
+                return;
+            }
+
+            foreach (var imagePath in gameImages)
+            {
+                try
+                {
+                    Uri imageUri = new Uri(imagePath);
+                    GameImages.Add(new BitmapImage(imageUri));
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("Błąd wczytywania obrazu: " + ex.Message);
+                }
+            }
+
+            OnPropertyChanged(nameof(GameImages));
+        }
+        public void LoadLogoFromDatabase(string gameSymbol)
+        {
+            var games = GamesRepository.FetchGames(true);
+            var gameData = games.FirstOrDefault(g => g.GameSymbol == gameSymbol);
+
+            GameLogo = gameData?.LogoPath ?? "ms-appx:///Assets/placeholder.png";  // URL lub domyślny obrazek
+            OnPropertyChanged(nameof(GameLogo));
+        }
+        #endregion
+
+
+
+
+
+
+
+
         #region Constructors and Properties
         private readonly IAppUser _appUser;
         private ObservableCollection<GameRating> _allRatings;

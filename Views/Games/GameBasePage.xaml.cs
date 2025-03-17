@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Windows;
 using System.Xml.Linq;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
 using SevenZipExtractor;
 using SGSClient.Controllers;
@@ -13,11 +12,7 @@ using SGSClient.Helpers;
 using SGSClient.Models;
 using SGSClient.ViewModels;
 using Windows.ApplicationModel.Core;
-using Windows.Storage;
 using File = System.IO.File;
-using SGSClient.DataAccess.Repositories;
-using Microsoft.Data.SqlClient;
-using SGSClient.Core.Utilities.AppInfoUtility.Models;
 
 namespace SGSClient.Views;
 
@@ -36,7 +31,6 @@ public sealed partial class GameBasePage : Page
     private GameRating? _gameRating;
     private readonly HttpClient httpClient = new();
     public GameBaseViewModel ViewModel { get; }
-    public GamesViewModel GamesViewModel { get; }
 
     internal LauncherStatus Status
     {
@@ -47,183 +41,24 @@ public sealed partial class GameBasePage : Page
             LauncherStatusHelper.UpdateStatus(PlayButton, CheckUpdateButton, UninstallButton, DownloadProgressBorder, _status, gameZip ?? "");
         }
     }
+
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
-        DataContext = ViewModel;
-        var game = new Game();
-
-        if (e.Parameter is string parameterString && !string.IsNullOrWhiteSpace(parameterString))
-        {
-            gameIdentifier = parameterString;
-
-            var gamesData = GamesRepository.FetchGames(true);
-            var gameData = gamesData.FirstOrDefault(g => g.GameSymbol == gameIdentifier);
-
-            if (gameData != null)
-            {
-                game = new Game
-                {
-                    GameId = gameData.GameId,
-                    GameSymbol = gameData.GameSymbol,
-                    GameName = gameData.GameName,
-                    GameDeveloper = gameData.GameDeveloper,
-                    GameTitle = gameData.GameTitle,
-                    ImageSource = gameData.ImageSource,
-                    GameVersion = gameData.GameVersion,
-                    GamePayloadName = gameData.GamePayloadName,
-                    GameExeName = gameData.GameExeName,
-                    GameZipLink = gameData.GameZipLink,
-                    GameVersionLink = gameData.GameVersionLink,
-                    GameDescription = gameData.GameDescription,
-                    HardwareRequirements = gameData.HardwareRequirements,
-                    OtherInformations = gameData.OtherInformations,
-                    LogoPath = gameData.LogoPath,
-                    GameType = gameData.GameType,
-                    DraftP = gameData.DraftP
-                };
-
-                gameId = gameData.GameId;
-                gameZip = gameData.GameZipLink;
-                gameExe = gameData.GameExeName;
-                gameIdentifier = gameData.GameName;
-                gameZipLink = game.GameZipLink;
-
-                LoadImagesFromDatabase(game.GameSymbol);
-                LoadLogoFromDatabase(game.GameSymbol);
-
-                ViewModel.LoadRatings(game.GameSymbol);
-                ViewModel.LoadGameRatingsStats(game.GameSymbol);
-            }
-        }
-
         base.OnNavigatedTo(e);
+        DataContext = ViewModel;
 
-        // Ścieżki do plików lokalnych
-        var location = Path.Combine(ApplicationData.Current.LocalFolder.Path, "LocalState");
-        rootPath = Path.GetDirectoryName(location) ?? string.Empty;
-
-        #region Ścieżki plików
-        versionFile = Path.Combine(rootPath, "versions.xml");
-        gameZip = Path.Combine(rootPath, $"{gameIdentifier}ARCHIVE");
-        gameExe = Path.Combine(rootPath, gameIdentifier ?? "", $"{gameExe}.exe");
-        gamepath = Path.Combine(rootPath, gameIdentifier ?? "");
-        #endregion
-
-        // Aktualizacja interfejsu użytkownika i sprawdzenie wersji
-        UpdateUI(game);
-        IsUpdated();
+        if (e.Parameter is string gameSymbol && !string.IsNullOrWhiteSpace(gameSymbol))
+        {
+            ViewModel.InitializeGame(gameSymbol);
+        }
     }
 
-    #region DB Handling
-    public static List<string> LoadGalleryImagesFromDatabase(string gameSymbol)
+    public GameBasePage()
     {
-        List<string> galleryImages = [];
-        var ds = db.con.select(@"
-select
-  i.ImagePath
-from sgsGameImages i
-inner join sgsGames g on g.Id = i.GameId
-where g.Symbol = @p0
-", gameSymbol);
-        foreach (DataRow dr in ds.Tables[0].Rows)
-            galleryImages.Add(dr.TryGetValue("ImagePath").ToString());
-
-        return galleryImages;
+        ViewModel = App.GetService<GameBaseViewModel>();
+        InitializeComponent();
+        Status = LauncherStatus.pageLauched;
     }
-    private void LoadImagesFromDatabase(string gameName)
-    {
-        var gameImages = LoadGalleryImagesFromDatabase(gameName);
-
-        if (gameImages == null || gameImages.Count == 0)
-        {
-            Debug.WriteLine("Brak obrazów galerii w bazie danych dla tej gry.");
-            return;
-        }
-
-        var flipView = FindName("GameGallery") as FlipView;
-        if (flipView == null)
-            return;
-
-        flipView.Items.Clear();
-
-        foreach (var imagePath in gameImages)
-        {
-            try
-            {
-                Uri imageUri = new Uri(imagePath);
-                Image image = new Image { Source = new BitmapImage(imageUri) };
-                flipView.Items.Add(image);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("Błąd wczytywania obrazu: " + ex.Message);
-            }
-        }
-    }
-    private void LoadLogoFromDatabase(string gameSymbol)
-    {
-        var games = GamesRepository.FetchGames(true);
-        var gameData = games.FirstOrDefault(g => g.GameSymbol == gameSymbol);
-
-        if (gameData == null || string.IsNullOrEmpty(gameData.LogoPath))
-        {
-            SetDefaultLogoImage();
-            return;
-        }
-
-        try
-        {
-            Uri logoImageUri = new Uri(gameData.LogoPath, UriKind.Absolute);
-            Image? gameLogoImage = FindName("GameLogoImage") as Image;
-
-            if (gameLogoImage != null)
-            {
-                gameLogoImage.Source = new BitmapImage(logoImageUri);
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Błąd wczytywania obrazu: {ex.Message}");
-            SetDefaultLogoImage();
-        }
-    }
-    #endregion
-
-    #region UI Handling
-    private void SetDefaultLogoImage()
-    {
-        Image? gameLogoImage = FindName("GameLogoImage") as Image;
-        if (gameLogoImage != null)
-            gameLogoImage.Source = new BitmapImage(new Uri("ms-appx:///Assets/placeholder.png"));
-    }
-    private void UpdateUI(Game game)
-    {
-        GameNameTextBlock.Text = game.GameName ?? "Brak dostępnych informacji.";
-        GameDeveloperTextBlock.Text = game.GameDeveloper ?? "Brak dostępnych informacji.";
-        GameDescriptionTextBlock.Text = game.GameDescription ?? "Brak dostępnych informacji.";
-        HardwareRequirementsTextBlock.Text = game.HardwareRequirements ?? "Brak dostępnych informacji.";
-
-        if (string.IsNullOrWhiteSpace(game.OtherInformations))
-        {
-            OtherInformationsTextBlock.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-            OtherInformationsStackPanel.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-        }
-        else
-        {
-            OtherInformationsTextBlock.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-            OtherInformationsTextBlock.Text = game.OtherInformations;
-        }
-
-        if (string.IsNullOrWhiteSpace(HardwareRequirementsTextBlock.Text))
-        {
-            reqStackPanel.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-        }
-        else
-        {
-            reqStackPanel.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-        }
-    }
-    #endregion
 
     #region Rating
     private void RatingRatingControl_ValueChanged(RatingControl sender, object args)
@@ -291,12 +126,7 @@ where g.Symbol = @p0
     }
     #endregion
 
-    public GameBasePage()
-    {
-        ViewModel = App.GetService<GameBaseViewModel>();
-        InitializeComponent();
-        Status = LauncherStatus.pageLauched;
-    }
+
 
     private void IsUpdated()
     {
