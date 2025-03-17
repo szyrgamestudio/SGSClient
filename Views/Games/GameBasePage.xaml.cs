@@ -129,12 +129,17 @@ public sealed partial class GameBasePage : Page
     #endregion
 
     private async void DownloadButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
-{
-    string downloadUrl = "https://sgsclient.m455yn.dev/api/shares/AutiBattlerGra/files/a0b33dc1-4cde-42a1-91b7-16108b3375e1";
-    string destinationPath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "game.zip");
+    {
+        string downloadUrl = "https://sgsclient.m455yn.dev/api/shares/AutiBattlerGra/files/a0b33dc1-4cde-42a1-91b7-16108b3375e1";
+        string destinationPath = Path.Combine(ApplicationData.Current.LocalFolder.Path, "game.zip");
 
-    await DownloadManager.Instance.StartDownloadAsync("Moja Gra", downloadUrl, destinationPath);
-}
+        // Znajdź `ShellPage`
+        var shellPage = (ShellPage)App.MainWindow.Content;
+
+        await DownloadManager.Instance.StartDownloadAsync(shellPage, "Moja Gra", downloadUrl, destinationPath);
+    }
+
+
 
 
     private void IsUpdated()

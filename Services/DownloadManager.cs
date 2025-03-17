@@ -1,4 +1,5 @@
 ﻿using SGSClient.Models;
+using SGSClient.Views;
 using System.Collections.ObjectModel;
 
 namespace SGSClient.Services
@@ -16,15 +17,19 @@ namespace SGSClient.Services
 
         private DownloadManager() { }
 
-        public async Task StartDownloadAsync(string gameName, string downloadUrl, string destinationPath)
+        public async Task StartDownloadAsync(ShellPage shellPage, string gameName, string url, string destinationPath)
         {
-            var downloadItem = new DownloadItem(gameName, downloadUrl, destinationPath);
-            ActiveDownloads.Add(downloadItem);
-            DownloadsUpdated?.Invoke();
+            shellPage?.AddDownload(gameName, url, destinationPath);
 
-            await downloadItem.StartDownloadAsync(httpClient);
-
-            DownloadsUpdated?.Invoke();
+            using (var client = new HttpClient())
+            {
+                var response = await client.GetAsync(url);
+                if (response.IsSuccessStatusCode)
+                {
+                    byte[] fileBytes = await response.Content.ReadAsByteArrayAsync();
+                    await File.WriteAllBytesAsync(destinationPath, fileBytes);
+                }
+            }
         }
     }
 }

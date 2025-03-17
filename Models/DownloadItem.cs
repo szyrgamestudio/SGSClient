@@ -1,7 +1,7 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.IO;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace SGSClient.Models
@@ -11,10 +11,28 @@ namespace SGSClient.Models
         public string GameName { get; }
         public string DownloadUrl { get; }
         public string DestinationPath { get; }
-        public double Progress { get; private set; }
+
+        private double _progress;
+        public double Progress
+        {
+            get => _progress;
+            set
+            {
+                _progress = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(ProgressText)); // Aktualizuje tekst procentowy
+            }
+        }
+
+        public string ProgressText => $"{Progress:F1}%";
+
         public bool IsCompleted { get; private set; }
 
-        public event PropertyChangedEventHandler? PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         public DownloadItem(string gameName, string downloadUrl, string destinationPath)
         {
@@ -41,11 +59,10 @@ namespace SGSClient.Models
                 await fileStream.WriteAsync(buffer, 0, bytesRead);
                 totalRead += bytesRead;
                 Progress = (double)totalRead / totalSize * 100;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Progress)));
             }
 
             IsCompleted = true;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsCompleted)));
+            OnPropertyChanged(nameof(IsCompleted));
         }
     }
 }

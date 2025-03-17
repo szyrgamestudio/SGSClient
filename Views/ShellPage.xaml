@@ -7,6 +7,7 @@
     xmlns:helpers="using:SGSClient.Helpers"
     xmlns:behaviors="using:SGSClient.Behaviors"
     xmlns:i="using:Microsoft.Xaml.Interactivity"
+    xmlns:controls="using:SGSClient.Controls"
     Loaded="OnLoaded">
 
     <Grid>
@@ -96,6 +97,11 @@
             </i:Interaction.Behaviors>
             <Grid Margin="{StaticResource NavigationViewPageContentMargin}">
                 <Frame x:Name="NavigationFrame" />
+                <controls:DownloadBar x:Name="DownloadBar"
+                                      VerticalAlignment="Bottom"
+                                      Margin="10"
+                                      Height="50"
+                                      Visibility="Collapsed"/>
             </Grid>
         </NavigationView>
     </Grid>

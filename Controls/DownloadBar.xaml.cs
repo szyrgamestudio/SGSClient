@@ -5,7 +5,7 @@ namespace SGSClient.Controls
 {
     public sealed partial class DownloadBar : UserControl
     {
-        public DownloadViewModel ViewModel { get; set; } = new DownloadViewModel();
+        public DownloadViewModel ViewModel => DownloadViewModel.Instance;
 
         public DownloadBar()
         {

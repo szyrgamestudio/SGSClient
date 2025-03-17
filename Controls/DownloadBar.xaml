@@ -3,7 +3,9 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:model="using:SGSClient.Models"
-    xmlns:vm="using:SGSClient.ViewModels">
+    xmlns:vm="using:SGSClient.ViewModels"
+    Background="LightGray"
+    BorderThickness="1" BorderBrush="Black">
 
     <UserControl.DataContext>
         <vm:DownloadViewModel/>
@@ -16,7 +18,8 @@
                 <DataTemplate x:DataType="model:DownloadItem">
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <TextBlock Text="{x:Bind GameName}" Width="200"/>
-                        <ProgressBar Value="{x:Bind Progress}" Width="150"/>
+                        <ProgressBar Value="{x:Bind Progress}" Width="150" Height="10"/>
+                        <TextBlock Text="{x:Bind ProgressText}" Width="50"/>
                     </StackPanel>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml.Input;
 
 using SGSClient.Contracts.Services;
 using SGSClient.Helpers;
+using SGSClient.Models;
 using SGSClient.ViewModels;
 
 using Windows.System;
@@ -13,6 +14,7 @@ namespace SGSClient.Views;
 // TODO: Update NavigationViewItem titles and icons in ShellPage.xaml.
 public sealed partial class ShellPage : Page
 {
+    public DownloadViewModel DownloadViewModel { get; } = new();
     public ShellViewModel ViewModel
     {
         get;
@@ -34,6 +36,22 @@ public sealed partial class ShellPage : Page
         App.MainWindow.Activated += MainWindow_Activated;
         AppTitleBarText.Text = "AppDisplayName".GetLocalized();
         this.PointerPressed += ShellPage_PointerPressed;
+        DownloadBar.DataContext = DownloadViewModel.Instance;
+
+    }
+
+    public void AddDownload(string gameName, string url, string destinationPath)
+    {
+        var downloadItem = new DownloadItem(gameName, url, destinationPath);
+        DownloadViewModel.Instance.ActiveDownloads.Add(downloadItem);
+
+        DownloadBar.Visibility = Visibility.Visible;
+
+        Task.Run(async () =>
+        {
+            using var httpClient = new HttpClient();
+            await downloadItem.StartDownloadAsync(httpClient);
+        });
     }
 
     private void OnLoaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
