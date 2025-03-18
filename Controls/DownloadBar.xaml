@@ -9,34 +9,51 @@
         <vm:DownloadViewModel/>
     </UserControl.DataContext>
 
-    <StackPanel Orientation="Vertical" Background="{ThemeResource AcrylicBackgroundFillColorBaseBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="1" CornerRadius="5">
-        <TextBlock Text="Aktywne pobierania" FontSize="12" Margin="10"/>
-        <ItemsControl ItemsSource="{x:Bind ViewModel.ActiveDownloads, Mode=OneWay}">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate x:DataType="model:DownloadItem">
-                    <Grid Margin="5">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="50"/>
-                            <ColumnDefinition Width="200"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="50"/>
-                            <ColumnDefinition Width="40"/>
-                        </Grid.ColumnDefinitions>
+    <StackPanel Background="{ThemeResource AcrylicBackgroundFillColorBaseBrush}"
+            BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="1" CornerRadius="5">
 
-                        <Image Source="{x:Bind GameIcon}" Grid.Column="0" Width="40" Height="40" Margin="5"/>
-                        <TextBlock Text="{x:Bind GameName}" Grid.Column="1" VerticalAlignment="Center"/>
-                        <ProgressBar Value="{x:Bind Progress, Mode=OneWay}" Grid.Column="2" Height="6" Margin="5,0"/>
-                        <TextBlock Text="{x:Bind ProgressText}" Grid.Column="3" VerticalAlignment="Center"/>
-                        <Button Grid.Column="4" Tag="{x:Bind}" Click="CancelDownload_Click" Width="35" Height="35">
-                            <Button.Content>
-                                <Viewbox Stretch="Uniform">
-                                    <FontIcon Glyph="&#xE711;"/>
-                                </Viewbox>
-                            </Button.Content>
-                        </Button>
-                    </Grid>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="40"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Text="Aktywne pobierania" FontSize="12" Margin="10" Grid.Column="0"/>
+
+            <Button Margin="0,0,5,0" Grid.Column="1" Click="ToggleDownloads_Click" Width="25" Height="25" Padding="0" HorizontalAlignment="Right" Background="Transparent" BorderThickness="0">
+                <FontIcon x:Name="MinimizeIcon" Glyph="&#xE921;" FontSize="16"/>
+            </Button>
+        </Grid>
+
+        <!-- Tylko ten panel będzie chowany --> 
+        <StackPanel x:Name="DownloadsContent">
+            <ItemsControl ItemsSource="{x:Bind ViewModel.ActiveDownloads, Mode=OneWay}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="model:DownloadItem">
+                        <Grid Margin="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="40"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Image Source="{x:Bind GameIcon}" Grid.Column="0" Width="40" Height="40" Margin="5"/>
+                            <TextBlock Text="{x:Bind GameName}" Grid.Column="1" VerticalAlignment="Center"/>
+                            <ProgressBar Value="{x:Bind Progress, Mode=OneWay}" Grid.Column="2" Height="6" Margin="5,0"/>
+                            <TextBlock Text="{x:Bind ProgressText}" Grid.Column="3" VerticalAlignment="Center"/>
+                            <Button Grid.Column="4" Tag="{x:Bind}" Click="CancelDownload_Click" Width="35" Height="35">
+                                <Button.Content>
+                                    <Viewbox Stretch="Uniform">
+                                        <FontIcon Glyph="&#xE711;"/>
+                                    </Viewbox>
+                                </Button.Content>
+                            </Button>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
     </StackPanel>
 </UserControl>
