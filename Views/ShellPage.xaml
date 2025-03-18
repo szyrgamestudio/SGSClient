@@ -100,7 +100,6 @@
                 <controls:DownloadBar x:Name="DownloadBar"
                                       VerticalAlignment="Bottom"
                                       Margin="10"
-                                      Height="50"
                                       Visibility="Collapsed"/>
             </Grid>
         </NavigationView>

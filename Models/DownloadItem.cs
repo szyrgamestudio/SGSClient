@@ -8,6 +8,17 @@ namespace SGSClient.Models
 {
     public class DownloadItem : INotifyPropertyChanged
     {
+        private string _gameIcon;
+        public string GameIcon
+        {
+            get => _gameIcon;
+            set
+            {
+                _gameIcon = value;
+                OnPropertyChanged();
+            }
+        }
+
         public string GameName { get; }
         public string DownloadUrl { get; }
         public string DestinationPath { get; }
@@ -24,6 +35,14 @@ namespace SGSClient.Models
             }
         }
 
+        private CancellationTokenSource _cts = new();
+
+        public void Cancel()
+        {
+            _cts.Cancel();
+        }
+
+
         public string ProgressText => $"{Progress:F1}%";
 
         public bool IsCompleted { get; private set; }
@@ -34,11 +53,12 @@ namespace SGSClient.Models
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public DownloadItem(string gameName, string downloadUrl, string destinationPath)
+        public DownloadItem(string gameName, string downloadUrl, string destinationPath, string gameIcon = "ms-appx:///Assets/placeholder.png")
         {
             GameName = gameName;
             DownloadUrl = downloadUrl;
             DestinationPath = destinationPath;
+            GameIcon = gameIcon;
         }
 
         public async Task StartDownloadAsync(HttpClient httpClient)
@@ -54,9 +74,9 @@ namespace SGSClient.Models
 
             int bytesRead;
             long totalRead = 0;
-            while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+            while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length, _cts.Token)) > 0)
             {
-                await fileStream.WriteAsync(buffer, 0, bytesRead);
+                await fileStream.WriteAsync(buffer, 0, bytesRead, _cts.Token);
                 totalRead += bytesRead;
                 Progress = (double)totalRead / totalSize * 100;
             }

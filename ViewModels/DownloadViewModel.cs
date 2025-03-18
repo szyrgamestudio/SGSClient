@@ -25,5 +25,13 @@ namespace SGSClient.ViewModels
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+        public void CancelDownload(DownloadItem item)
+        {
+            if (ActiveDownloads.Contains(item))
+            {
+                ActiveDownloads.Remove(item);
+            }
+        }
+
     }
 }

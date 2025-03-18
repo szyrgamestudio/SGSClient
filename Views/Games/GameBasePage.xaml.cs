@@ -136,7 +136,7 @@ public sealed partial class GameBasePage : Page
         // Znajdź `ShellPage`
         var shellPage = (ShellPage)App.MainWindow.Content;
 
-        await DownloadManager.Instance.StartDownloadAsync(shellPage, "Moja Gra", downloadUrl, destinationPath);
+        await DownloadManager.Instance.StartDownloadAsync(shellPage, "Black white jump", downloadUrl, destinationPath);
     }
 
 
