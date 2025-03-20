@@ -40,9 +40,9 @@ public sealed partial class ShellPage : Page
 
     }
 
-    public void AddDownload(string gameName, string url, string destinationPath)
+    public void AddDownload(string gameName, string url, string destinationPath, string gameLogo)
     {
-        var downloadItem = new DownloadItem(gameName, url, destinationPath);
+        var downloadItem = new DownloadItem(gameName, url, destinationPath, gameLogo);
         DownloadViewModel.Instance.ActiveDownloads.Add(downloadItem);
 
         DownloadBar.Visibility = Visibility.Visible;
@@ -53,6 +53,23 @@ public sealed partial class ShellPage : Page
             await downloadItem.StartDownloadAsync(httpClient);
         });
     }
+
+    public void RemoveDownload(string gameName)
+    {
+        var itemToRemove = DownloadViewModel.Instance.ActiveDownloads
+            .FirstOrDefault(d => d.GameName == gameName);
+
+        if (itemToRemove != null)
+        {
+            DownloadViewModel.Instance.ActiveDownloads.Remove(itemToRemove);
+        }
+
+        if (DownloadViewModel.Instance.ActiveDownloads.Count == 0)
+        {
+            DownloadBar.Visibility = Visibility.Collapsed;
+        }
+    }
+
 
     private void OnLoaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {

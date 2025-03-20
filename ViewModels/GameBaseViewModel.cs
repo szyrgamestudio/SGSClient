@@ -8,6 +8,8 @@ using SGSClient.Core.Database;
 using SGSClient.Core.Extensions;
 using SGSClient.DataAccess.Repositories;
 using SGSClient.Models;
+using SGSClient.Services;
+using SGSClient.Views;
 using Windows.Storage;
 
 namespace SGSClient.ViewModels
@@ -46,23 +48,31 @@ namespace SGSClient.ViewModels
                 gameExe = gameData.GameExeName;
                 gameIdentifier = gameData.GameName;
                 gameZipLink = gameData.GameZipLink;
-                LoadRatings(gameData.GameSymbol);
-                LoadGameRatingsStats(gameData.GameSymbol);
-                LoadImagesFromDatabase(gameData.GameSymbol);
-                LoadLogoFromDatabase(gameData.GameSymbol);
+
+                LoadRatings(gameData.GameSymbol ?? "");
+                LoadGameRatingsStats(gameData.GameSymbol ?? "");
+                LoadImagesFromDatabase(gameData.GameSymbol ?? "");
+                LoadLogoFromDatabase(gameData.GameSymbol ?? "");
+
                 UpdateUI(gameData);
             }
 
-            var location = Path.Combine(ApplicationData.Current.LocalFolder.Path, "LocalState");
-            rootPath = Path.GetDirectoryName(location) ?? string.Empty;
+
+            string rootPath = ApplicationData.Current.LocalFolder.Path;
+            gamepath = Path.Combine(rootPath, gameIdentifier ?? "DefaultGame");
 
             versionFile = Path.Combine(rootPath, "versions.xml");
             gameZip = Path.Combine(rootPath, $"{gameIdentifier}ARCHIVE");
             gameExe = Path.Combine(rootPath, gameIdentifier ?? "", $"{gameExe}.exe");
-            gamepath = Path.Combine(rootPath, gameIdentifier ?? "");
         }
 
-
+        public async Task DownloadGame(ShellPage shellPage)
+        {
+            if (!string.IsNullOrEmpty(gameIdentifier) && !string.IsNullOrEmpty(gameZipLink) && !string.IsNullOrEmpty(GameLogo))
+            {
+                shellPage?.AddDownload(gameIdentifier, gameZipLink, ApplicationData.Current.LocalFolder.Path, GameLogo);
+            }
+        }
 
 
         #region UI
@@ -130,7 +140,7 @@ where g.Symbol = @p0
             var games = GamesRepository.FetchGames(true);
             var gameData = games.FirstOrDefault(g => g.GameSymbol == gameSymbol);
 
-            GameLogo = gameData?.LogoPath ?? "ms-appx:///Assets/placeholder.png";  // URL lub domyślny obrazek
+            GameLogo = gameData?.LogoPath ?? "ms-appx:///Assets/placeholder.png";
             OnPropertyChanged(nameof(GameLogo));
         }
         #endregion
@@ -147,13 +157,15 @@ where g.Symbol = @p0
         private ObservableCollection<GameRating> _allRatings;
         private const int PageSize = 2;
 
+
+        public bool CanGoToPreviousPage => CurrentPage > 0;
+        public bool CanGoToNextPage => (CurrentPage + 1) * PageSize < _allRatings.Count;
+
         [ObservableProperty]
         private ObservableCollection<GameRating> ratings;
 
         [ObservableProperty]
         private int currentPage;
-        public bool CanGoToPreviousPage => CurrentPage > 0;
-        public bool CanGoToNextPage => (CurrentPage + 1) * PageSize < _allRatings.Count;
 
         [ObservableProperty]
         private int ratingCount;

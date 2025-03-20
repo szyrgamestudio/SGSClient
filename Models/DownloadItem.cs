@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
@@ -29,11 +30,15 @@ namespace SGSClient.Models
             get => _progress;
             set
             {
-                _progress = value;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(ProgressText)); // Aktualizuje tekst procentowy
+                if (_progress != value)
+                {
+                    _progress = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(ProgressText));
+                }
             }
         }
+
 
         private CancellationTokenSource _cts = new();
 
@@ -69,20 +74,52 @@ namespace SGSClient.Models
             var totalSize = response.Content.Headers.ContentLength ?? 1;
             var buffer = new byte[8192];
 
-            using var fileStream = new FileStream(DestinationPath, FileMode.Create, FileAccess.Write, FileShare.None);
-            using var contentStream = await response.Content.ReadAsStreamAsync();
-
-            int bytesRead;
-            long totalRead = 0;
-            while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length, _cts.Token)) > 0)
+            // Obsługa błędu podczas otwierania pliku
+            FileStream? fileStream = null;
+            string filePath = Path.Combine(DestinationPath, $"{GameName}.zip");
+            try
             {
-                await fileStream.WriteAsync(buffer, 0, bytesRead, _cts.Token);
-                totalRead += bytesRead;
-                Progress = (double)totalRead / totalSize * 100;
+                fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Błąd przy otwieraniu pliku: {ex.Message}");
+                return;
             }
 
-            IsCompleted = true;
-            OnPropertyChanged(nameof(IsCompleted));
+            try
+            {
+                using var contentStream = await response.Content.ReadAsStreamAsync();
+                int bytesRead;
+                long totalRead = 0;
+                var dispatcherQueue = App.MainWindow.DispatcherQueue;
+                double lastReportedProgress = 0;
+                while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length, _cts.Token)) > 0)
+                {
+                    await fileStream.WriteAsync(buffer, 0, bytesRead, _cts.Token);
+                    totalRead += bytesRead;
+                    double progressValue = (double)totalRead / totalSize * 100;
+
+                    if (progressValue - lastReportedProgress >= 5)
+                    {
+                        lastReportedProgress = progressValue;
+                        dispatcherQueue.TryEnqueue(() =>
+                        {
+                            Progress = progressValue;
+                        });
+                    }
+                }
+                IsCompleted = true;
+                dispatcherQueue.TryEnqueue(() => OnPropertyChanged(nameof(IsCompleted)));
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Błąd podczas pobierania: {ex.Message}");
+            }
+            finally
+            {
+                fileStream?.Dispose(); // Zamknięcie pliku, jeśli został otwarty
+            }
         }
     }
 }
