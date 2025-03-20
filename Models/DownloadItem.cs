@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using SevenZipExtractor;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
@@ -33,6 +34,7 @@ namespace SGSClient.Models
                 if (_progress != value)
                 {
                     _progress = value;
+                    ProgressText = $"{_progress:F1}%";
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(ProgressText));
                 }
@@ -48,7 +50,19 @@ namespace SGSClient.Models
         }
 
 
-        public string ProgressText => $"{Progress:F1}%";
+        private string _progressText = "0.0%";
+        public string ProgressText
+        {
+            get => _progressText;
+            private set
+            {
+                if (_progressText != value)
+                {
+                    _progressText = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         public bool IsCompleted { get; private set; }
 
@@ -100,7 +114,7 @@ namespace SGSClient.Models
                     totalRead += bytesRead;
                     double progressValue = (double)totalRead / totalSize * 100;
 
-                    if (progressValue - lastReportedProgress >= 5)
+                    if (progressValue - lastReportedProgress >= 5 || progressValue == 100)
                     {
                         lastReportedProgress = progressValue;
                         dispatcherQueue.TryEnqueue(() =>
@@ -121,5 +135,6 @@ namespace SGSClient.Models
                 fileStream?.Dispose(); // Zamknięcie pliku, jeśli został otwarty
             }
         }
+
     }
 }

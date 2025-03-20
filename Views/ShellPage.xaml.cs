@@ -1,12 +1,12 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-
+using SevenZipExtractor;
 using SGSClient.Contracts.Services;
+using SGSClient.Core.Utilities.LogUtility;
 using SGSClient.Helpers;
 using SGSClient.Models;
 using SGSClient.ViewModels;
-
 using Windows.System;
 
 namespace SGSClient.Views;
@@ -51,8 +51,36 @@ public sealed partial class ShellPage : Page
         {
             using var httpClient = new HttpClient();
             await downloadItem.StartDownloadAsync(httpClient);
+            await ExtractAndCleanup(downloadItem);
+
         });
     }
+    private async Task ExtractAndCleanup(DownloadItem item)
+    {
+        try
+        {
+            string zipFilePath = Path.Combine(item.DestinationPath, $"{item.GameName}.zip");
+            string extractPath = Path.Combine(item.DestinationPath, item.GameName);
+
+            if (!Directory.Exists(extractPath))
+                Directory.CreateDirectory(extractPath);
+
+            using (var archiveFile = new ArchiveFile(zipFilePath))
+            {
+                archiveFile.Extract(extractPath);
+            }
+
+            File.Delete(zipFilePath);
+            if (!DownloadViewModel.Instance.ActiveDownloads.Any())
+                DownloadBar.Visibility = Visibility.Collapsed;
+        }
+        catch (Exception ex)
+        {
+            _ = Log.ErrorAsync("Exception (ExtractAndCleanup)", ex);
+        }
+    }
+
+
 
     public void RemoveDownload(string gameName)
     {
