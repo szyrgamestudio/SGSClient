@@ -50,11 +50,10 @@ public sealed partial class GameBasePage : Page
         DataContext = ViewModel;
 
         if (e.Parameter is string gameSymbol && !string.IsNullOrWhiteSpace(gameSymbol))
-        {
             ViewModel.InitializeGame(gameSymbol);
-        }
-    }
 
+        Status = LauncherStatus.readyNoGame;
+    }
     public GameBasePage()
     {
         ViewModel = App.GetService<GameBaseViewModel>();

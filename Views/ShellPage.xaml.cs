@@ -40,65 +40,6 @@ public sealed partial class ShellPage : Page
 
     }
 
-    public void AddDownload(string gameName, string url, string destinationPath, string gameLogo)
-    {
-        var downloadItem = new DownloadItem(gameName, url, destinationPath, gameLogo);
-        DownloadViewModel.Instance.ActiveDownloads.Add(downloadItem);
-
-        DownloadBar.Visibility = Visibility.Visible;
-
-        Task.Run(async () =>
-        {
-            using var httpClient = new HttpClient();
-            await downloadItem.StartDownloadAsync(httpClient);
-            await ExtractAndCleanup(downloadItem);
-
-        });
-    }
-    private async Task ExtractAndCleanup(DownloadItem item)
-    {
-        try
-        {
-            string zipFilePath = Path.Combine(item.DestinationPath, $"{item.GameName}.zip");
-            string extractPath = Path.Combine(item.DestinationPath, item.GameName);
-
-            if (!Directory.Exists(extractPath))
-                Directory.CreateDirectory(extractPath);
-
-            using (var archiveFile = new ArchiveFile(zipFilePath))
-            {
-                archiveFile.Extract(extractPath);
-            }
-
-            File.Delete(zipFilePath);
-            if (!DownloadViewModel.Instance.ActiveDownloads.Any())
-                DownloadBar.Visibility = Visibility.Collapsed;
-        }
-        catch (Exception ex)
-        {
-            _ = Log.ErrorAsync("Exception (ExtractAndCleanup)", ex);
-        }
-    }
-
-
-
-    public void RemoveDownload(string gameName)
-    {
-        var itemToRemove = DownloadViewModel.Instance.ActiveDownloads
-            .FirstOrDefault(d => d.GameName == gameName);
-
-        if (itemToRemove != null)
-        {
-            DownloadViewModel.Instance.ActiveDownloads.Remove(itemToRemove);
-        }
-
-        if (DownloadViewModel.Instance.ActiveDownloads.Count == 0)
-        {
-            DownloadBar.Visibility = Visibility.Collapsed;
-        }
-    }
-
-
     private void OnLoaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
         TitleBarHelper.UpdateTitleBar(RequestedTheme);
@@ -106,12 +47,10 @@ public sealed partial class ShellPage : Page
         KeyboardAccelerators.Add(BuildKeyboardAccelerator(VirtualKey.Left, VirtualKeyModifiers.Menu));
         KeyboardAccelerators.Add(BuildKeyboardAccelerator(VirtualKey.GoBack));
     }
-
     private void MainWindow_Activated(object sender, WindowActivatedEventArgs args)
     {
         App.AppTitlebar = AppTitleBarText as UIElement;
     }
-
     private void NavigationViewControl_DisplayModeChanged(NavigationView sender, NavigationViewDisplayModeChangedEventArgs args)
     {
         AppTitleBar.Margin = new Thickness()
@@ -122,7 +61,6 @@ public sealed partial class ShellPage : Page
             Bottom = AppTitleBar.Margin.Bottom
         };
     }
-
     private static KeyboardAccelerator BuildKeyboardAccelerator(VirtualKey key, VirtualKeyModifiers? modifiers = null)
     {
         var keyboardAccelerator = new KeyboardAccelerator() { Key = key };
@@ -136,7 +74,6 @@ public sealed partial class ShellPage : Page
 
         return keyboardAccelerator;
     }
-
     private static void OnKeyboardAcceleratorInvoked(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
     {
         var navigationService = App.GetService<INavigationService>();
@@ -145,15 +82,12 @@ public sealed partial class ShellPage : Page
 
         args.Handled = result;
     }
-
     private void ShellPage_PointerPressed(object sender, PointerRoutedEventArgs e)
     {
         var properties = e.GetCurrentPoint(this).Properties;
 
-        // Check if the XButton1 (back) or XButton2 (forward) is pressed
         if (properties.IsXButton1Pressed)
         {
-            // Handle the back navigation
             ViewModel.NavigationService.GoBack();
         }
         else if (properties.IsXButton2Pressed)
@@ -183,5 +117,64 @@ public sealed partial class ShellPage : Page
 
         flyout.ShowAt((FrameworkElement)sender);
     }
+    public async Task AddDownload(string gameName, string url, string destinationPath, string gameLogo)
+    {
+        var downloadItem = new DownloadItem(gameName, url, destinationPath, gameLogo);
+        DownloadViewModel.Instance.ActiveDownloads.Add(downloadItem);
+
+        DownloadBar.Visibility = Visibility.Visible;
+
+        using var httpClient = new HttpClient();
+        await downloadItem.StartDownloadAsync(httpClient);
+        await ExtractAndCleanup(downloadItem);
+    }
+    private async Task ExtractAndCleanup(DownloadItem item)
+    {
+        try
+        {
+            await Task.Run(() =>
+            {
+                string zipFilePath = Path.Combine(item.DestinationPath, $"{item.GameName}.zip");
+                string extractPath = Path.Combine(item.DestinationPath, item.GameName);
+
+                if (!Directory.Exists(extractPath))
+                    Directory.CreateDirectory(extractPath);
+
+                using (var archiveFile = new ArchiveFile(zipFilePath))
+                {
+                    archiveFile.Extract(extractPath);
+                }
+
+                File.Delete(zipFilePath);
+            });
+
+            App.MainWindow.DispatcherQueue.TryEnqueue(() =>
+            {
+                DownloadViewModel.Instance.ActiveDownloads.Remove(item);
+                if (DownloadViewModel.Instance.ActiveDownloads.Count == 0)
+                    DownloadBar.Visibility = Visibility.Collapsed;
+            });
+        }
+        catch (Exception ex)
+        {
+            await Log.ErrorAsync("Exception (ExtractAndCleanup)", ex);
+        }
+    }
+    public void RemoveDownload(string gameName)
+    {
+        var itemToRemove = DownloadViewModel.Instance.ActiveDownloads
+            .FirstOrDefault(d => d.GameName == gameName);
+
+        if (itemToRemove != null)
+        {
+            DownloadViewModel.Instance.ActiveDownloads.Remove(itemToRemove);
+        }
+
+        if (DownloadViewModel.Instance.ActiveDownloads.Count == 0)
+        {
+            DownloadBar.Visibility = Visibility.Collapsed;
+        }
+    }
+
 
 }

@@ -1,5 +1,4 @@
-﻿using SevenZipExtractor;
-using SGSClient.Models;
+﻿using SGSClient.Models;
 using SGSClient.Views;
 using System.Collections.ObjectModel;
 
@@ -7,20 +6,24 @@ namespace SGSClient.Services
 {
     public class DownloadManager
     {
+        #region Singleton
         private static readonly Lazy<DownloadManager> instance = new(() => new DownloadManager());
         public static DownloadManager Instance => instance.Value;
+        #endregion
 
+        #region Properties
         public ObservableCollection<DownloadItem> ActiveDownloads { get; } = new();
+        #endregion
 
-        private readonly HttpClient httpClient = new();
-
-        public event Action? DownloadsUpdated;
-
+        #region Constructor
         private DownloadManager() { }
+        #endregion
 
-        public static async Task StartDownloadAsync(ShellPage shellPage, string gameName, string url, string destinationPath, string gameLogo)
+        #region Methods
+        public static Task StartDownloadAsync(ShellPage shellPage, string gameName, string url, string destinationPath, string gameLogo)
         {
-            shellPage?.AddDownload(gameName, url, destinationPath, gameLogo);
+            return shellPage?.AddDownload(gameName, url, destinationPath, gameLogo) ?? Task.CompletedTask;
         }
+        #endregion
     }
 }

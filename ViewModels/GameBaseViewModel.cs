@@ -3,13 +3,18 @@ using System.Data;
 using System.Diagnostics;
 using System.Windows.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Graph.Models;
+using SGSClient.Controllers;
 using SGSClient.Core.Authorization;
 using SGSClient.Core.Database;
 using SGSClient.Core.Extensions;
+using SGSClient.Core.Utilities.LogUtility;
 using SGSClient.DataAccess.Repositories;
+using SGSClient.Helpers;
 using SGSClient.Models;
 using SGSClient.Services;
 using SGSClient.Views;
+using SQLite;
 using Windows.Storage;
 
 namespace SGSClient.ViewModels
@@ -24,7 +29,10 @@ namespace SGSClient.ViewModels
         private string? gameExe;
         private string? gameIdentifier;
         private string? gameZipLink;
+        private string gameVersion;
         private readonly HttpClient httpClient = new();
+        private static readonly string DatabasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "local_game_data.db");
+
 
         public ObservableCollection<BitmapImage> GameImages { get; } = new();
         public string? GameLogo { get; private set; }
@@ -46,8 +54,14 @@ namespace SGSClient.ViewModels
                 gameId = gameData.GameId;
                 gameZip = gameData.GameZipLink;
                 gameExe = gameData.GameExeName;
-                gameIdentifier = gameData.GameName;
+                gameIdentifier = gameData.GameSymbol;
                 gameZipLink = gameData.GameZipLink;
+                gameVersion = db.con.scalar(@"
+select
+  g.CurrentVersion
+from sgsGames g
+where g.Id = @p0
+", gameId);
 
                 LoadRatings(gameData.GameSymbol ?? "");
                 LoadGameRatingsStats(gameData.GameSymbol ?? "");
@@ -65,15 +79,36 @@ namespace SGSClient.ViewModels
             gameZip = Path.Combine(rootPath, $"{gameIdentifier}ARCHIVE");
             gameExe = Path.Combine(rootPath, gameIdentifier ?? "", $"{gameExe}.exe");
         }
-
         public async Task DownloadGame(ShellPage shellPage)
         {
             if (!string.IsNullOrEmpty(gameIdentifier) && !string.IsNullOrEmpty(gameZipLink) && !string.IsNullOrEmpty(GameLogo))
             {
                 shellPage?.AddDownload(gameIdentifier, gameZipLink, ApplicationData.Current.LocalFolder.Path, GameLogo);
+
+                await SaveGameVersionToDatabase(gameIdentifier, gameVersion);
             }
         }
+        private static async Task SaveGameVersionToDatabase(string gameIdentifier, string version)
+        {
+            try
+            {
+                using var db = new SQLiteConnection(DatabasePath);
+                db.CreateTable<GameVersion>();
 
+                var existingGame = db.Table<GameVersion>().FirstOrDefault(g => g.Identifier == gameIdentifier);
+                if (existingGame != null)
+                {
+                    existingGame.Version = version;
+                    db.Update(existingGame);
+                }
+                else
+                    db.Insert(new GameVersion { Identifier = gameIdentifier, Version = version });
+            }
+            catch (Exception ex)
+            {
+                await Log.ErrorAsync("Błąd zapisu wersji gry w bazie", ex);
+            }
+        }
 
         #region UI
         private void UpdateUI(Game game)
@@ -144,8 +179,6 @@ where g.Symbol = @p0
             OnPropertyChanged(nameof(GameLogo));
         }
         #endregion
-
-
 
 
 
