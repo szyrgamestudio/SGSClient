@@ -28,6 +28,7 @@ namespace SGSClient.ViewModels
         private string? gameZip;
         private string? gameExe;
         private string? gameIdentifier;
+        private string? gameName;
         private string? gameZipLink;
         private string gameVersion;
         private readonly HttpClient httpClient = new();
@@ -54,6 +55,7 @@ namespace SGSClient.ViewModels
                 gameId = gameData.GameId;
                 gameZip = gameData.GameZipLink;
                 gameExe = gameData.GameExeName;
+                gameName = gameData.GameName;
                 gameIdentifier = gameData.GameSymbol;
                 gameZipLink = gameData.GameZipLink;
                 gameVersion = db.con.scalar(@"
@@ -81,14 +83,14 @@ where g.Id = @p0
         }
         public async Task DownloadGame(ShellPage shellPage)
         {
-            if (!string.IsNullOrEmpty(gameIdentifier) && !string.IsNullOrEmpty(gameZipLink) && !string.IsNullOrEmpty(GameLogo))
+            if (!string.IsNullOrEmpty(gameName) && !string.IsNullOrEmpty(gameZipLink) && !string.IsNullOrEmpty(GameLogo) && !string.IsNullOrEmpty(gameExe))
             {
-                shellPage?.AddDownload(gameIdentifier, gameZipLink, ApplicationData.Current.LocalFolder.Path, GameLogo);
+                shellPage?.AddDownload(gameName, gameZipLink, ApplicationData.Current.LocalFolder.Path, GameLogo);
 
-                await SaveGameVersionToDatabase(gameIdentifier, gameVersion);
+                await SaveGameVersionToDatabase(gameName, gameVersion, gameExe);
             }
         }
-        private static async Task SaveGameVersionToDatabase(string gameIdentifier, string version)
+        private static async Task SaveGameVersionToDatabase(string gameIdentifier, string version, string gameExe)
         {
             try
             {
@@ -99,10 +101,11 @@ where g.Id = @p0
                 if (existingGame != null)
                 {
                     existingGame.Version = version;
+                    existingGame.Exe = gameExe;
                     db.Update(existingGame);
                 }
                 else
-                    db.Insert(new GameVersion { Identifier = gameIdentifier, Version = version });
+                    db.Insert(new GameVersion { Identifier = gameIdentifier, Version = version, Exe = gameExe });
             }
             catch (Exception ex)
             {

@@ -100,15 +100,12 @@
                         <Button
                 x:Name="PlayButton"
                 Width="100"
-                Click="PlayClickButton"
+                Click="DownloadButton_Click"
                 ClickMode="Press"
-                Content="Zainstaluj"
+                Content="Graj"
                 Style="{StaticResource AccentButtonStyle}" />
                         
                     </StackPanel>
-
-                    <Button Content="Pobierz" Click="DownloadButton_Click"/>
-
 
                     <!--  5 - Przycisk aktualizuj  -->
                     <StackPanel
