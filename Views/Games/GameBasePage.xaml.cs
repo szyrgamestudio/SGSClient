@@ -29,6 +29,7 @@ public sealed partial class GameBasePage : Page
     private string? gameExe;
     private string? gameIdentifier;
     private string? gameZipLink;
+    private bool updateP;
 
     private GameRating? _gameRating;
     private readonly HttpClient httpClient = new();
@@ -58,7 +59,16 @@ public sealed partial class GameBasePage : Page
     {
         ViewModel = App.GetService<GameBaseViewModel>();
         InitializeComponent();
-        Status = LauncherStatus.pageLauched;
+
+        (bool installedP, bool updateP) = ViewModel.CheckForUpdate();
+        if (installedP)
+            Status = LauncherStatus.ready;
+        else
+            Status = LauncherStatus.readyNoGame;
+
+        if (updateP)
+            CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+
     }
 
     #region Rating

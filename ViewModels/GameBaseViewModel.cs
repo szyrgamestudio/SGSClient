@@ -87,10 +87,10 @@ where g.Id = @p0
             {
                 shellPage?.AddDownload(gameName, gameZipLink, ApplicationData.Current.LocalFolder.Path, GameLogo);
 
-                await SaveGameVersionToDatabase(gameName, gameVersion, gameExe);
+                await SetLocalVersion(gameName, gameVersion, gameExe);
             }
         }
-        private static async Task SaveGameVersionToDatabase(string gameIdentifier, string version, string gameExe)
+        private static async Task SetLocalVersion(string gameIdentifier, string version, string gameExe)
         {
             try
             {
@@ -105,13 +105,60 @@ where g.Id = @p0
                     db.Update(existingGame);
                 }
                 else
-                    db.Insert(new GameVersion { Identifier = gameIdentifier, Version = version, Exe = gameExe });
+                {
+                    db.Insert(new GameVersion
+                    {
+                        Identifier = gameIdentifier,
+                        Version = version,
+                        Exe = gameExe
+                    });
+
+                }
             }
             catch (Exception ex)
             {
                 await Log.ErrorAsync("Błąd zapisu wersji gry w bazie", ex);
             }
         }
+        private static string GetLocalVersion(string gameIdentifier)
+        {
+            using var db = new SQLiteConnection(DatabasePath);
+            var game = db.Table<GameVersion>().FirstOrDefault(g => g.Identifier == gameIdentifier);
+            return game?.Version ?? "0.0.0";
+        }
+
+        public (bool installedP, bool isUpdateP) CheckForUpdate()
+        {
+            try
+            {
+                string localVersion = GetLocalVersion(gameIdentifier ?? "");
+
+                if (string.IsNullOrEmpty(localVersion))
+                {
+                    Debug.WriteLine("Brak zainstalowanej wersji gry.");
+                    return (false, false);
+                }
+
+                bool isUpdateP = localVersion != gameVersion;
+                if (isUpdateP)
+                {
+                    Debug.WriteLine($"Dostępna nowa wersja: {gameVersion}. Aktualna: {localVersion}");
+                    //CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+                }
+                else
+                {
+                    Debug.WriteLine("Gra jest aktualna.");
+                }
+
+                return (true, isUpdateP);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Błąd podczas sprawdzania aktualizacji: {ex.Message}");
+                return (false, false);
+            }
+        }
+
 
         #region UI
         private void UpdateUI(Game game)
