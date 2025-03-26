@@ -100,7 +100,7 @@
                         <Button
                 x:Name="PlayButton"
                 Width="100"
-                Click="DownloadButton_Click"
+                Click="PlayButton_Click"
                 ClickMode="Press"
                 Content="Graj"
                 Style="{StaticResource AccentButtonStyle}" />
@@ -116,7 +116,7 @@
                 x:Name="CheckUpdateButton"
                 Width="100"
                 Margin="0,5,0,0"
-                Click="UpdateClickButton"
+                Click="UpdateButton_Click"
                 Content="Aktualizuj"
                 Style="{StaticResource AccentButtonStyle}" />
                     </StackPanel>

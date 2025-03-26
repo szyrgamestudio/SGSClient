@@ -37,7 +37,6 @@ namespace SGSClient.Helpers
                     CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
                     DownloadProgressBorder.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
                     UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-                    File.Delete(gameZip); //delete file zip (free memory is important)
                     break;
                 case LauncherStatus.failed:
                     UninstallButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;

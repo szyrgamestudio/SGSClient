@@ -3,18 +3,15 @@ using System.Data;
 using System.Diagnostics;
 using System.Windows.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.Graph.Models;
-using SGSClient.Controllers;
 using SGSClient.Core.Authorization;
 using SGSClient.Core.Database;
 using SGSClient.Core.Extensions;
 using SGSClient.Core.Utilities.LogUtility;
 using SGSClient.DataAccess.Repositories;
-using SGSClient.Helpers;
 using SGSClient.Models;
-using SGSClient.Services;
 using SGSClient.Views;
 using SQLite;
+using Windows.ApplicationModel.Core;
 using Windows.Storage;
 
 namespace SGSClient.ViewModels
@@ -126,7 +123,6 @@ where g.Id = @p0
             var game = db.Table<GameVersion>().FirstOrDefault(g => g.Identifier == gameIdentifier);
             return game?.Version ?? "0.0.0";
         }
-
         public (bool installedP, bool isUpdateP) CheckForUpdate()
         {
             try
@@ -230,10 +226,72 @@ where g.Symbol = @p0
         }
         #endregion
 
+        public void PlayGame()
+        {
+            if (File.Exists(gameExe))
+            {
+                ProcessStartInfo startInfo = new(gameExe)
+                {
+                    WorkingDirectory = Path.Combine(rootPath ?? "")
+                };
 
+                DateTime startTime = DateTime.Now;
+                System.Diagnostics.Process process = System.Diagnostics.Process.Start(startInfo);
+                process.WaitForExit();
 
+                TimeSpan elapsedTime = DateTime.Now - startTime;
 
+                int dbTime = db.con.scalar<int>(@"
+select
+  ugt.TotalTime
+from sgsUsersGameTime ugt
+inner join Registration r on r.Id = ugt.UserId
+where ugt.GameId = @p0 and r.UserId = @p1", gameId, "a8fcd7ae-2410-46f4-9943-fc790905d9bb") ?? -1;
 
+                double totalTime = 0;
+                totalTime = Convert.ToDouble(dbTime < 0 ? 0 : dbTime);
+                totalTime += elapsedTime.TotalSeconds;
+
+                if (dbTime >= 0)
+                {
+                    db.con.exec(@"
+update ugt set 
+  ugt.TotalTime = @p0
+, ugt.LastPlayed = @p1
+from sgsUsersGameTime ugt
+inner join Registration r on r.Id = ugt.UserId
+where ugt.GameId = @p2 and r.UserId = @p3", totalTime, DateTime.Now, gameId, "a8fcd7ae-2410-46f4-9943-fc790905d9bb");
+                }
+                else
+                {
+                    db.con.exec(@"
+declare @userId int = 
+(
+  select
+    r.Id
+  from Registration r
+  where r.UserId = @p0
+)
+
+insert sgsUsersGameTime (UserId, GameId, LastPlayed, TotalTime)
+select
+  @userId
+, @p1
+, @p2
+, @p3
+", "a8fcd7ae-2410-46f4-9943-fc790905d9bb", gameId, DateTime.Now, totalTime);
+                }
+
+                //MessageBox.Show($"Łączny czas działania: {TimeSpan.FromSeconds(totalTime)}");
+
+                CoreApplication.Exit();
+
+            }
+            else
+            {
+                Debug.WriteLine("Brak pliku exe gry.");
+            }
+        }
 
         #region Constructors and Properties
         private readonly IAppUser _appUser;
