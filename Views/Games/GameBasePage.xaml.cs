@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
+using SGSClient.Controls;
 using SGSClient.Helpers;
 using SGSClient.Models;
 using SGSClient.ViewModels;
@@ -52,7 +53,7 @@ public sealed partial class GameBasePage : Page
     }
 
     #region Rating
-    private static void RatingRatingControl_ValueChanged(RatingControl sender, object args)
+    private void RatingRatingControl_ValueChanged(RatingControl sender, object args)
     {
         ArgumentNullException.ThrowIfNull(sender);
     }
@@ -128,7 +129,17 @@ public sealed partial class GameBasePage : Page
         switch (Status)
         {
             case LauncherStatus.readyNoGame:
-                await ViewModel.DownloadGame(shellPage);
+                var dialog = new ChooseInstallLocationDialog
+                {
+                    XamlRoot = XamlRoot
+                };
+                var result = await dialog.ShowAsync();
+
+                if (result == ContentDialogResult.Primary)
+                {
+                    var installPath = dialog.SelectedPath;
+                    await ViewModel.DownloadGame(shellPage, installPath);
+                }
                 break;
             case LauncherStatus.ready:
                 ViewModel.PlayGame();
@@ -139,9 +150,20 @@ public sealed partial class GameBasePage : Page
     }
     private async void UpdateButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
-        var shellPage = (ShellPage)App.MainWindow.Content;
-        await ViewModel.DownloadGame(shellPage);
+        var dialog = new ChooseInstallLocationDialog
+        {
+            XamlRoot = XamlRoot
+        };
+        var result = await dialog.ShowAsync();
+
+        if (result == ContentDialogResult.Primary)
+        {
+            var installPath = dialog.SelectedPath;
+            var shellPage = (ShellPage)App.MainWindow.Content;
+            await ViewModel.DownloadGame(shellPage, installPath);
+        }
     }
+
     private void UninstallButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
 

@@ -78,11 +78,11 @@ where g.Id = @p0
             gameZip = Path.Combine(rootPath, $"{gameIdentifier}ARCHIVE");
             gameExe = Path.Combine(rootPath, gameIdentifier ?? "", $"{gameExe}.exe");
         }
-        public async Task DownloadGame(ShellPage shellPage)
+        public async Task DownloadGame(ShellPage shellPage, string? installPath)
         {
             if (!string.IsNullOrEmpty(gameName) && !string.IsNullOrEmpty(gameZipLink) && !string.IsNullOrEmpty(GameLogo) && !string.IsNullOrEmpty(gameExe))
             {
-                shellPage?.AddDownload(gameName, gameZipLink, ApplicationData.Current.LocalFolder.Path, GameLogo);
+                shellPage?.AddDownload(gameName, gameZipLink, installPath ?? ApplicationData.Current.LocalFolder.Path, GameLogo);
 
                 await SetLocalVersion(gameName, gameVersion, gameExe);
             }

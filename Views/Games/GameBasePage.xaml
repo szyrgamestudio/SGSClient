@@ -142,7 +142,7 @@
                                         <Button
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
-                        Click="UninstallClickButton"
+                        Click="UninstallButton_Click"
                         Content="Odinstaluj" />
                                     </StackPanel>
                                 </Flyout>

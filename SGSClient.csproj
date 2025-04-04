@@ -47,6 +47,7 @@
     <None Remove="Assets\GalleryHeaderImage.png" />
     <None Remove="Assets\Games\AtorthTalesOfUlkimond\Atorth_Logo - kopiować.png" />
     <None Remove="Assets\Games\Zacmienie\Zacmienie_Logo - kopiować.png" />
+    <None Remove="Controls\ChooseInstallLocationDialog.xaml" />
     <None Remove="Controls\DownloadBar.xaml" />
     <None Remove="Views\GamesPage — kopia.xaml" />
     <None Remove="Views\Games\Games.rar" />
@@ -84,6 +85,9 @@
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Page Update="Controls\ChooseInstallLocationDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Update="Controls\DownloadBar.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
