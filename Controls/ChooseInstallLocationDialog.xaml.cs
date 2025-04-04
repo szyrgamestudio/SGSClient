@@ -1,23 +1,11 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 
 namespace SGSClient.Controls
 {
     public sealed partial class ChooseInstallLocationDialog : ContentDialog
     {
-        public string SelectedPath { get; private set; }
+        public string SelectedPath { get; private set; } = string.Empty;
 
         public ChooseInstallLocationDialog()
         {
@@ -27,8 +15,10 @@ namespace SGSClient.Controls
 
         private async void BrowseButton_Click(object sender, RoutedEventArgs e)
         {
-            var picker = new Windows.Storage.Pickers.FolderPicker();
-            picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.ComputerFolder;
+            var picker = new Windows.Storage.Pickers.FolderPicker
+            {
+                SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.ComputerFolder
+            };
             picker.FileTypeFilter.Add("*");
 
             var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);

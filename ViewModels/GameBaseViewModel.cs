@@ -236,7 +236,7 @@ where g.Symbol = @p0
                 };
 
                 DateTime startTime = DateTime.Now;
-                System.Diagnostics.Process process = System.Diagnostics.Process.Start(startInfo);
+                Process process = Process.Start(startInfo);
                 process.WaitForExit();
 
                 TimeSpan elapsedTime = DateTime.Now - startTime;

@@ -1,13 +1,12 @@
-﻿using System.Data;
-using Microsoft.UI.Xaml.Controls;
+﻿using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using SGSClient.Controls;
 using SGSClient.Helpers;
 using SGSClient.Models;
 using SGSClient.ViewModels;
+using System.Data;
 
 namespace SGSClient.Views;
-
 public sealed partial class GameBasePage : Page
 {
     private LauncherStatus _status;
@@ -163,7 +162,6 @@ public sealed partial class GameBasePage : Page
             await ViewModel.DownloadGame(shellPage, installPath);
         }
     }
-
     private void UninstallButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
 
