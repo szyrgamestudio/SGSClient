@@ -84,10 +84,10 @@ where g.Id = @p0
             {
                 shellPage?.AddDownload(gameName, gameZipLink, installPath ?? ApplicationData.Current.LocalFolder.Path, GameLogo);
 
-                await SetLocalVersion(gameName, gameVersion, gameExe);
+                await SetLocalVersion(gameName, gameVersion, gameExe, installPath ?? ApplicationData.Current.LocalFolder.Path);
             }
         }
-        private static async Task SetLocalVersion(string gameIdentifier, string version, string gameExe)
+        private static async Task SetLocalVersion(string gameIdentifier, string version, string gameExe, string path)
         {
             try
             {
@@ -97,6 +97,7 @@ where g.Id = @p0
                 var existingGame = db.Table<GameVersion>().FirstOrDefault(g => g.Identifier == gameIdentifier);
                 if (existingGame != null)
                 {
+                    existingGame.Path = path;
                     existingGame.Version = version;
                     existingGame.Exe = gameExe;
                     db.Update(existingGame);
@@ -105,6 +106,7 @@ where g.Id = @p0
                 {
                     db.Insert(new GameVersion
                     {
+                        Path = path,
                         Identifier = gameIdentifier,
                         Version = version,
                         Exe = gameExe
