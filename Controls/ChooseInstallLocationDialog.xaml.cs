@@ -10,7 +10,7 @@ namespace SGSClient.Controls
         public ChooseInstallLocationDialog()
         {
             this.InitializeComponent();
-            PathTextBox.Text = @"C:\Gry\";
+            PathTextBox.Text = @"C:\Program Files\SGSClient\Games\";
         }
 
         private async void BrowseButton_Click(object sender, RoutedEventArgs e)

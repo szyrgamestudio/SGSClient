@@ -29,7 +29,7 @@
     <Version>$(VersionPrefix)</Version>
     <FileVersion>3.0.0.0</FileVersion>
     <AssemblyVersion>3.0.0.0</AssemblyVersion>
-    <DefaultLanguage>pl-pl</DefaultLanguage>
+    <DefaultLanguage>pl-PL</DefaultLanguage>
     <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <IncludeSymbols>True</IncludeSymbols>
@@ -71,7 +71,7 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.1" />
     <PackageReference Include="Microsoft.Graphics.Win2D" Version="1.3.1" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1742" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.250108002" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.7.250401001" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.WinUI.Managed" Version="2.0.9" />
     <PackageReference Include="ModernWpf.MessageBox.Mica" Version="0.5.5" />
     <PackageReference Include="SevenZipExtractor" Version="1.0.19" />
@@ -84,6 +84,11 @@
   <ItemGroup>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Strings\en-US\Resources.Designer.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>Resources.resw</DependentUpon>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </None>
     <Page Update="Controls\ChooseInstallLocationDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -100,6 +105,11 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Strings\en-US\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.Designer.tt</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -141,4 +151,12 @@
       <FrameworkSdkReference Remove="@(FrameworkSdkReference)" Condition="$([System.String]::Copy('%(FrameworkSdkReference.SDKName)').StartsWith('Microsoft.WindowsAppRuntime.'))" />
     </ItemGroup>
   </Target>
+  <ItemGroup>
+    <PRIResource Update="Strings\en-US\Resources.resw">
+      <Generator></Generator>
+    </PRIResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
 </Project>
