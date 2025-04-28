@@ -156,7 +156,29 @@ where g.Id = @p0
                 return (false, false);
             }
         }
+        public static void UninstallGame(string gameIdentifier)
+        {
+            using var db = new SQLiteConnection(DatabasePath);
+            var game = db.Table<GameVersion>().FirstOrDefault(g => g.Identifier == gameIdentifier);
+            string path = game?.Path ?? string.Empty;
 
+            try
+            {
+                if (Directory.Exists(path))
+                {
+                    Directory.Delete(path, true);
+                    Debug.WriteLine("Gra została odinstalowana.");
+                }
+                else
+                {
+                    Debug.WriteLine("Nie znaleziono katalogu gry do odinstalowania.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Błąd podczas odinstalowywania gry: {ex.Message}");
+            }
+        }
 
         #region UI
         private void UpdateUI(Game game)

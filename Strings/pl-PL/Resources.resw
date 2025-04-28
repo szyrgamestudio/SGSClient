@@ -137,18 +137,6 @@
   &lt;/actions&gt;
 &lt;/toast&gt;</value>
   </data>
-  <data name="BrowserBackButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
-    <value>Kliknij, aby wrócić</value>
-  </data>
-  <data name="BrowserBackButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Kliknij, aby wrócić</value>
-  </data>
-  <data name="BrowserForwardButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
-    <value>Kliknij, aby przejść do przodu</value>
-  </data>
-  <data name="BrowserForwardButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Kliknij, aby przejść do przodu</value>
-  </data>
   <data name="HomePage_BugBtn.Text" xml:space="preserve">
     <value>Zgłoś błąd</value>
   </data>
@@ -197,12 +185,6 @@
   <data name="LoginPage_RegisterBtn.Text" xml:space="preserve">
     <value>Zarejestruj się</value>
   </data>
-  <data name="OpenInBrowserButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
-    <value>Otwórz w przeglądarce</value>
-  </data>
-  <data name="OpenInBrowserButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Otwórz w przeglądarce</value>
-  </data>
   <data name="RegisterPage_AccountName.Text" xml:space="preserve">
     <value>Nazwa konta</value>
   </data>
@@ -223,12 +205,6 @@
   </data>
   <data name="RegisterPage_RegisterBtn.Content" xml:space="preserve">
     <value>Zarejestruj się</value>
-  </data>
-  <data name="ReloadButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
-    <value>Odśwież</value>
-  </data>
-  <data name="ReloadButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Odśwież</value>
   </data>
   <data name="SettingsPage_PrivacyTermsLink.Content" xml:space="preserve">
     <value>Polityka prywatności</value>
@@ -307,5 +283,11 @@
   </data>
   <data name="WebView_Reload.Content" xml:space="preserve">
     <value>Odśwież</value>
+  </data>
+  <data name="Error_EmptyPath" xml:space="preserve">
+    <value>Ścieżka nie może być pusta.</value>
+  </data>
+  <data name="Error_InvalidOrUnauthorized" xml:space="preserve">
+    <value>Brak uprawnień lub nieprawidłowa ścieżka.</value>
   </data>
 </root>

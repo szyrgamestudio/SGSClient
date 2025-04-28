@@ -137,35 +137,11 @@
   &lt;/actions&gt;
 &lt;/toast&gt;</value>
   </data>
-  <data name="BrowserBackButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
-    <value>Click to return</value>
-  </data>
-  <data name="BrowserBackButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Click to return</value>
-  </data>
-  <data name="BrowserForwardButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
-    <value>Click to move forward</value>
-  </data>
-  <data name="BrowserForwardButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Click to move forward</value>
-  </data>
   <data name="HomePage_MyAccountBtn.Text" xml:space="preserve">
     <value>My Account</value>
   </data>
   <data name="HomePage_MyAccountBtnDesc.Text" xml:space="preserve">
     <value>Log in or register, then apply to add your own game to SGSClient.</value>
-  </data>
-  <data name="OpenInBrowserButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
-    <value>Open in browser</value>
-  </data>
-  <data name="OpenInBrowserButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Open in browser</value>
-  </data>
-  <data name="ReloadButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
-    <value>Refresh</value>
-  </data>
-  <data name="ReloadButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Refresh</value>
   </data>
   <data name="SettingsPage_PrivacyTermsLink.Content" xml:space="preserve">
     <value>Privacy Policy</value>
@@ -307,5 +283,11 @@
   </data>
   <data name="RegisterPage_Error_PasswdDiff" xml:space="preserve">
     <value>The passwords entered are different</value>
+  </data>
+  <data name="Error_EmptyPath" xml:space="preserve">
+    <value>The path cannot be empty.</value>
+  </data>
+  <data name="Error_InvalidOrUnauthorized" xml:space="preserve">
+    <value>No permission or invalid path. Please choose another folder.</value>
   </data>
 </root>

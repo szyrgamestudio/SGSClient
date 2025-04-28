@@ -7,13 +7,15 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Title="Wybierz lokalizację instalacji"
+    PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
     PrimaryButtonText="Zainstaluj"
     CloseButtonText="Anuluj"
     DefaultButton="Primary">
 
     <StackPanel Spacing="12">
         <TextBlock Text="Wybierz folder, w którym chcesz zainstalować grę:" />
-        <TextBox x:Name="PathTextBox" PlaceholderText="C:\Program Files\SGSClient\Games\" />
+        <TextBox x:Name="PathTextBox" PlaceholderText="Wprowadź ścieżkę instalacji..." TextChanged="PathTextBox_TextChanged" />
         <Button Content="Przeglądaj" Click="BrowseButton_Click" />
+        <TextBlock x:Name="ErrorTextBlock" Foreground="Red" Visibility="Collapsed" TextWrapping="Wrap" />
     </StackPanel>
 </ContentDialog>

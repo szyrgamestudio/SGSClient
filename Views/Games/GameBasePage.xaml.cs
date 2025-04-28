@@ -164,7 +164,7 @@ public sealed partial class GameBasePage : Page
     }
     private void UninstallButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
-
+        GameBaseViewModel.UninstallGame(gameIdentifier);
     }
     #endregion
 
