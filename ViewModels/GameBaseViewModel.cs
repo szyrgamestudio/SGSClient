@@ -71,12 +71,12 @@ where g.Id = @p0
             }
 
 
-            string rootPath = ApplicationData.Current.LocalFolder.Path;
-            gamepath = Path.Combine(rootPath, gameIdentifier ?? "DefaultGame");
+            //string rootPath = ApplicationData.Current.LocalFolder.Path;
+            //gamepath = Path.Combine(rootPath, gameIdentifier ?? "DefaultGame");
 
-            versionFile = Path.Combine(rootPath, "versions.xml");
-            gameZip = Path.Combine(rootPath, $"{gameIdentifier}ARCHIVE");
-            gameExe = Path.Combine(rootPath, gameIdentifier ?? "", $"{gameExe}.exe");
+            ////versionFile = Path.Combine(rootPath, "versions.xml");
+            //gameZip = Path.Combine(rootPath, $"{gameIdentifier}ARCHIVE");
+            //gameExe = Path.Combine(rootPath, gameIdentifier ?? "", $"{gameExe}.exe");
         }
         public async Task DownloadGame(ShellPage shellPage, string? installPath)
         {
@@ -156,23 +156,20 @@ where g.Id = @p0
                 return (false, false);
             }
         }
-        public static void UninstallGame(string gameIdentifier)
+        public void UninstallGame()
         {
             using var db = new SQLiteConnection(DatabasePath);
-            var game = db.Table<GameVersion>().FirstOrDefault(g => g.Identifier == gameIdentifier);
+            var game = db.Table<GameVersion>().FirstOrDefault(g => g.Identifier == gameName);
             string path = game?.Path ?? string.Empty;
 
             try
             {
                 if (Directory.Exists(path))
-                {
                     Directory.Delete(path, true);
-                    Debug.WriteLine("Gra została odinstalowana.");
-                }
-                else
-                {
-                    Debug.WriteLine("Nie znaleziono katalogu gry do odinstalowania.");
-                }
+
+                if (!db.Table<GameVersion>().Any())
+                    if (File.Exists(DatabasePath))
+                        File.Delete(DatabasePath);
             }
             catch (Exception ex)
             {
