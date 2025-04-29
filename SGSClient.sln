@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Resources.Designer.t4 = Resources.Designer.t4
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SGSClient.Api", "..\SGSClient.Api\SGSClient.Api.csproj", "{BD749A9E-13AB-E674-F867-9E36992ACA26}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -60,12 +62,28 @@ Global
 		{72BD3829-A71A-4378-9DBE-CB4EDAA0309F}.Release|x64.Build.0 = Release|x64
 		{72BD3829-A71A-4378-9DBE-CB4EDAA0309F}.Release|x86.ActiveCfg = Release|x86
 		{72BD3829-A71A-4378-9DBE-CB4EDAA0309F}.Release|x86.Build.0 = Release|x86
+		{BD749A9E-13AB-E674-F867-9E36992ACA26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD749A9E-13AB-E674-F867-9E36992ACA26}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD749A9E-13AB-E674-F867-9E36992ACA26}.Debug|arm64.ActiveCfg = Debug|Any CPU
+		{BD749A9E-13AB-E674-F867-9E36992ACA26}.Debug|arm64.Build.0 = Debug|Any CPU
+		{BD749A9E-13AB-E674-F867-9E36992ACA26}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BD749A9E-13AB-E674-F867-9E36992ACA26}.Debug|x64.Build.0 = Debug|Any CPU
+		{BD749A9E-13AB-E674-F867-9E36992ACA26}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BD749A9E-13AB-E674-F867-9E36992ACA26}.Debug|x86.Build.0 = Debug|Any CPU
+		{BD749A9E-13AB-E674-F867-9E36992ACA26}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD749A9E-13AB-E674-F867-9E36992ACA26}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD749A9E-13AB-E674-F867-9E36992ACA26}.Release|arm64.ActiveCfg = Release|Any CPU
+		{BD749A9E-13AB-E674-F867-9E36992ACA26}.Release|arm64.Build.0 = Release|Any CPU
+		{BD749A9E-13AB-E674-F867-9E36992ACA26}.Release|x64.ActiveCfg = Release|Any CPU
+		{BD749A9E-13AB-E674-F867-9E36992ACA26}.Release|x64.Build.0 = Release|Any CPU
+		{BD749A9E-13AB-E674-F867-9E36992ACA26}.Release|x86.ActiveCfg = Release|Any CPU
+		{BD749A9E-13AB-E674-F867-9E36992ACA26}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		RESX_NeutralResourcesLanguage = en-US
 		SolutionGuid = {93CF03F6-6512-4422-8319-D2D0B791EEEC}
+		RESX_NeutralResourcesLanguage = en-US
 	EndGlobalSection
 EndGlobal
