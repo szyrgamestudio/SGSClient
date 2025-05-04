@@ -5,6 +5,7 @@ using System.IO;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Windows.Storage;
 
 namespace SGSClient.Models
 {
@@ -23,7 +24,7 @@ namespace SGSClient.Models
 
         public string GameName { get; }
         public string DownloadUrl { get; }
-        public string DestinationPath { get; }
+        public StorageFolder DestinationFolder { get; }
 
         private double _progress;
         public double Progress
@@ -72,69 +73,52 @@ namespace SGSClient.Models
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public DownloadItem(string gameName, string downloadUrl, string destinationPath, string gameIcon = "ms-appx:///Assets/placeholder.png")
+        public DownloadItem(string gameName, string downloadUrl, StorageFolder destinationFolder, string gameIcon = "ms-appx:///Assets/placeholder.png")
         {
             GameName = gameName;
             DownloadUrl = downloadUrl;
-            DestinationPath = destinationPath;
+            DestinationFolder = destinationFolder;
             GameIcon = gameIcon;
         }
 
         public async Task StartDownloadAsync(HttpClient httpClient)
         {
+            if (DestinationFolder == null)
+            {
+                throw new InvalidOperationException("Destination folder is not set.");
+            }
+
             using var response = await httpClient.GetAsync(DownloadUrl, HttpCompletionOption.ResponseHeadersRead);
             response.EnsureSuccessStatusCode();
 
             var totalSize = response.Content.Headers.ContentLength ?? 1;
             var buffer = new byte[8192];
 
-            // Obsługa błędu podczas otwierania pliku
-            FileStream? fileStream = null;
-            string filePath = Path.Combine(DestinationPath, $"{GameName}.zip");
-            try
-            {
-                fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Błąd przy otwieraniu pliku: {ex.Message}");
-                return;
-            }
+            StorageFile zipFile = await DestinationFolder.CreateFileAsync($"{GameName}.zip", CreationCollisionOption.ReplaceExisting);
 
-            try
+            using var stream = await zipFile.OpenStreamForWriteAsync();
+            using var contentStream = await response.Content.ReadAsStreamAsync();
+
+            long totalRead = 0;
+            var dispatcherQueue = App.MainWindow.DispatcherQueue;
+            double lastReportedProgress = 0;
+
+            int bytesRead;
+            while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
             {
-                using var contentStream = await response.Content.ReadAsStreamAsync();
-                int bytesRead;
-                long totalRead = 0;
-                var dispatcherQueue = App.MainWindow.DispatcherQueue;
-                double lastReportedProgress = 0;
-                while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length, _cts.Token)) > 0)
+                await stream.WriteAsync(buffer, 0, bytesRead);
+                totalRead += bytesRead;
+                double progressValue = (double)totalRead / totalSize * 100;
+
+                if (progressValue - lastReportedProgress >= 5 || progressValue == 100)
                 {
-                    await fileStream.WriteAsync(buffer, 0, bytesRead, _cts.Token);
-                    totalRead += bytesRead;
-                    double progressValue = (double)totalRead / totalSize * 100;
-
-                    if (progressValue - lastReportedProgress >= 5 || progressValue == 100)
-                    {
-                        lastReportedProgress = progressValue;
-                        dispatcherQueue.TryEnqueue(() =>
-                        {
-                            Progress = progressValue;
-                        });
-                    }
+                    lastReportedProgress = progressValue;
+                    dispatcherQueue.TryEnqueue(() => Progress = progressValue);
                 }
-                IsCompleted = true;
-                dispatcherQueue.TryEnqueue(() => OnPropertyChanged(nameof(IsCompleted)));
             }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Błąd podczas pobierania: {ex.Message}");
-            }
-            finally
-            {
-                fileStream?.Dispose(); // Zamknięcie pliku, jeśli został otwarty
-            }
-        }
 
+            IsCompleted = true;
+            dispatcherQueue.TryEnqueue(() => OnPropertyChanged(nameof(IsCompleted)));
+        }
     }
 }

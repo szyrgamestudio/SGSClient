@@ -1,23 +1,23 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Windows.Storage.Pickers;
-using SGSClient.Helpers; // Dodaj na górze!
+using Windows.Storage;
+
 namespace SGSClient.Controls
 {
     public sealed partial class ChooseInstallLocationDialog : ContentDialog
     {
-        public string SelectedPath { get; private set; } = string.Empty;
+        public StorageFolder SelectedFolder { get; private set; }
+
         public ChooseInstallLocationDialog()
         {
-            InitializeComponent();
-            var localAppDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SGSClient", "Gry");
-            PathTextBox.Text = localAppDataPath;
+            this.InitializeComponent();
         }
+
         private async void BrowseButton_Click(object sender, RoutedEventArgs e)
         {
-            var picker = new FolderPicker
+            var picker = new Windows.Storage.Pickers.FolderPicker
             {
-                SuggestedStartLocation = PickerLocationId.ComputerFolder
+                SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.ComputerFolder
             };
             picker.FileTypeFilter.Add("*");
 
@@ -27,53 +27,47 @@ namespace SGSClient.Controls
             var folder = await picker.PickSingleFolderAsync();
             if (folder != null)
             {
+                SelectedFolder = folder;
+
+                string token = "GameInstallFolder";
+                Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.AddOrReplace(token, folder);
+
                 PathTextBox.Text = folder.Path;
+            }
+        }
+        private void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        {
+            if (SelectedFolder == null)
+            {
+                args.Cancel = true;
+                SetError("Musisz wybraæ folder instalacji.");
             }
         }
         private void PathTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            ValidatePath();
-        }
-        private void ValidatePath()
-        {
-            try
+            if (PathTextBox != null)
             {
                 string path = PathTextBox.Text.Trim();
+
                 if (string.IsNullOrEmpty(path))
                 {
-                    SetError(LocalizationHelper.GetString("Error_EmptyPath"));
-                    return;
+                    SetError("Œcie¿ka nie mo¿e byæ pusta.");
                 }
-
-                if (!Directory.Exists(path))
-                    Directory.CreateDirectory(path);
-
-                string testFilePath = Path.Combine(path, "sgs_testfile.tmp");
-                File.WriteAllText(testFilePath, "test");
-                File.Delete(testFilePath);
-
-                ClearError();
-            }
-            catch (Exception)
-            {
-                SetError(LocalizationHelper.GetString("Error_InvalidOrUnauthorized"));
+                else
+                {
+                    ClearError();
+                }
             }
         }
-        private void SetError(string message)
+
+        private void SetError(string msg)
         {
-            ErrorTextBlock.Text = message;
-            ErrorTextBlock.Visibility = Visibility.Visible;
-            IsPrimaryButtonEnabled = false;
+            ToolTipService.SetToolTip(PathTextBox, msg);
         }
+
         private void ClearError()
         {
-            ErrorTextBlock.Text = "";
-            ErrorTextBlock.Visibility = Visibility.Collapsed;
-            IsPrimaryButtonEnabled = true;
-        }
-        private void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
-        {
-            SelectedPath = PathTextBox.Text;
+            ToolTipService.SetToolTip(PathTextBox, null);
         }
     }
 }

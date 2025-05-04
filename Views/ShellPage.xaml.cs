@@ -7,6 +7,7 @@ using SGSClient.Core.Utilities.LogUtility;
 using SGSClient.Helpers;
 using SGSClient.Models;
 using SGSClient.ViewModels;
+using Windows.Storage;
 using Windows.System;
 
 namespace SGSClient.Views;
@@ -97,7 +98,6 @@ public sealed partial class ShellPage : Page
             // ViewModel.NavigationService.GoForward();
         }
     }
-
     private void UserAccountItem_Tapped(object sender, TappedRoutedEventArgs e)
     {
         var flyout = new MenuFlyout();
@@ -117,9 +117,14 @@ public sealed partial class ShellPage : Page
 
         flyout.ShowAt((FrameworkElement)sender);
     }
-    public async Task AddDownload(string gameName, string url, string destinationPath, string gameLogo)
+    public async Task AddDownload(string gameName, string url, StorageFolder folder, string gameLogo)
     {
-        var downloadItem = new DownloadItem(gameName, url, destinationPath, gameLogo);
+        if (folder == null)
+        {
+            throw new ArgumentNullException(nameof(folder), "Destination folder cannot be null.");
+        }
+
+        var downloadItem = new DownloadItem(gameName, url, folder, gameLogo);
         DownloadViewModel.Instance.ActiveDownloads.Add(downloadItem);
 
         DownloadBar.Visibility = Visibility.Visible;
@@ -132,20 +137,17 @@ public sealed partial class ShellPage : Page
     {
         try
         {
-            await Task.Run(() =>
+            await Task.Run(async () =>
             {
-                string zipFilePath = Path.Combine(item.DestinationPath, $"{item.GameName}.zip");
-                string extractPath = Path.Combine(item.DestinationPath, item.GameName);
+                StorageFile zipFile = await item.DestinationFolder.GetFileAsync($"{item.GameName}.zip");
+                StorageFolder extractFolder = await item.DestinationFolder.CreateFolderAsync(item.GameName, CreationCollisionOption.ReplaceExisting);
 
-                if (!Directory.Exists(extractPath))
-                    Directory.CreateDirectory(extractPath);
-
-                using (var archiveFile = new ArchiveFile(zipFilePath))
+                using (var archive = new ArchiveFile(zipFile.Path))
                 {
-                    archiveFile.Extract(extractPath);
+                    archive.Extract(extractFolder.Path);
                 }
 
-                File.Delete(zipFilePath);
+                await zipFile.DeleteAsync();
             });
 
             App.MainWindow.DispatcherQueue.TryEnqueue(() =>
@@ -175,6 +177,4 @@ public sealed partial class ShellPage : Page
             DownloadBar.Visibility = Visibility.Collapsed;
         }
     }
-
-
 }

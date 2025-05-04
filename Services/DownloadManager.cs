@@ -1,6 +1,7 @@
 ﻿using SGSClient.Models;
 using SGSClient.Views;
 using System.Collections.ObjectModel;
+using Windows.Storage;
 
 namespace SGSClient.Services;
 public class DownloadManager
@@ -19,7 +20,7 @@ public class DownloadManager
     #endregion
 
     #region Methods
-    public static Task StartDownloadAsync(ShellPage shellPage, string gameName, string url, string destinationPath, string gameLogo)
+    public static Task StartDownloadAsync(ShellPage shellPage, string gameName, string url, StorageFolder destinationPath, string gameLogo)
     {
         return shellPage?.AddDownload(gameName, url, destinationPath, gameLogo) ?? Task.CompletedTask;
     }

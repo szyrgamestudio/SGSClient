@@ -13,6 +13,7 @@ using SGSClient.Views;
 using SQLite;
 using Windows.ApplicationModel.Core;
 using Windows.Storage;
+using Windows.Storage.AccessCache;
 
 namespace SGSClient.ViewModels
 {
@@ -78,15 +79,42 @@ where g.Id = @p0
             //gameZip = Path.Combine(rootPath, $"{gameIdentifier}ARCHIVE");
             //gameExe = Path.Combine(rootPath, gameIdentifier ?? "", $"{gameExe}.exe");
         }
-        public async Task DownloadGame(ShellPage shellPage, string? installPath)
+        public async Task DownloadGame(ShellPage shellPage)
         {
             if (!string.IsNullOrEmpty(gameName) && !string.IsNullOrEmpty(gameZipLink) && !string.IsNullOrEmpty(GameLogo) && !string.IsNullOrEmpty(gameExe))
             {
-                shellPage?.AddDownload(gameName, gameZipLink, installPath ?? ApplicationData.Current.LocalFolder.Path, GameLogo);
+                StorageFolder? folder = null;
+                if (StorageApplicationPermissions.FutureAccessList.ContainsItem("GameInstallFolder"))
+                {
+                    folder = await StorageApplicationPermissions.FutureAccessList.GetFolderAsync("GameInstallFolder");
+                }
 
-                await SetLocalVersion(gameName, gameVersion, gameExe, installPath ?? ApplicationData.Current.LocalFolder.Path);
+                if (folder != null)
+                {
+                    shellPage?.AddDownload(gameName, gameZipLink, folder, GameLogo);
+                    await SetLocalVersion(gameName, gameVersion, gameExe, folder.Path);
+                }
+                else
+                {
+                    // fallback: np. do LocalFolder
+                }
             }
         }
+
+        public static async Task<string?> ResolveTokenToPathAsync(string token)
+        {
+            try
+            {
+                var folder = await Windows.Storage.AccessCache.StorageApplicationPermissions
+                    .FutureAccessList.GetFolderAsync(token);
+                return folder.Path;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         private static async Task SetLocalVersion(string gameIdentifier, string version, string gameExe, string path)
         {
             try

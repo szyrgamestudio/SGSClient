@@ -134,16 +134,14 @@ public sealed partial class GameBasePage : Page
                 };
                 var result = await dialog.ShowAsync();
 
-                if (result == ContentDialogResult.Primary)
+                if (result == ContentDialogResult.Primary && dialog.SelectedFolder != null)
                 {
-                    var installPath = dialog.SelectedPath;
-                    await ViewModel.DownloadGame(shellPage, installPath);
+                    await ViewModel.DownloadGame(shellPage);
                 }
                 break;
+
             case LauncherStatus.ready:
                 ViewModel.PlayGame();
-                break;
-            default:
                 break;
         }
     }
@@ -157,9 +155,13 @@ public sealed partial class GameBasePage : Page
 
         if (result == ContentDialogResult.Primary)
         {
-            var installPath = dialog.SelectedPath;
-            var shellPage = (ShellPage)App.MainWindow.Content;
-            await ViewModel.DownloadGame(shellPage, installPath);
+            // Pobranie ścieżki z wybranego folderu
+            var installPath = dialog.SelectedFolder?.Path;
+            if (installPath != null)
+            {
+                var shellPage = (ShellPage)App.MainWindow.Content;
+                await ViewModel.DownloadGame(shellPage);
+            }
         }
     }
     private void UninstallButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
