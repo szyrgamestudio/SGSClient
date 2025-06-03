@@ -290,4 +290,10 @@
   <data name="Error_InvalidOrUnauthorized" xml:space="preserve">
     <value>No permission or invalid path. Please choose another folder.</value>
   </data>
+  <data name="UploadGamePage_ZIPTextBlock" xml:space="preserve">
+    <value>Zip file*</value>
+  </data>
+  <data name="UploadGamePage_ZIPTextBox" xml:space="preserve">
+    <value>Zip file</value>
+  </data>
 </root>

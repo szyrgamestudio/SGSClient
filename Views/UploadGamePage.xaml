@@ -90,17 +90,13 @@
                     <Rectangle Height="1" HorizontalAlignment="Stretch" Fill="{ThemeResource ControlElevationBorderBrush}" />
 
                     <StackPanel x:Name="ImageTextBox1Panels" Orientation="Horizontal">
-                        <TextBox x:Name="gameLogoTextBox" Margin="5" PlaceholderText="Wprowadź link do loga twojej gry" Width="400" />
-                        <Button Margin="5" Click="PreviewImageButton_Click" ToolTipService.ToolTip="Podgląd">
+                        <TextBox x:Name="gameLogoTextBox" Margin="5" PlaceholderText="Ścieżka do pliku z logo" Width="400" IsReadOnly="True" />
+                        <Button Margin="5" Content="Wybierz plik" Click="PickLogoImage_Click" />
+                        <!--<Button Margin="5" Click="PreviewImageButton_Click" ToolTipService.ToolTip="Podgląd">
                             <Button.Content>
                                 <FontIcon Glyph="&#xE71E;"/>
                             </Button.Content>
-                        </Button>
-                        <Button x:Name="AddImageButton2j" Margin="5" ToolTipService.ToolTip="Dodaj zdjęcie na hosting SGS" Click="gotoSGSClientWWW_Click">
-                            <Button.Content>
-                                <FontIcon Glyph="&#xE8A7;"/>
-                            </Button.Content>
-                        </Button>
+                        </Button>-->
                     </StackPanel>
                 </StackPanel>
 
@@ -111,17 +107,19 @@
 
                     <!-- TextBox for first image URL -->
                     <StackPanel x:Name="ImageTextBox1Panel" Orientation="Horizontal">
-                        <TextBox x:Name="ImageTextBox1" Margin="5" PlaceholderText="Wstaw link do zdjęcia" Width="400" />
+                        <TextBox x:Name="ImageTextBox1" Margin="5" PlaceholderText="Ścieżka do pliku z logo" Width="400" IsReadOnly="True" />
+                        <Button Margin="5" Content="Wybierz plik" Click="PickScreenshotImage_Click" />
+
                         <Button Margin="5" Click="RemoveImageButton_Click" ToolTipService.ToolTip="Usuń">
                             <Button.Content>
                                 <FontIcon Glyph="&#xE74D;"/>
                             </Button.Content>
                         </Button>
-                        <Button Margin="5" Click="PreviewImageButton_Click" ToolTipService.ToolTip="Podgląd">
+                        <!--<Button Margin="5" Click="PreviewImageButton_Click" ToolTipService.ToolTip="Podgląd">
                             <Button.Content>
                                 <FontIcon Glyph="&#xE71E;"/>
                             </Button.Content>
-                        </Button>
+                        </Button>-->
                     </StackPanel>
 
                     <!-- TextBox for additional image URLs (hidden by default) -->
@@ -130,11 +128,11 @@
                     <!-- Button to add additional image text box -->
                     <StackPanel x:Name="ImageTextBox2Panel" Orientation="Horizontal">
                         <Button x:Name="AddImageButton" Content="Dodaj kolejne zdjęcie" Margin="5" Click="AddImageButton_Click"/>
-                        <Button x:Name="AddImageButton2" Margin="5" ToolTipService.ToolTip="Dodaj zdjęcie na hosting SGS" Click="gotoSGSClientWWW_Click">
+                        <!--<Button x:Name="AddImageButton2" Margin="5" ToolTipService.ToolTip="Dodaj zdjęcie na hosting SGS" Click="gotoSGSClientWWW_Click">
                             <Button.Content>
                                 <FontIcon Glyph="&#xE8A7;"/>
                             </Button.Content>
-                        </Button>
+                        </Button>-->
                     </StackPanel>
                 </StackPanel>
 

@@ -1,14 +1,17 @@
-﻿using System.Data;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using SGSClient.Core.Authorization;
 using SGSClient.Core.Database;
 using SGSClient.Core.Extensions;
+using SGSClient.Core.Helpers;
 using SGSClient.ViewModels;
+using System.Data;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
+using Windows.Storage;
+using Windows.Storage.Pickers;
 
 namespace SGSClient.Views;
 
@@ -17,6 +20,7 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
     private int selectedGameTypeId; //zmienna przechowująca wybrany gatunek gry
     private int selectedGameEngineId; //zmienna przechowująca wybrany silnik gry
     private readonly IAppUser _appUser;  // Declare _appUser
+    private StorageFile selectedZipFile;
     public class GameTypeItem
     {
         public int Id
@@ -61,6 +65,59 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
             return Pair.Value; // Zwraca nazwę jako wartość do wyświetlenia w ComboBox
         }
     }
+
+    private async void PickZIPFile_Click(object sender, RoutedEventArgs e)
+    {
+        var picker = new FileOpenPicker();
+        picker.ViewMode = PickerViewMode.Thumbnail;
+        picker.SuggestedStartLocation = PickerLocationId.Desktop;
+        picker.FileTypeFilter.Add(".zip");
+
+        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
+        WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+
+        StorageFile file = await picker.PickSingleFileAsync();
+        if (file != null)
+        {
+            selectedZipFile = file;
+            linkZIPTextBox.Text = file.Name;
+        }
+    }
+    private async void PickLogoImage_Click(object sender, RoutedEventArgs e)
+    {
+        var picker = new FileOpenPicker();
+        picker.FileTypeFilter.Add(".png");
+        picker.FileTypeFilter.Add(".jpg");
+        picker.FileTypeFilter.Add(".jpeg");
+        picker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
+
+        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
+        WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+
+        StorageFile file = await picker.PickSingleFileAsync();
+        if (file != null)
+        {
+            gameLogoTextBox.Text = file.Path;
+        }
+    }
+    private async void PickScreenshotImage_Click(object sender, RoutedEventArgs e)
+    {
+        var picker = new FileOpenPicker();
+        picker.FileTypeFilter.Add(".png");
+        picker.FileTypeFilter.Add(".jpg");
+        picker.FileTypeFilter.Add(".jpeg");
+        picker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
+
+        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
+        WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+
+        StorageFile file = await picker.PickSingleFileAsync();
+        if (file != null)
+        {
+            ImageTextBox1.Text = file.Path;
+        }
+    }
+
 
     /// <summary>
     /// Wczytaj wszystkie gatunki gier i zapisz je do comboboxa
@@ -158,9 +215,14 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
     {
         get;
     }
+    public ShellViewModel shViewModel
+    {
+        get;
+    }
     public UploadGamePage()
     {
         ViewModel = App.GetService<UploadGameViewModel>();
+        shViewModel = App.GetService<ShellViewModel>();
         InitializeComponent();
         LoadGameTypes();
         LoadGameEngines();
@@ -178,18 +240,11 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
         };
 
         ContentDialogResult result = await messageDialog.ShowAsync();
-
-        //if (result == ContentDialogResult.Primary)
-        //{
-        //    // Użytkownik kliknął OK
-        //}
-        //else
-        //{
-        //    // Użytkownik kliknął Anuluj lub zamknął okno dialogowe
-        //}
     }
-    private void ButtonAdd_Click(object sender, RoutedEventArgs e)
+    private async void ButtonAdd_Click(object sender, RoutedEventArgs e)
     {
+        string userId = shViewModel.GetUserDisplayNameAsync().ToString();
+
         if (string.IsNullOrEmpty(gameNameTextBox.Text) ||
             string.IsNullOrEmpty(versionTextBox.Text) ||
             string.IsNullOrEmpty(linkZIPTextBox.Text) ||
@@ -221,47 +276,89 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
         //Opis gry
         string gameDescription = gameDescriptionTextBox.Text;
         string[] gameDescriptionLines = gameDescription.Split(new string[] { "\r\n", "\n", "\r" }, StringSplitOptions.None);
-        SqlParameter gameDescriptionParam = new SqlParameter("@gameDescriptionParam", SqlDbType.NVarChar);
-        gameDescriptionParam.Value = string.Join(Environment.NewLine, gameDescriptionLines);
+        string gameDescriptionParam = string.Join(Environment.NewLine, gameDescriptionLines);
 
         //Wymagania sprzętowe
         string hardwareRequirements = hardwareRequirementsTextBox.Text;
         string[] hardwareRequirementsLines = hardwareRequirements.Split(new string[] { "\r\n", "\n", "\r" }, StringSplitOptions.None);
-        SqlParameter hardwareRequirementsParam = new SqlParameter("@hardwareRequirementsParam", SqlDbType.NVarChar);
-        hardwareRequirementsParam.Value = string.Join(Environment.NewLine, hardwareRequirementsLines);
+        string hardwareRequirementsParam = string.Join(Environment.NewLine, hardwareRequirementsLines);
 
         //Pozostałe informacje - pole tekstowe
         string otherInformations = otherInfoTextBox.Text;
         string[] otherInformationsLines = otherInformations.Split(new string[] { "\r\n", "\n", "\r" }, StringSplitOptions.None);
-        SqlParameter otherInformationsParam = new SqlParameter("@otherInformationsParam", SqlDbType.NVarChar);
-        otherInformationsParam.Value = string.Join(Environment.NewLine, otherInformationsLines);
+        string otherInformationsParam = string.Join(Environment.NewLine, otherInformationsLines);
 
-        //Galeria zdjęć
-        List<string> galleryImageUrls = new List<string>();
+        var gameEngine = selectedGameEngineId == 0 ? (int?)null : selectedGameEngineId;
+        var gameType = selectedGameTypeId == 0 ? (int?)null : selectedGameTypeId;
+
+        #region Upload to Nextcloud
+        var uploader = new NextcloudUploader("https://cloud.m455yn.dev/", "sgsclient", "yGnxE-Tykxe-SwjwW-NooLc-xSwPT");
+        string nextcloudGameFolder = gameName;
+
+        string uploadedLogoUrl = null;
+        List<string> uploadedImageUrls = new();
+
+        string uploadedZipUrl = null;
+        if (selectedZipFile != null)
+        {
+            string zipName = Guid.NewGuid() + ".zip";
+            zipLink = await uploader.UploadFileAsync(selectedZipFile.Path, nextcloudGameFolder, zipName);
+        }
+        else if (!string.IsNullOrWhiteSpace(linkZIPTextBox.Text) && !Path.IsPathRooted(linkZIPTextBox.Text))
+        {
+            zipLink = linkZIPTextBox.Text;
+        }
+        else
+        {
+            Debug.WriteLine("Nie wybrano pliku ZIP.");
+            return;
+        }
+
+        string logoPath = gameLogoTextBox.Text;
+        if (!string.IsNullOrWhiteSpace(logoPath) && Path.IsPathRooted(logoPath))
+        {
+            string ext = Path.GetExtension(logoPath);
+            uploadedLogoUrl = await uploader.UploadFileAsync(logoPath, nextcloudGameFolder, $"logo{ext}", userId);
+        }
+        else
+        {
+            uploadedLogoUrl = logoPath;
+        }
+
+        int imageIndex = 1;
         foreach (var child in gameGalleryStackPanel.Children)
         {
             if (child is StackPanel stackPanel)
             {
                 TextBox textBox = stackPanel.Children.OfType<TextBox>().FirstOrDefault();
-                if (textBox != null && !string.IsNullOrWhiteSpace(textBox.Text))
+                if (!string.IsNullOrWhiteSpace(textBox?.Text))
                 {
-                    galleryImageUrls.Add(textBox.Text);
+                    string imgPath = textBox.Text;
+                    if (Path.IsPathRooted(imgPath))
+                    {
+                        string ext = Path.GetExtension(imgPath);
+                        string uploadedUrl = await uploader.UploadFileAsync(imgPath, nextcloudGameFolder, $"zrzutEkranu_{imageIndex++}{ext}", userId);
+                        if (uploadedUrl != null)
+                            uploadedImageUrls.Add(uploadedUrl);
+                    }
+                    else
+                    {
+                        uploadedImageUrls.Add(imgPath); // gotowy URL
+                    }
                 }
             }
         }
 
-
-        var gameEngine = selectedGameEngineId == 0 ? (int?)null : selectedGameEngineId;
-        var gameType = selectedGameTypeId == 0 ? (int?)null : selectedGameTypeId;
+        #endregion
 
         try
         {
             SqlCommand cmd = new SqlCommand(@"
-declare @developerId int = (select r.DeveloperId from Registration r where r.Id = @userId)
+declare @developerId int = (select r.DeveloperId from Registration r where r.UserId = @userId)
 
 insert sgsGames (Title, DeveloperId, PayloadName, ExeName, ZipLink, VersionLink, CurrentVersion, Description, HardwareRequirements, OtherInformation, Symbol, EngineId, TypeId, DraftP)
 select 
-  @Name
+  @gameName
 , @developerId
 , null
 , @ExeName
@@ -281,7 +378,7 @@ select
 ", db.con);
 
             cmd.Parameters.AddWithValue("gameName", gameName.ToSqlParameter());
-            cmd.Parameters.AddWithValue("userId", _appUser.UserId.ToSqlParameter());
+            cmd.Parameters.AddWithValue("userId", userId.ToSqlParameter());
             cmd.Parameters.AddWithValue("exeName", exeName.ToSqlParameter());
             cmd.Parameters.AddWithValue("zipLink", zipLink.ToSqlParameter());
             cmd.Parameters.AddWithValue("currentVersion", currentVersion.ToSqlParameter());
@@ -292,38 +389,33 @@ select
             cmd.Parameters.AddWithValue("gameEngine", gameEngine.ToSqlParameter());
             cmd.Parameters.AddWithValue("gameType", gameType.ToSqlParameter());
 
-            int gameId = (int)db.scalarSQL(cmd);
+            int gameId = Convert.ToInt32(db.scalarSQL(cmd));
 
             //-----------------------------------
-            cmd.Parameters.Clear();
-            cmd = new SqlCommand(@"
+            // Zrzuty ekranu
+            if (uploadedImageUrls.Count > 0)
+            {
+                foreach (var url in uploadedImageUrls)
+                {
+                    db.con.exec(@"
 insert sgsGameImages (GameId, ImagePath)
 select
-  @GameId
-, @ImageUrl
-", db.con);
-
-            cmd.Parameters.AddWithValue("gameId", gameId.ToSqlParameter());
-            foreach (string imageUrl in galleryImageUrls)
-            {
-                cmd.Parameters.AddWithValue("imageUrl", imageUrl.ToSqlParameter());
-                db.execSQL(cmd);
-
-                cmd.Parameters.Clear();
-                cmd.Parameters.AddWithValue("gameId", gameId.ToSqlParameter());
+  @p0
+, @p1
+", gameId.ToSqlParameter(), url.ToSqlParameter());
+                }
             }
-            //-----------------------------------
-            cmd.Parameters.Clear();
-            cmd = new SqlCommand(@"
+            // Logo
+            if (!string.IsNullOrWhiteSpace(uploadedLogoUrl))
+            {
+                db.con.exec(@"
 insert sgsGameLogo (GameId, LogoPath)
 select
-  @GameId
-, @ImageUrl
-", db.con);
+  @p0
+, @p1
+", gameId.ToSqlParameter(), uploadedLogoUrl.ToSqlParameter());
 
-            cmd.Parameters.AddWithValue("gameId", gameId.ToSqlParameter());
-            cmd.Parameters.AddWithValue("gameId", gameLogo.ToSqlParameter());
-            db.execSQL(cmd);
+            }
 
             if (gameId > 0)
                 Frame.Navigate(typeof(MyGamesPage), new DrillInNavigationTransitionInfo());
@@ -338,18 +430,34 @@ select
     }
 
     private int additionalImageCount = 1;
-    private void AddImageButton_Click(object sender, RoutedEventArgs e)
+    private async void AddImageButton_Click(object sender, RoutedEventArgs e)
     {
-        // Tworzenie nowego TextBoxa dla kolejnego zdjęcia
+        var picker = new FileOpenPicker();
+        picker.ViewMode = PickerViewMode.Thumbnail;
+        picker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
+        picker.FileTypeFilter.Add(".jpg");
+        picker.FileTypeFilter.Add(".jpeg");
+        picker.FileTypeFilter.Add(".png");
+        picker.FileTypeFilter.Add(".bmp");
+
+        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
+        WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+        //WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+
+        StorageFile file = await picker.PickSingleFileAsync();
+
+        if (file == null)
+            return;
+
         StackPanel imageTextBoxPanel = new StackPanel();
         imageTextBoxPanel.Orientation = Orientation.Horizontal;
 
         TextBox newImageTextBox = new TextBox();
         newImageTextBox.Name = "ImageTextBox" + (additionalImageCount + 1);
         newImageTextBox.Margin = new Thickness(5);
-        newImageTextBox.PlaceholderText = "Wstaw link do zdjęcia";
         newImageTextBox.Width = 400;
         newImageTextBox.TextWrapping = TextWrapping.Wrap;
+        newImageTextBox.Text = file.Path;
 
         #region Przycisk "Usuń"
         Button removeButton = new Button();
@@ -379,19 +487,15 @@ select
         ToolTipService.SetToolTip(previewButton, previewToolTip);
         #endregion
 
-        // Dodanie nowego TextBoxa do StackPanelu
         imageTextBoxPanel.Children.Add(newImageTextBox);
         imageTextBoxPanel.Children.Add(removeButton);
-        imageTextBoxPanel.Children.Add(previewButton);
+        //imageTextBoxPanel.Children.Add(previewButton);
 
-        //StackPanel.SetMargin(imageTextBoxPanel, new Thickness(5));
-        gameGalleryStackPanel.Children.Insert(gameGalleryStackPanel.Children.Count - 1, imageTextBoxPanel); // Dodaj na przedostatniej pozycji
+        gameGalleryStackPanel.Children.Insert(gameGalleryStackPanel.Children.Count - 1, imageTextBoxPanel);
 
-        // Zwiększanie licznika dodatkowych zdjęć
         additionalImageCount++;
 
-        // Ukrycie przycisku dodawania zdjęcia, jeśli osiągnięto limit
-        if (additionalImageCount >= 10) // Dla przykładu, limit 10 zdjęć
+        if (additionalImageCount >= 10)
         {
             AddImageButton.Visibility = Visibility.Collapsed;
         }
@@ -423,35 +527,8 @@ select
             Console.WriteLine("Wystąpił błąd podczas otwierania linku do logo gry: " + ex.Message);
         }
     }
-    private void gotoSGSClientWWW_Click(object sender, RoutedEventArgs e)
-    {
-        var URL = "https://sgsclient.m455yn.dev/upload";
-        try
-        {
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = URL,
-                UseShellExecute = true
-            });
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Wystąpił błąd podczas otwierania linku do logo gry: " + ex.Message);
-        }
-    }
     private void ButtonCancel_Click(object sender, RoutedEventArgs e)
     {
         Frame.Navigate(typeof(MyGamesPage), new DrillInNavigationTransitionInfo());
     }
-
-    //[Obsolete]
-    //private void LogoutButton_Click(object sender, RoutedEventArgs e)
-    //{
-    //    _appUser.IsLoggedIn = false;
-    //    _appUser.UserId = null;
-    //    _appUser.UserName = null;
-
-    //    Frame.Navigate(typeof(LoginPage), new DrillInNavigationTransitionInfo());
-    //}
-
 }

@@ -92,6 +92,18 @@ public partial class ShellViewModel : ObservableRecipient
         UpdateUserData();
     }
 
+    public string GetUserDisplayNameAsync()
+    {
+        if (_appUser.IsLoggedIn)
+        {
+            return _appUser.UserId;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     public void NavigateToMyGames()
     {
         NavigationService.NavigateTo(typeof(MyGamesViewModel).FullName!);
