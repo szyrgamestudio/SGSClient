@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml.Media.Imaging;
 using SGSClient.Core.Database;
 using SGSClient.Core.Extensions;
 using SGSClient.Core.Helpers;
+using SGSClient.Models;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Net.Http.Headers;

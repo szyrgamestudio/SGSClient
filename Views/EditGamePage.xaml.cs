@@ -16,50 +16,6 @@ namespace SGSClient.Views
     {
         private int gameId;
         public string GameId { get; private set; }
-        public class GameTypeItem
-        {
-            public int Id
-            {
-                get; set;
-            }
-            public KeyValuePair<int, string> Pair
-            {
-                get; set;
-            }
-
-            public GameTypeItem(int id, KeyValuePair<int, string> pair)
-            {
-                Id = id;
-                Pair = pair;
-            }
-
-            public override string ToString()
-            {
-                return Pair.Value;
-            }
-        }
-        public class GameEngineItem
-        {
-            public int Id
-            {
-                get; set;
-            }
-            public KeyValuePair<int, string> Pair
-            {
-                get; set;
-            }
-
-            public GameEngineItem(int id, KeyValuePair<int, string> pair)
-            {
-                Id = id;
-                Pair = pair;
-            }
-
-            public override string ToString()
-            {
-                return Pair.Value;
-            }
-        }
         public EditGameViewModel ViewModel { get; }
         public EditGamePage()
         {

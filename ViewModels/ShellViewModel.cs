@@ -3,6 +3,8 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml.Navigation;
 using SGSClient.Contracts.Services;
 using SGSClient.Core.Authorization;
+using SGSClient.Core.Database;
+using SGSClient.Core.Extensions;
 using System.Windows.Input;
 
 namespace SGSClient.ViewModels;
@@ -67,6 +69,28 @@ public partial class ShellViewModel : ObservableRecipient
         {
             Selected = selectedItem;
         }
+
+        #region Database Update
+
+        if (!string.IsNullOrWhiteSpace(_appUser.DisplayName) && !string.IsNullOrWhiteSpace(_appUser.UserId))
+        {
+            db.con.exec(@"
+insert Users(DisplayName, UserId)
+select
+  @p0
+, @p1
+from (select 1 x) x
+left join Users u on u.UserId = @p1
+where u.UserId is null
+
+update u set
+  u.DisplayName = @p0
+from Users u
+where u.UserId = @p1 and u.DisplayName != @p0
+", _appUser.DisplayName.ToString(), _appUser.UserId.ToString());
+        }
+        #endregion
+
     }
 
     private void UpdateUserData()

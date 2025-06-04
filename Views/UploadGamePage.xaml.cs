@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Media.Animation;
 using SGSClient.Core.Database;
 using SGSClient.Core.Extensions;
 using SGSClient.Core.Helpers;
+using SGSClient.Models;
 using SGSClient.ViewModels;
 using System.Data;
 using System.Diagnostics;
@@ -19,50 +20,6 @@ public sealed partial class UploadGamePage : Page
     private int selectedGameTypeId;
     private int selectedGameEngineId;
     private StorageFile? selectedZipFile;
-    public class GameTypeItem
-    {
-        public int Id
-        {
-            get; set;
-        }
-        public KeyValuePair<int, string> Pair
-        {
-            get; set;
-        }
-
-        public GameTypeItem(int id, KeyValuePair<int, string> pair)
-        {
-            Id = id;
-            Pair = pair;
-        }
-
-        public override string ToString()
-        {
-            return Pair.Value; // Zwraca nazwę jako wartość do wyświetlenia w ComboBox
-        }
-    }
-    public class GameEngineItem
-    {
-        public int Id
-        {
-            get; set;
-        }
-        public KeyValuePair<int, string> Pair
-        {
-            get; set;
-        }
-
-        public GameEngineItem(int id, KeyValuePair<int, string> pair)
-        {
-            Id = id;
-            Pair = pair;
-        }
-
-        public override string ToString()
-        {
-            return Pair.Value; // Zwraca nazwę jako wartość do wyświetlenia w ComboBox
-        }
-    }
 
     #region File pickers
     private async void PickZIPFile_Click(object sender, RoutedEventArgs e)
@@ -349,10 +306,10 @@ from sgsGameEngines ge");
             SqlCommand cmd = new(@"
 declare @developerId int = (select r.DeveloperId from Registration r where r.UserId = @userId)
 
-insert sgsGames (Title, DeveloperId, PayloadName, ExeName, ZipLink, VersionLink, CurrentVersion, Description, HardwareRequirements, OtherInformation, Symbol, EngineId, TypeId, DraftP)
+insert sgsGames (UserId, Title, PayloadName, ExeName, ZipLink, VersionLink, CurrentVersion, Description, HardwareRequirements, OtherInformation, Symbol, EngineId, TypeId, DraftP)
 select 
-  @gameName
-, @developerId
+  @userId
+, @gameName
 , null
 , @ExeName
 , @ZipLink
