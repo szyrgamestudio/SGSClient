@@ -2,7 +2,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
-using SGSClient.Core.Authorization;
 using SGSClient.Core.Database;
 using SGSClient.Core.Extensions;
 using SGSClient.Core.Helpers;
@@ -15,12 +14,11 @@ using Windows.Storage.Pickers;
 
 namespace SGSClient.Views;
 
-public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
+public sealed partial class UploadGamePage : Page
 {
-    private int selectedGameTypeId; //zmienna przechowująca wybrany gatunek gry
-    private int selectedGameEngineId; //zmienna przechowująca wybrany silnik gry
-    private readonly IAppUser _appUser;  // Declare _appUser
-    private StorageFile selectedZipFile;
+    private int selectedGameTypeId;
+    private int selectedGameEngineId;
+    private StorageFile? selectedZipFile;
     public class GameTypeItem
     {
         public int Id
@@ -66,6 +64,7 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
         }
     }
 
+    #region File pickers
     private async void PickZIPFile_Click(object sender, RoutedEventArgs e)
     {
         var picker = new FileOpenPicker();
@@ -117,31 +116,32 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
             ImageTextBox1.Text = file.Path;
         }
     }
+    #endregion
 
-
-    /// <summary>
-    /// Wczytaj wszystkie gatunki gier i zapisz je do comboboxa
-    /// </summary>
+    #region DDLs
     private void LoadGameTypes()
     {
+        List<GameTypeItem> gameTypeList = [];
+
         try
         {
-            DataSet ds = db.con.select("select sgsgt.Id, sgsgt.Name from sgsGameTypes sgsgt");
+            DataSet ds = db.con.select(@"
+select
+  gt.Id
+, gt.Name
+from sgsGameTypes gt
+");
 
-            List<GameTypeItem> gameTypeList = new List<GameTypeItem>();
-
-            // Sprawdź, czy są jakiekolwiek tabele w DataSet
             if (ds.Tables.Count > 0)
             {
-                foreach (DataRow row in ds.Tables[0].Rows)
+                foreach (DataRow dr in ds.Tables[0].Rows)
                 {
-                    int typeId = Convert.ToInt32(row["Id"]);
-                    string typeName = row["Name"].ToString();
-                    var pair = new KeyValuePair<int, string>(typeId, typeName);
+                    int typeId = dr.TryGetValue("Id").ToInt32();
+                    string typeName = dr.TryGetValue("Name").ToString();
+                    KeyValuePair<int, string> pair = new(typeId, typeName);
                     gameTypeList.Add(new GameTypeItem(typeId, pair));
                 }
 
-                // Wyczyść istniejące elementy ComboBox przed dodaniem nowych
                 comboBoxGameType.Items.Clear();
                 foreach (var item in gameTypeList)
                 {
@@ -154,31 +154,29 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
             Console.WriteLine($"Błąd: {ex.Message}");
         }
     }
-
-    /// <summary>
-    /// Wczytaj wszystkie silniki gier i zapisz je do comboboxa
-    /// </summary>
     private void LoadGameEngines()
     {
-        string query = "SELECT sgseg.Id, sgseg.Name FROM sgsGameEngines sgseg";
+        List<GameEngineItem> enginesList = [];
 
         try
         {
-            DataSet ds = db.con.select("SELECT sgseg.Id, sgseg.Name FROM sgsGameEngines sgseg");
-            List<GameEngineItem> enginesList = new List<GameEngineItem>();
+            DataSet ds = db.con.select(@"
+select
+  ge.Id
+, ge.Name
+from sgsGameEngines ge");
 
-            // Sprawdź, czy są jakiekolwiek tabele w DataSet
             if (ds.Tables.Count > 0)
             {
-                foreach (DataRow row in ds.Tables[0].Rows)
+                foreach (DataRow dr in ds.Tables[0].Rows)
                 {
-                    int engineId = Convert.ToInt32(row["Id"]);
-                    string engineName = row["Name"].ToString();
-                    var pair = new KeyValuePair<int, string>(engineId, engineName);
+                    int engineId = dr.TryGetValue("Id").ToInt32();
+                    string engineName = dr.TryGetValue("Name").ToString();
+
+                    KeyValuePair<int, string> pair = new(engineId, engineName);
                     enginesList.Add(new GameEngineItem(engineId, pair));
                 }
 
-                // Wyczyść istniejące elementy ComboBox przed dodaniem nowych
                 comboBoxGameEngine.Items.Clear();
                 foreach (var item in enginesList)
                 {
@@ -189,40 +187,38 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
         catch (Exception ex)
         {
             Console.WriteLine($"Błąd: {ex.Message}");
-            throw; // Możesz obsłużyć wyjątek lub logować go, jeśli to konieczne
         }
     }
     private void GetSelectedGameTypeKey()
     {
         if (comboBoxGameType.SelectedItem != null)
         {
-            var selectedGameType = (GameTypeItem)comboBoxGameType.SelectedItem;
-            selectedGameTypeId = selectedGameType.Id; // Przypisanie id do zmiennej na zewnątrz metody
-            string gameType = selectedGameType.Pair.Value;
+            GameTypeItem selectedGameType = (GameTypeItem)comboBoxGameType.SelectedItem;
+            selectedGameTypeId = selectedGameType.Id;
         }
     }
     private void GetSelectedGameEngineKey()
     {
         if (comboBoxGameEngine.SelectedItem != null)
         {
-            var selectedGameEngine = (GameEngineItem)comboBoxGameEngine.SelectedItem;
-            selectedGameEngineId = selectedGameEngine.Id; // Przypisanie id do zmiennej na zewnątrz metody
-            string engineName = selectedGameEngine.Pair.Value;
+            GameEngineItem selectedGameEngine = (GameEngineItem)comboBoxGameEngine.SelectedItem;
+            selectedGameEngineId = selectedGameEngine.Id;
         }
     }
+    #endregion
 
     public UploadGameViewModel ViewModel
     {
         get;
     }
-    public ShellViewModel shViewModel
+    public ShellViewModel ShellViewModel
     {
         get;
     }
     public UploadGamePage()
     {
         ViewModel = App.GetService<UploadGameViewModel>();
-        shViewModel = App.GetService<ShellViewModel>();
+        ShellViewModel = App.GetService<ShellViewModel>();
         InitializeComponent();
         LoadGameTypes();
         LoadGameEngines();
@@ -243,7 +239,7 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
     }
     private async void ButtonAdd_Click(object sender, RoutedEventArgs e)
     {
-        string userId = shViewModel.GetUserDisplayNameAsync().ToString();
+        string userId = ShellViewModel.GetUserDisplayNameAsync().ToString();
 
         if (string.IsNullOrEmpty(gameNameTextBox.Text) ||
             string.IsNullOrEmpty(versionTextBox.Text) ||
@@ -265,48 +261,45 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
 
         GetSelectedGameTypeKey();
         GetSelectedGameEngineKey();
+
         // Pobranie wartości z formularza
-        var gameName = gameNameTextBox.Text;      //Nazwa gry
-        var symbol = symbolTextBox.Text;          //Symbol gry
-        var currentVersion = versionTextBox.Text; //Aktualna wersja gry
-        var zipLink = linkZIPTextBox.Text;        //Link do pliku ZIP z grą
-        var gameLogo = gameLogoTextBox.Text;      //Link do loga gry
-        var exeName = gameEXETextBox.Text;        //Plik wykonawczy gry
+        string gameName = gameNameTextBox.Text;      //Nazwa gry
+        string symbol = symbolTextBox.Text;          //Symbol gry
+        string currentVersion = versionTextBox.Text; //Aktualna wersja gry
+        string exeName = gameEXETextBox.Text;        //Plik wykonawczy gry
 
         //Opis gry
         string gameDescription = gameDescriptionTextBox.Text;
-        string[] gameDescriptionLines = gameDescription.Split(new string[] { "\r\n", "\n", "\r" }, StringSplitOptions.None);
+        string[] gameDescriptionLines = gameDescription.Split(["\r\n", "\n", "\r"], StringSplitOptions.None);
         string gameDescriptionParam = string.Join(Environment.NewLine, gameDescriptionLines);
 
         //Wymagania sprzętowe
         string hardwareRequirements = hardwareRequirementsTextBox.Text;
-        string[] hardwareRequirementsLines = hardwareRequirements.Split(new string[] { "\r\n", "\n", "\r" }, StringSplitOptions.None);
+        string[] hardwareRequirementsLines = hardwareRequirements.Split(["\r\n", "\n", "\r"], StringSplitOptions.None);
         string hardwareRequirementsParam = string.Join(Environment.NewLine, hardwareRequirementsLines);
 
         //Pozostałe informacje - pole tekstowe
         string otherInformations = otherInfoTextBox.Text;
-        string[] otherInformationsLines = otherInformations.Split(new string[] { "\r\n", "\n", "\r" }, StringSplitOptions.None);
+        string[] otherInformationsLines = otherInformations.Split(["\r\n", "\n", "\r"], StringSplitOptions.None);
         string otherInformationsParam = string.Join(Environment.NewLine, otherInformationsLines);
 
-        var gameEngine = selectedGameEngineId == 0 ? (int?)null : selectedGameEngineId;
-        var gameType = selectedGameTypeId == 0 ? (int?)null : selectedGameTypeId;
+        int? gameEngine = selectedGameEngineId == 0 ? null : selectedGameEngineId;
+        int? gameType = selectedGameTypeId == 0 ? null : selectedGameTypeId;
 
         #region Upload to Nextcloud
         var uploader = new NextcloudUploader("https://cloud.m455yn.dev/", "sgsclient", "yGnxE-Tykxe-SwjwW-NooLc-xSwPT");
         string nextcloudGameFolder = gameName;
 
-        string uploadedLogoUrl = null;
         List<string> uploadedImageUrls = new();
 
-        string uploadedZipUrl = null;
         if (selectedZipFile != null)
         {
             string zipName = Guid.NewGuid() + ".zip";
-            zipLink = await uploader.UploadFileAsync(selectedZipFile.Path, nextcloudGameFolder, zipName);
+            linkZIPTextBox.Text = await uploader.UploadFileAsync(selectedZipFile.Path, nextcloudGameFolder, zipName);
         }
         else if (!string.IsNullOrWhiteSpace(linkZIPTextBox.Text) && !Path.IsPathRooted(linkZIPTextBox.Text))
         {
-            zipLink = linkZIPTextBox.Text;
+            linkZIPTextBox.Text = linkZIPTextBox.Text;
         }
         else
         {
@@ -318,11 +311,11 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
         if (!string.IsNullOrWhiteSpace(logoPath) && Path.IsPathRooted(logoPath))
         {
             string ext = Path.GetExtension(logoPath);
-            uploadedLogoUrl = await uploader.UploadFileAsync(logoPath, nextcloudGameFolder, $"logo{ext}", userId);
+            gameLogoTextBox.Text = await uploader.UploadFileAsync(logoPath, nextcloudGameFolder, $"logo{ext}", userId);
         }
         else
         {
-            uploadedLogoUrl = logoPath;
+            gameLogoTextBox.Text = logoPath;
         }
 
         int imageIndex = 1;
@@ -353,7 +346,7 @@ public sealed partial class UploadGamePage : Microsoft.UI.Xaml.Controls.Page
 
         try
         {
-            SqlCommand cmd = new SqlCommand(@"
+            SqlCommand cmd = new(@"
 declare @developerId int = (select r.DeveloperId from Registration r where r.UserId = @userId)
 
 insert sgsGames (Title, DeveloperId, PayloadName, ExeName, ZipLink, VersionLink, CurrentVersion, Description, HardwareRequirements, OtherInformation, Symbol, EngineId, TypeId, DraftP)
@@ -380,7 +373,7 @@ select
             cmd.Parameters.AddWithValue("gameName", gameName.ToSqlParameter());
             cmd.Parameters.AddWithValue("userId", userId.ToSqlParameter());
             cmd.Parameters.AddWithValue("exeName", exeName.ToSqlParameter());
-            cmd.Parameters.AddWithValue("zipLink", zipLink.ToSqlParameter());
+            cmd.Parameters.AddWithValue("zipLink", linkZIPTextBox.Text.ToSqlParameter());
             cmd.Parameters.AddWithValue("currentVersion", currentVersion.ToSqlParameter());
             cmd.Parameters.AddWithValue("gameDescriptionParam", gameDescriptionParam.ToSqlParameter());
             cmd.Parameters.AddWithValue("hardwareRequirementsParam", hardwareRequirementsParam.ToSqlParameter());
@@ -406,14 +399,14 @@ select
                 }
             }
             // Logo
-            if (!string.IsNullOrWhiteSpace(uploadedLogoUrl))
+            if (!string.IsNullOrWhiteSpace(gameLogoTextBox.Text))
             {
                 db.con.exec(@"
 insert sgsGameLogo (GameId, LogoPath)
 select
   @p0
 , @p1
-", gameId.ToSqlParameter(), uploadedLogoUrl.ToSqlParameter());
+", gameId.ToSqlParameter(), gameLogoTextBox.Text.ToSqlParameter());
 
             }
 
@@ -473,23 +466,8 @@ select
         ToolTipService.SetToolTip(removeButton, removeToolTip);
         #endregion
 
-        #region Przycisk "Podgląd"
-        Button previewButton = new Button();
-        previewButton.Margin = new Thickness(5);
-        previewButton.Click += PreviewImageButton_Click;
-
-        var previewButtonFontIcon = new FontIcon();
-        previewButtonFontIcon.Glyph = "\xE71E";
-        previewButton.Content = previewButtonFontIcon;
-
-        ToolTip previewToolTip = new ToolTip();
-        previewToolTip.Content = "Podgląd";
-        ToolTipService.SetToolTip(previewButton, previewToolTip);
-        #endregion
-
         imageTextBoxPanel.Children.Add(newImageTextBox);
         imageTextBoxPanel.Children.Add(removeButton);
-        //imageTextBoxPanel.Children.Add(previewButton);
 
         gameGalleryStackPanel.Children.Insert(gameGalleryStackPanel.Children.Count - 1, imageTextBoxPanel);
 
@@ -506,26 +484,6 @@ select
         StackPanel parentPanel = removeButton.Parent as StackPanel;
 
         gameGalleryStackPanel.Children.Remove(parentPanel);
-    }
-    private void PreviewImageButton_Click(object sender, RoutedEventArgs e)
-    {
-        Button previewButton = sender as Button;
-        StackPanel parentPanel = previewButton.Parent as StackPanel;
-        TextBox imageTextBox = parentPanel.Children.OfType<TextBox>().FirstOrDefault();
-
-        string imageURL = imageTextBox.Text;
-        try
-        {
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = imageURL,
-                UseShellExecute = true
-            });
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Wystąpił błąd podczas otwierania linku do logo gry: " + ex.Message);
-        }
     }
     private void ButtonCancel_Click(object sender, RoutedEventArgs e)
     {
