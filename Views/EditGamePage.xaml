@@ -194,6 +194,8 @@
 
         <!-- Always visible buttons -->
         <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
+            <Button x:Name="CancelButton" Content="Anuluj" Click="ButtonCancel_Click" Margin="5"/>
+
             <Button x:Name="SaveChangesButton" Content="Zapisz zmiany" Margin="5" Style="{StaticResource AccentButtonStyle}">
                 <Button.Flyout>
                     <Flyout x:Name="saveChangesFlyout">
@@ -204,7 +206,6 @@
                     </Flyout>
                 </Button.Flyout>
             </Button>
-            <Button x:Name="CancelButton" Content="Anuluj" Click="ButtonCancel_Click" Margin="5"/>
         </StackPanel>
     </Grid>
 </Page>

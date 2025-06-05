@@ -54,6 +54,9 @@ public partial class EditGameViewModel : ObservableRecipient
     [ObservableProperty]
     private GameEngineItem _selectedGameEngine;
 
+    public int SelectedGameTypeId => SelectedGameType?.Id ?? 0;
+    public int SelectedGameEngineId => SelectedGameEngine?.Id ?? 0;
+
     #region Logo
     private ObservableCollection<GameImage> _gameLogos;
     public ObservableCollection<GameImage> GameLogos
@@ -103,8 +106,6 @@ public partial class EditGameViewModel : ObservableRecipient
         GameImages = new ObservableCollection<GameImage>();
     }
 
-    public int SelectedGameTypeId => SelectedGameType?.Id ?? 0;
-    public int SelectedGameEngineId => SelectedGameEngine?.Id ?? 0;
 
     public async Task LoadGameData(int gameId)
     {

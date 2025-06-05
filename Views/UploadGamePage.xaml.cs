@@ -1,7 +1,9 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
+using Microsoft.UI.Xaml.Navigation;
 using SGSClient.Core.Database;
 using SGSClient.Core.Extensions;
 using SGSClient.Core.Helpers;
@@ -9,9 +11,13 @@ using SGSClient.Models;
 using SGSClient.ViewModels;
 using System.Data;
 using System.Diagnostics;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Text.RegularExpressions;
+using Windows.Gaming.Input;
 using Windows.Storage;
 using Windows.Storage.Pickers;
+using Windows.Storage.Streams;
 
 namespace SGSClient.Views;
 
@@ -53,7 +59,21 @@ public sealed partial class UploadGamePage : Page
         StorageFile file = await picker.PickSingleFileAsync();
         if (file != null)
         {
-            gameLogoTextBox.Text = file.Path;
+            //gameLogoTextBox.Text = file.Path;
+            using (IRandomAccessStream fileStream = await file.OpenAsync(FileAccessMode.Read))
+            {
+                var bitmapImage = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage();
+                await bitmapImage.SetSourceAsync(fileStream);
+
+                var newGameImage = new GameImage(bitmapImage)
+                {
+                    Url = file.Path
+                };
+
+                ViewModel.GameLogos.Add(newGameImage);
+                AddLogoBtn.IsEnabled = false;
+            }
+
         }
     }
     private async void PickScreenshotImage_Click(object sender, RoutedEventArgs e)
@@ -70,82 +90,163 @@ public sealed partial class UploadGamePage : Page
         StorageFile file = await picker.PickSingleFileAsync();
         if (file != null)
         {
-            ImageTextBox1.Text = file.Path;
+            using (IRandomAccessStream fileStream = await file.OpenAsync(FileAccessMode.Read))
+            {
+                var bitmapImage = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage();
+                await bitmapImage.SetSourceAsync(fileStream);
+
+                // Add the selected image to the GameImages collection
+                var newGameImage = new GameImage(bitmapImage)
+                {
+                    Url = file.Path // Store the image path (URL)
+                };
+
+                ViewModel.GameImages.Add(newGameImage);
+
+                // Open the preview dialog to show the image immediately
+                await OpenImagePreviewDialog(newGameImage);
+            }
         }
     }
     #endregion
 
+    private void RemoveLogoButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.DataContext is GameImage gameImage)
+            ViewModel.GameLogos.Remove(gameImage);
+
+        AddLogoBtn.IsEnabled = true;
+    }
+    private void RemoveImageButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.DataContext is GameImage gameImage)
+        {
+            ViewModel.GameImages.Remove(gameImage);
+        }
+    }
+    private void PreviewImageButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.DataContext is GameImage gameImage)
+        {
+            _ = OpenImagePreviewDialog(gameImage);
+        }
+    }
+    private void ButtonCancel_Click(object sender, RoutedEventArgs e)
+    {
+        Frame.Navigate(typeof(MyGamesPage), new DrillInNavigationTransitionInfo());
+    }
+    private async Task OpenImagePreviewDialog(GameImage gameImage)
+    {
+        var previewDialog = new ContentDialog
+        {
+            Title = "Podgląd zdjęcia",
+            CloseButtonText = "Zamknij",
+            PrimaryButtonText = "Zmień zdjęcie",
+            XamlRoot = this.XamlRoot,
+            Width = 800,
+            Height = 450
+        };
+
+        // StackPanel for dialog layout
+        StackPanel dialogStackPanel = new StackPanel();
+
+        // Image for displaying the preview
+        Image imagePreview = new Image
+        {
+            Width = 800,
+            Height = 450,
+            Stretch = Stretch.Uniform,
+            Margin = new Thickness(5)
+        };
+
+        // Load initial image source asynchronously
+        if (!string.IsNullOrEmpty(gameImage.Url))
+        {
+            try
+            {
+                string username = "sgsclient";
+                string password = "yGnxE-Tykxe-SwjwW-NooLc-xSwPT";
+
+                var uri = new Uri(gameImage.Url, UriKind.RelativeOrAbsolute);
+                if (uri.Scheme == "http" || uri.Scheme == "https")
+                {
+                    using (var client = new HttpClient())
+                    {
+                        var authHeader = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}"));
+                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authHeader);
+
+                        var response = await client.GetAsync(uri);
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var imageStream = await response.Content.ReadAsStreamAsync();
+
+                            Microsoft.UI.Xaml.Media.Imaging.BitmapImage bitmapImage = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage();
+                            await bitmapImage.SetSourceAsync(imageStream.AsRandomAccessStream());
+
+                            imagePreview.Source = bitmapImage;
+                        }
+                        else
+                        {
+                            var bitmapImage = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage();
+                            await bitmapImage.SetSourceAsync(await RandomAccessStreamReference.CreateFromUri(uri).OpenReadAsync());
+                            imagePreview.Source = bitmapImage;
+                        }
+                    }
+                }
+
+                else if (uri.IsFile) // If it's a local file path, use StorageFile
+                {
+                    var file = await StorageFile.GetFileFromPathAsync(gameImage.Url); // Use the local path
+                    using (IRandomAccessStream fileStream = await file.OpenAsync(FileAccessMode.Read))
+                    {
+                        var bitmapImage = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage();
+                        await bitmapImage.SetSourceAsync(fileStream);
+                        imagePreview.Source = bitmapImage;
+                    }
+                }
+            }
+            catch
+            {
+                imagePreview.Source = null; // Handle invalid URIs
+            }
+        }
+
+        dialogStackPanel.Children.Add(imagePreview);
+
+        previewDialog.Content = dialogStackPanel;
+
+        // Define the action for the primary button click (Change Image)
+        previewDialog.PrimaryButtonClick += async (s, e) =>
+        {
+            // Open file picker
+            var picker = new Windows.Storage.Pickers.FileOpenPicker();
+            picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.PicturesLibrary;
+            picker.FileTypeFilter.Add(".jpg");
+            picker.FileTypeFilter.Add(".png");
+            picker.FileTypeFilter.Add(".bmp");
+
+            // Ensure picker works in desktop apps
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+
+            var file = await picker.PickSingleFileAsync();
+            if (file != null)
+            {
+                // Update image preview with the selected file
+                var fileStream = await file.OpenAsync(Windows.Storage.FileAccessMode.Read);
+                var bitmapImage = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage();
+                await bitmapImage.SetSourceAsync(fileStream);
+
+                imagePreview.Source = bitmapImage;
+                gameImage.Url = file.Path; // Update the GameImage URL to reflect the local path
+            }
+        };
+
+        // Show the dialog
+        await previewDialog.ShowAsync();
+    }
+
     #region DDLs
-    private void LoadGameTypes()
-    {
-        List<GameTypeItem> gameTypeList = [];
-
-        try
-        {
-            DataSet ds = db.con.select(@"
-select
-  gt.Id
-, gt.Name
-from sgsGameTypes gt
-");
-
-            if (ds.Tables.Count > 0)
-            {
-                foreach (DataRow dr in ds.Tables[0].Rows)
-                {
-                    int typeId = dr.TryGetValue("Id").ToInt32();
-                    string typeName = dr.TryGetValue("Name").ToString();
-                    KeyValuePair<int, string> pair = new(typeId, typeName);
-                    gameTypeList.Add(new GameTypeItem(typeId, pair));
-                }
-
-                comboBoxGameType.Items.Clear();
-                foreach (var item in gameTypeList)
-                {
-                    comboBoxGameType.Items.Add(item);
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Błąd: {ex.Message}");
-        }
-    }
-    private void LoadGameEngines()
-    {
-        List<GameEngineItem> enginesList = [];
-
-        try
-        {
-            DataSet ds = db.con.select(@"
-select
-  ge.Id
-, ge.Name
-from sgsGameEngines ge");
-
-            if (ds.Tables.Count > 0)
-            {
-                foreach (DataRow dr in ds.Tables[0].Rows)
-                {
-                    int engineId = dr.TryGetValue("Id").ToInt32();
-                    string engineName = dr.TryGetValue("Name").ToString();
-
-                    KeyValuePair<int, string> pair = new(engineId, engineName);
-                    enginesList.Add(new GameEngineItem(engineId, pair));
-                }
-
-                comboBoxGameEngine.Items.Clear();
-                foreach (var item in enginesList)
-                {
-                    comboBoxGameEngine.Items.Add(item);
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Błąd: {ex.Message}");
-        }
-    }
     private void GetSelectedGameTypeKey()
     {
         if (comboBoxGameType.SelectedItem != null)
@@ -177,8 +278,15 @@ from sgsGameEngines ge");
         ViewModel = App.GetService<UploadGameViewModel>();
         ShellViewModel = App.GetService<ShellViewModel>();
         InitializeComponent();
-        LoadGameTypes();
-        LoadGameEngines();
+
+        DataContext = ViewModel;
+    }
+    protected async override void OnNavigatedTo(NavigationEventArgs e)
+    {
+        base.OnNavigatedTo(e);
+
+        await ViewModel.LoadGameTypes();
+        await ViewModel.LoadGameEngines();
     }
 
     private async void ShowMessageDialog(string title, string content)
@@ -197,7 +305,10 @@ from sgsGameEngines ge");
     private async void ButtonAdd_Click(object sender, RoutedEventArgs e)
     {
         string userId = ShellViewModel.GetUserDisplayNameAsync().ToString();
+        await ViewModel.AddGameData(userId);
+        Frame.GoBack(new DrillInNavigationTransitionInfo());
 
+        #region Do przeniesienia do ViewModel 
         if (string.IsNullOrEmpty(gameNameTextBox.Text) ||
             string.IsNullOrEmpty(versionTextBox.Text) ||
             string.IsNullOrEmpty(linkZIPTextBox.Text) ||
@@ -264,16 +375,16 @@ from sgsGameEngines ge");
             return;
         }
 
-        string logoPath = gameLogoTextBox.Text;
-        if (!string.IsNullOrWhiteSpace(logoPath) && Path.IsPathRooted(logoPath))
-        {
-            string ext = Path.GetExtension(logoPath);
-            gameLogoTextBox.Text = await uploader.UploadFileAsync(logoPath, nextcloudGameFolder, $"logo{ext}", userId);
-        }
-        else
-        {
-            gameLogoTextBox.Text = logoPath;
-        }
+        //string logoPath = gameLogoTextBox.Text;
+        //if (!string.IsNullOrWhiteSpace(logoPath) && Path.IsPathRooted(logoPath))
+        //{
+        //    string ext = Path.GetExtension(logoPath);
+        //    gameLogoTextBox.Text = await uploader.UploadFileAsync(logoPath, nextcloudGameFolder, $"logo{ext}", userId);
+        //}
+        //else
+        //{
+        //    gameLogoTextBox.Text = logoPath;
+        //}
 
         int imageIndex = 1;
         foreach (var child in gameGalleryStackPanel.Children)
@@ -356,21 +467,22 @@ select
                 }
             }
             // Logo
-            if (!string.IsNullOrWhiteSpace(gameLogoTextBox.Text))
-            {
-                db.con.exec(@"
-insert sgsGameLogo (GameId, LogoPath)
-select
-  @p0
-, @p1
-", gameId.ToSqlParameter(), gameLogoTextBox.Text.ToSqlParameter());
+            //            if (!string.IsNullOrWhiteSpace(gameLogoTextBox.Text))
+            //            {
+            //                db.con.exec(@"
+            //insert sgsGameLogo (GameId, LogoPath)
+            //select
+            //  @p0
+            //, @p1
+            //", gameId.ToSqlParameter(), gameLogoTextBox.Text.ToSqlParameter());
 
-            }
+            //            }
 
             if (gameId > 0)
                 Frame.Navigate(typeof(MyGamesPage), new DrillInNavigationTransitionInfo());
             else
                 System.Windows.MessageBox.Show("Błąd podczas dodawania gry do bazy danych.");
+            #endregion
         }
         catch (Exception ex)
         {
@@ -379,71 +491,4 @@ select
 
     }
 
-    private int additionalImageCount = 1;
-    private async void AddImageButton_Click(object sender, RoutedEventArgs e)
-    {
-        var picker = new FileOpenPicker();
-        picker.ViewMode = PickerViewMode.Thumbnail;
-        picker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
-        picker.FileTypeFilter.Add(".jpg");
-        picker.FileTypeFilter.Add(".jpeg");
-        picker.FileTypeFilter.Add(".png");
-        picker.FileTypeFilter.Add(".bmp");
-
-        var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
-        WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
-        //WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
-
-        StorageFile file = await picker.PickSingleFileAsync();
-
-        if (file == null)
-            return;
-
-        StackPanel imageTextBoxPanel = new StackPanel();
-        imageTextBoxPanel.Orientation = Orientation.Horizontal;
-
-        TextBox newImageTextBox = new TextBox();
-        newImageTextBox.Name = "ImageTextBox" + (additionalImageCount + 1);
-        newImageTextBox.Margin = new Thickness(5);
-        newImageTextBox.Width = 400;
-        newImageTextBox.TextWrapping = TextWrapping.Wrap;
-        newImageTextBox.Text = file.Path;
-
-        #region Przycisk "Usuń"
-        Button removeButton = new Button();
-        removeButton.Margin = new Thickness(5);
-        removeButton.Click += RemoveImageButton_Click;
-
-        var removeButtonFontIcon = new FontIcon();
-        removeButtonFontIcon.Glyph = "\xE74D";
-        removeButton.Content = removeButtonFontIcon;
-
-        ToolTip removeToolTip = new ToolTip();
-        removeToolTip.Content = "Usuń";
-        ToolTipService.SetToolTip(removeButton, removeToolTip);
-        #endregion
-
-        imageTextBoxPanel.Children.Add(newImageTextBox);
-        imageTextBoxPanel.Children.Add(removeButton);
-
-        gameGalleryStackPanel.Children.Insert(gameGalleryStackPanel.Children.Count - 1, imageTextBoxPanel);
-
-        additionalImageCount++;
-
-        if (additionalImageCount >= 10)
-        {
-            AddImageButton.Visibility = Visibility.Collapsed;
-        }
-    }
-    private void RemoveImageButton_Click(object sender, RoutedEventArgs e)
-    {
-        Button removeButton = sender as Button;
-        StackPanel parentPanel = removeButton.Parent as StackPanel;
-
-        gameGalleryStackPanel.Children.Remove(parentPanel);
-    }
-    private void ButtonCancel_Click(object sender, RoutedEventArgs e)
-    {
-        Frame.Navigate(typeof(MyGamesPage), new DrillInNavigationTransitionInfo());
-    }
 }
