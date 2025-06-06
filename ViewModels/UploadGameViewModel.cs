@@ -15,8 +15,20 @@ namespace SGSClient.ViewModels;
 
 public partial class UploadGameViewModel : ObservableRecipient
 {
-    public ObservableCollection<GameTypeItem> GameTypes { get; set; } = new ObservableCollection<GameTypeItem>();
-    public ObservableCollection<GameEngineItem> GameEngines { get; set; } = new ObservableCollection<GameEngineItem>();
+    private StorageFile _zipFile;
+    public StorageFile ZipFile
+    {
+        get => _zipFile;
+        set
+        {
+            _zipFile = value;
+            OnPropertyChanged();
+        }
+    }
+    public string NextcloudUsername { get; set; } = "sgsclient";
+    public string NextcloudPassword { get; set; } = "yGnxE-Tykxe-SwjwW-NooLc-xSwPT";
+    public ObservableCollection<GameTypeItem> GameTypes { get; set; } = [];
+    public ObservableCollection<GameEngineItem> GameEngines { get; set; } = [];
 
     [ObservableProperty]
     public string gameName;
@@ -53,6 +65,7 @@ public partial class UploadGameViewModel : ObservableRecipient
 
     public int SelectedGameTypeId => SelectedGameType?.Id ?? 0;
     public int SelectedGameEngineId => SelectedGameEngine?.Id ?? 0;
+    public string GameLogoUrl { get; set; }
 
     #region Logo
     private ObservableCollection<GameImage> _gameLogos;
@@ -162,15 +175,15 @@ from sgsGameEngines ge
             Console.WriteLine($"Error: {ex.Message}");
         }
     }
-    public async Task AddGameData(string userId)
+    public async Task<bool> AddGameData(string userId)
     {
         if (string.IsNullOrEmpty(GameName) ||
-    string.IsNullOrEmpty(CurrentVersion) ||
-    string.IsNullOrEmpty(ZipLink) ||
-    string.IsNullOrEmpty(ExeName) ||
-    string.IsNullOrEmpty(GameDescription))
+            string.IsNullOrEmpty(CurrentVersion) ||
+            (ZipFile == null && string.IsNullOrEmpty(ZipLink)) ||
+            string.IsNullOrEmpty(ExeName) ||
+            string.IsNullOrEmpty(GameDescription))
         {
-            return;
+            return false;
         }
 
         string pattern = @"^\d+\.\d+\.\d+$";
@@ -178,16 +191,58 @@ from sgsGameEngines ge
         if (!isMatch)
         {
             ShowMessageDialog("Błąd", "Wprowadzono wersję w niepoprawnym formacie.\nUpewnij się, że format wersji wygląda następująco: x.x.x");
-            return;
+            return false;
         }
 
-        string gameDescriptionParam = string.Join(Environment.NewLine, GameDescription.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
-        string hardwareRequirementsParam = string.Join(Environment.NewLine, HardwareRequirements.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
-        string otherInfoParam = string.Join(Environment.NewLine, OtherInfo.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
+        string gameDescriptionParam = string.Join(Environment.NewLine, GameDescription.Split(["\r\n", "\n", "\r"], StringSplitOptions.None));
+        string hardwareRequirementsParam = string.Join(Environment.NewLine, HardwareRequirements.Split(["\r\n", "\n", "\r"], StringSplitOptions.None));
+        string otherInfoParam = string.Join(Environment.NewLine, OtherInfo.Split(["\r\n", "\n", "\r"], StringSplitOptions.None));
+
+        var uploader = new NextcloudUploader("https://cloud.m455yn.dev/", NextcloudUsername, NextcloudPassword);
+        string nextcloudFolder = GameName;
+
+        #region ZIP File Upload
+        if (ZipFile != null)
+        {
+            string zipName = Guid.NewGuid() + ".zip";
+            ZipLink = await uploader.UploadFileAsync(ZipFile.Path, nextcloudFolder, zipName);
+        }
+        else if (Path.IsPathRooted(ZipLink))
+        {
+            ZipLink = await uploader.UploadFileAsync(ZipLink, nextcloudFolder, Guid.NewGuid() + ".zip");
+        }
+        #endregion
+
+        #region GameLogo File Upload
+        if (GameLogos.FirstOrDefault() is GameImage logoImage && Path.IsPathRooted(logoImage.Url))
+        {
+            string ext = Path.GetExtension(logoImage.Url);
+            GameLogoUrl = await uploader.UploadFileAsync(logoImage.Url, nextcloudFolder, $"logo{ext}", userId);
+        }
+        #endregion
+
+        #region GameScreenshots Files Upload
+        List<string> uploadedGalleryUrls = new();
+        int index = 1;
+        foreach (var path in GameImages)
+        {
+            if (string.IsNullOrWhiteSpace(path.Url)) continue;
+
+            if (Path.IsPathRooted(path.Url))
+            {
+                string ext = Path.GetExtension(path.Url);
+                string uploadedUrl = await uploader.UploadFileAsync(path.Url, nextcloudFolder, $"zrzutEkranu_{index++}{ext}", userId);
+                if (uploadedUrl != null)
+                    uploadedGalleryUrls.Add(uploadedUrl);
+            }
+            else
+            {
+                uploadedGalleryUrls.Add(path.Url);
+            }
+        }
+        #endregion
 
         SqlCommand cmd = new(@"
-declare @developerId int = (select r.DeveloperId from Registration r where r.UserId = @userId)
-
 insert sgsGames (UserId, Title, PayloadName, ExeName, ZipLink, VersionLink, CurrentVersion, Description, HardwareRequirements, OtherInformation, Symbol, EngineId, TypeId, DraftP)
 select 
   @userId
@@ -223,18 +278,25 @@ select
 
         int gameId = Convert.ToInt32(db.scalarSQL(cmd));
 
-        await UpdateGameLogo(gameId);
-        await UpdateGameImages(gameId);
-    }
-    private async Task UpdateGameLogo(int gameId)
-    {
+        foreach (var url in uploadedGalleryUrls)
+        {
+            db.con.exec(@"
+insert sgsGameImages (GameId, ImagePath)
+select @p0, @p1
+", gameId.ToSqlParameter(), url.ToSqlParameter());
+        }
 
-    }
-    private async Task UpdateGameImages(int gameId)
-    {
+        if (!string.IsNullOrWhiteSpace(GameLogoUrl))
+        {
+            db.con.exec(@"
+insert sgsGameLogo (GameId, LogoPath)
+select @p0, @p1
+", gameId.ToSqlParameter(), GameLogoUrl.ToSqlParameter());
+        }
 
+        return gameId > 0;
     }
-    private async void ShowMessageDialog(string title, string content)
+    private static async void ShowMessageDialog(string title, string content)
     {
         ContentDialog messageDialog = new ContentDialog
         {
