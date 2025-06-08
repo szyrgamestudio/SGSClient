@@ -26,10 +26,10 @@ namespace SGSClient.Views
         protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            if (e.Parameter is string gameIdParam && int.TryParse(gameIdParam, out int parsedGameId))
+            if (e.Parameter is int parsedGameId)
             {
                 gameId = parsedGameId;
-                GameId = gameIdParam;
+                GameId = parsedGameId.ToString();
 
                 await ViewModel.LoadGameTypes();
                 await ViewModel.LoadGameEngines();

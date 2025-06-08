@@ -33,7 +33,7 @@ public sealed partial class GameBasePage : Page
         DataContext = ViewModel;
 
         if (e.Parameter is string gameSymbol && !string.IsNullOrWhiteSpace(gameSymbol))
-            ViewModel.InitializeGame(gameSymbol);
+            ViewModel.LoadGameData(gameSymbol);
     }
     public GameBasePage()
     {

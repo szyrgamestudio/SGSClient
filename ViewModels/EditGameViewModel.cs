@@ -18,8 +18,21 @@ namespace SGSClient.ViewModels;
 
 public partial class EditGameViewModel : ObservableRecipient
 {
-    public ObservableCollection<GameTypeItem> GameTypes { get; set; } = new ObservableCollection<GameTypeItem>();
-    public ObservableCollection<GameEngineItem> GameEngines { get; set; } = new ObservableCollection<GameEngineItem>();
+    private StorageFile _zipFile;
+    public StorageFile ZipFile
+    {
+        get => _zipFile;
+        set
+        {
+            _zipFile = value;
+            OnPropertyChanged();
+        }
+    }
+    public string NextcloudUsername { get; set; } = "sgsclient";
+    public string NextcloudPassword { get; set; } = "yGnxE-Tykxe-SwjwW-NooLc-xSwPT";
+
+    public ObservableCollection<GameTypeItem> GameTypes { get; set; } = [];
+    public ObservableCollection<GameEngineItem> GameEngines { get; set; } = [];
 
     [ObservableProperty]
     public string gameName;
@@ -56,6 +69,7 @@ public partial class EditGameViewModel : ObservableRecipient
 
     public int SelectedGameTypeId => SelectedGameType?.Id ?? 0;
     public int SelectedGameEngineId => SelectedGameEngine?.Id ?? 0;
+    public string GameLogoUrl { get; set; }
 
     #region Logo
     private ObservableCollection<GameImage> _gameLogos;
@@ -102,127 +116,28 @@ public partial class EditGameViewModel : ObservableRecipient
 
     public EditGameViewModel()
     {
-        GameLogos = new ObservableCollection<GameImage>();
-        GameImages = new ObservableCollection<GameImage>();
+        GameLogos = [];
+        GameImages = [];
     }
 
-
-    public async Task LoadGameData(int gameId)
-    {
-        var gameData = db.con.select(SqlQueries.gameInfoSQL, gameId);
-        if (gameData.Tables[0].Rows.Count > 0)
-        {
-            var row = gameData.Tables[0].Rows[0];
-
-            GameName = row.IsNull("Title") ? string.Empty : row["Title"].ToString();
-            Symbol = row.IsNull("Symbol") ? string.Empty : row["Symbol"].ToString();
-            CurrentVersion = row.IsNull("CurrentVersion") ? string.Empty : row["CurrentVersion"].ToString();
-            ZipLink = row.IsNull("ZipLink") ? string.Empty : row["ZipLink"].ToString();
-            ExeName = row.IsNull("ExeName") ? string.Empty : row["ExeName"].ToString();
-            GameDescription = row.IsNull("Description") ? string.Empty : row["Description"].ToString();
-            HardwareRequirements = row.IsNull("HardwareRequirements") ? string.Empty : row["HardwareRequirements"].ToString();
-            OtherInfo = row.IsNull("OtherInformation") ? string.Empty : row["OtherInformation"].ToString();
-
-            int gameTypeId = Convert.ToInt32(row["TypeId"]);
-            int gameEngineId = row["EngineId"] != DBNull.Value ? Convert.ToInt32(row["EngineId"]) : -1;
-
-            SelectedGameType = GameTypes.FirstOrDefault(g => g.Id == gameTypeId);
-            SelectedGameEngine = GameEngines.FirstOrDefault(g => g.Id == gameEngineId);
-
-            var logoData = db.con.select(SqlQueries.gameLogoSQL, gameId);
-            var imagesData = db.con.select(SqlQueries.gameImagesByIdSQL, gameId);
-
-            GameLogos.Clear();
-            foreach (DataRow logoRow in logoData.Tables[0].Rows)
-            {
-                string imageUrl = logoRow["LogoPath"].ToString();
-
-                string username = "sgsclient";
-                string password = "yGnxE-Tykxe-SwjwW-NooLc-xSwPT";
-
-                await LoadLogoFromNextcloud(logoRow, username, password);
-            }
-
-            GameImages.Clear();
-            foreach (DataRow imageRow in imagesData.Tables[0].Rows)
-            {
-                string imageUrl = imageRow["ImagePath"].ToString();
-
-                string username = "sgsclient";
-                string password = "yGnxE-Tykxe-SwjwW-NooLc-xSwPT";
-
-                await LoadImageFromNextcloud(imageRow, username, password);
-            }
-
-        }
-    }
-
-    public async Task LoadLogoFromNextcloud(DataRow imageRow, string username, string password)
-    {
-        string imageUrl = imageRow["LogoPath"].ToString();
-
-        using (var client = new HttpClient())
-        {
-            var authHeader = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}"));
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authHeader);
-
-            var response = await client.GetAsync(imageUrl);
-            if (response.IsSuccessStatusCode)
-            {
-                var imageStream = await response.Content.ReadAsStreamAsync();
-                BitmapImage bitmapImage = new BitmapImage();
-                await bitmapImage.SetSourceAsync(imageStream.AsRandomAccessStream());
-
-                GameLogos.Add(new GameImage(imageUrl, bitmapImage));
-            }
-            else
-            {
-                GameLogos.Add(new GameImage(imageUrl));
-            }
-        }
-
-        IsAddLogoBtnEnabled = !GameLogos.Any();
-
-    }
-    public async Task LoadImageFromNextcloud(DataRow imageRow, string username, string password)
-    {
-        string imageUrl = imageRow["ImagePath"].ToString();
-
-        using (var client = new HttpClient())
-        {
-            var authHeader = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}"));
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authHeader);
-
-            var response = await client.GetAsync(imageUrl);
-            if (response.IsSuccessStatusCode)
-            {
-                var imageStream = await response.Content.ReadAsStreamAsync();
-                BitmapImage bitmapImage = new BitmapImage();
-                await bitmapImage.SetSourceAsync(imageStream.AsRandomAccessStream());
-
-                GameImages.Add(new GameImage(imageUrl, bitmapImage));
-            }
-            else
-            {
-                GameImages.Add(new GameImage(imageUrl));
-            }
-        }
-    }
-
-
-    public async Task LoadGameTypes()
+    public Task LoadGameTypes()
     {
         try
         {
-            var dataSet = db.con.select(SqlQueries.gameTypesSQL);
-            if (dataSet.Tables.Count > 0)
+            DataSet ds = db.con.select(@"
+select
+  gt.Id
+, gt.Name
+from sgsGameTypes gt
+");
+            if (ds.Tables.Count > 0)
             {
-                GameTypes.Clear(); // Wyczyść istniejące elementy
+                GameTypes.Clear();
 
-                foreach (DataRow row in dataSet.Tables[0].Rows)
+                foreach (DataRow dr in ds.Tables[0].Rows)
                 {
-                    int typeId = Convert.ToInt32(row["Id"]);
-                    string typeName = row["Name"].ToString();
+                    int typeId = dr.TryGetValue("Id");
+                    string typeName = dr.TryGetValue("Name");
                     var pair = new KeyValuePair<int, string>(typeId, typeName);
                     GameTypes.Add(new GameTypeItem(typeId, pair));
                 }
@@ -233,20 +148,28 @@ public partial class EditGameViewModel : ObservableRecipient
         {
             Console.WriteLine($"Error: {ex.Message}");
         }
+
+        return Task.CompletedTask;
     }
-    public async Task LoadGameEngines()
+    public Task LoadGameEngines()
     {
         try
         {
-            var dataSet = db.con.select(SqlQueries.gameEnginesSQL);
-            if (dataSet.Tables.Count > 0)
+            DataSet ds = db.con.select(@"
+select
+  ge.Id
+, ge.Name
+from sgsGameEngines ge
+");
+            if (ds.Tables.Count > 0)
             {
                 GameEngines.Clear();
 
-                foreach (DataRow row in dataSet.Tables[0].Rows)
+                foreach (DataRow dr in ds.Tables[0].Rows)
                 {
-                    int engineId = Convert.ToInt32(row["Id"]);
-                    string engineName = row["Name"].ToString();
+                    int engineId = dr.TryGetValue("Id");
+                    string engineName = dr.TryGetValue("Name");
+
                     var pair = new KeyValuePair<int, string>(engineId, engineName);
                     GameEngines.Add(new GameEngineItem(engineId, pair));
                 }
@@ -257,7 +180,72 @@ public partial class EditGameViewModel : ObservableRecipient
         {
             Console.WriteLine($"Error: {ex.Message}");
         }
+
+        return Task.CompletedTask;
     }
+    public async Task LoadGameData(int gameId)
+    {
+        DataSet ds = db.con.select(@"
+select
+  g.Title
+, g.Symbol
+, g.CurrentVersion
+, g.ZipLink
+, g.ExeName
+, g.Description
+, g.HardwareRequirements
+, g.OtherInformation
+, g.TypeId
+, g.EngineId
+from sgsGames g
+where g.Id = @p0
+", gameId);
+        if (ds.Tables[0].Rows.Count > 0)
+        {
+            DataRow dr = ds.Tables[0].Rows[0];
+
+            GameName = dr.TryGetValue("Title");
+            Symbol = dr.TryGetValue("Symbol");
+            CurrentVersion = dr.TryGetValue("CurrentVersion");
+            ZipLink = dr.TryGetValue("ZipLink");
+            ExeName = dr.TryGetValue("ExeName");
+            GameDescription = dr.TryGetValue("Description");
+            HardwareRequirements = dr.TryGetValue("HardwareRequirements");
+            OtherInfo = dr.TryGetValue("OtherInformation");
+
+            int gameTypeId = Convert.ToInt32(dr.TryGetValue("TypeId"));
+            int gameEngineId = Convert.ToInt32(dr.TryGetValue("EngineId"));
+
+            SelectedGameType = GameTypes.FirstOrDefault(g => g.Id == gameTypeId);
+            SelectedGameEngine = GameEngines.FirstOrDefault(g => g.Id == gameEngineId);
+
+            DataSet logoData = db.con.select(@"
+select
+  l.LogoPath
+from sgsGameLogo l
+where l.GameId = @p0
+", gameId);
+            DataSet imagesData = db.con.select(SqlQueries.gameImagesByIdSQL, gameId);
+
+            GameLogos.Clear();
+            foreach (DataRow dr0 in logoData.Tables[0].Rows)
+            {
+                string imageUrl = dr0.TryGetValue("LogoPath").ToString();
+
+                await LoadLogoFromNextcloud(dr0, NextcloudUsername, NextcloudPassword);
+            }
+
+            GameImages.Clear();
+            foreach (DataRow dr1 in imagesData.Tables[0].Rows)
+            {
+                string imageUrl = dr1.TryGetValue("ImagePath").ToString();
+
+                await LoadImageFromNextcloud(dr1, NextcloudUsername, NextcloudPassword);
+            }
+
+        }
+    }
+
     public async Task SaveGameData(int gameId)
     {
         if (string.IsNullOrEmpty(GameName) ||
@@ -342,17 +330,68 @@ public partial class EditGameViewModel : ObservableRecipient
         }
     }
 
-    private async void ShowMessageDialog(string title, string content)
+    #region Helper Methods
+    private static async void ShowMessageDialog(string title, string content)
     {
         ContentDialog messageDialog = new ContentDialog
         {
             Title = title,
             Content = content,
             PrimaryButtonText = "OK",
-            //CloseButtonText = "Anuluj",
-            //XamlRoot = this.Content.XamlRoot //FIXME
         };
 
         ContentDialogResult result = await messageDialog.ShowAsync();
     }
+    public async Task LoadLogoFromNextcloud(DataRow imageRow, string username, string password)
+    {
+        string imageUrl = imageRow["LogoPath"].ToString();
+
+        using (var client = new HttpClient())
+        {
+            var authHeader = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}"));
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authHeader);
+
+            var response = await client.GetAsync(imageUrl);
+            if (response.IsSuccessStatusCode)
+            {
+                var imageStream = await response.Content.ReadAsStreamAsync();
+                BitmapImage bitmapImage = new BitmapImage();
+                await bitmapImage.SetSourceAsync(imageStream.AsRandomAccessStream());
+
+                GameLogos.Add(new GameImage(imageUrl, bitmapImage));
+            }
+            else
+            {
+                GameLogos.Add(new GameImage(imageUrl));
+            }
+        }
+
+        IsAddLogoBtnEnabled = !GameLogos.Any();
+
+    }
+    public async Task LoadImageFromNextcloud(DataRow imageRow, string username, string password)
+    {
+        string imageUrl = imageRow["ImagePath"].ToString();
+
+        using (var client = new HttpClient())
+        {
+            var authHeader = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}"));
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authHeader);
+
+            var response = await client.GetAsync(imageUrl);
+            if (response.IsSuccessStatusCode)
+            {
+                var imageStream = await response.Content.ReadAsStreamAsync();
+                BitmapImage bitmapImage = new BitmapImage();
+                await bitmapImage.SetSourceAsync(imageStream.AsRandomAccessStream());
+
+                GameImages.Add(new GameImage(imageUrl, bitmapImage));
+            }
+            else
+            {
+                GameImages.Add(new GameImage(imageUrl));
+            }
+        }
+    }
+    #endregion
 }

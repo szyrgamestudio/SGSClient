@@ -112,11 +112,11 @@ public partial class UploadGameViewModel : ObservableRecipient
 
     public UploadGameViewModel()
     {
-        GameLogos = new ObservableCollection<GameImage>();
-        GameImages = new ObservableCollection<GameImage>();
+        GameLogos = [];
+        GameImages = [];
     }
 
-    public async Task LoadGameTypes()
+    public Task LoadGameTypes()
     {
         try
         {
@@ -144,8 +144,10 @@ from sgsGameTypes gt
         {
             Console.WriteLine($"Error: {ex.Message}");
         }
+
+        return Task.CompletedTask;
     }
-    public async Task LoadGameEngines()
+    public Task LoadGameEngines()
     {
         try
         {
@@ -174,6 +176,8 @@ from sgsGameEngines ge
         {
             Console.WriteLine($"Error: {ex.Message}");
         }
+
+        return Task.CompletedTask;
     }
     public async Task<bool> AddGameData(string userId)
     {

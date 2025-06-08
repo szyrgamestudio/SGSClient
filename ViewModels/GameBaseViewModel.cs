@@ -1,8 +1,5 @@
-﻿using System.Collections.ObjectModel;
-using System.Data;
-using System.Diagnostics;
-using System.Windows.Media.Imaging;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.UI.Xaml.Media.Imaging;
 using SGSClient.Core.Authorization;
 using SGSClient.Core.Database;
 using SGSClient.Core.Extensions;
@@ -11,6 +8,11 @@ using SGSClient.DataAccess.Repositories;
 using SGSClient.Models;
 using SGSClient.Views;
 using SQLite;
+using System.Collections.ObjectModel;
+using System.Data;
+using System.Diagnostics;
+using System.Net.Http.Headers;
+using System.Text;
 using Windows.ApplicationModel.Core;
 using Windows.Storage;
 using Windows.Storage.AccessCache;
@@ -19,6 +21,9 @@ namespace SGSClient.ViewModels
 {
     public partial class GameBaseViewModel : ObservableRecipient
     {
+        public string NextcloudUsername { get; set; } = "sgsclient";
+        public string NextcloudPassword { get; set; } = "yGnxE-Tykxe-SwjwW-NooLc-xSwPT";
+
         private string? rootPath;
         private string? gamepath;
         private int? gameId;
@@ -32,9 +37,145 @@ namespace SGSClient.ViewModels
         private readonly HttpClient httpClient = new();
         private static readonly string DatabasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "local_game_data.db");
 
+        #region Logo
+        private GameImage _gameLogo;
+        public GameImage GameLogo
+        {
+            get => _gameLogo;
+            set
+            {
+                _gameLogo = value;
+                OnPropertyChanged(nameof(GameLogo));
+            }
+        }
+        public ObservableCollection<GameImage> GameLogos { get; set; } = new();
 
-        public ObservableCollection<BitmapImage> GameImages { get; } = new();
-        public string? GameLogo { get; private set; }
+        #endregion
+
+        #region Images gallery
+        private ObservableCollection<GameImage> _gameImages;
+        public ObservableCollection<GameImage> GameImages
+        {
+            get => _gameImages;
+            set
+            {
+                _gameImages = value;
+                OnPropertyChanged(nameof(GameImages));
+            }
+        }
+        public ObservableCollection<string> GameImagePaths { get; set; } = new ObservableCollection<string>();
+        #endregion
+
+        public GameBaseViewModel(IAppUser appUser)
+        {
+            ratingCount = 0;
+            avgRating = "5.0";
+            count1 = 0;
+            count2 = 0;
+            count3 = 0;
+            count4 = 0;
+            count5 = 0;
+
+            _allRatings = new ObservableCollection<GameRating>();
+
+            Ratings = new ObservableCollection<GameRating>();
+            CurrentPage = 0;
+            _appUser = appUser;
+
+            GameLogos = [];
+            GameImages = [];
+        }
+        public async Task LoadGameData(string gameSymbol)
+        {
+            DataSet ds = db.con.select(@"
+select
+  g.Id       [GameId]
+, g.Title
+, g.Symbol   [GameSymbol]
+, d.Name     [GameDeveloper]
+, l.LogoPath [LogoPath]
+, t.Name	 [GameType]
+, g.PayloadName
+, g.ExeName
+, g.ZipLink
+, g.VersionLink
+, g.Description
+, g.HardwareRequirements
+, g.OtherInformation
+, g.DraftP
+, g.CurrentVersion
+from sgsGames g
+inner join sgsDevelopers d on d.Id = g.DeveloperId
+left join sgsGameLogo l on l.GameId = g.Id
+left join sgsGameTypes t on t.Id = g.TypeId
+where g.Symbol = @p0
+order by g.Title
+", gameSymbol);
+
+            if (ds.Tables[0].Rows.Count > 0)
+            {
+                DataRow dr = ds.Tables[0].Rows[0];
+
+                gameId = dr.TryGetValue("GameId");
+                gameZip = dr.TryGetValue("ZipLink");
+                gameExe = dr.TryGetValue("ExeName");
+                gameName = dr.TryGetValue("Title");
+                gameIdentifier = dr.TryGetValue("GameSymbol");
+                gameZipLink = dr.TryGetValue("ZipLink");
+                gameVersion = dr.TryGetValue("CurrentVersion") ?? "0.0.0"; // Default version if not found
+
+                LoadRatings(gameSymbol ?? "");
+                LoadGameRatingsStats(gameSymbol ?? "");
+
+                GameName = dr.TryGetValue("Title") ?? "Brak dostępnych informacji.";
+                GameDeveloper = dr.TryGetValue("GameDeveloper") ?? "Brak dostępnych informacji.";
+                GameDescription = dr.TryGetValue("Description") ?? "Brak dostępnych informacji.";
+                HardwareRequirements = dr.TryGetValue("HardwareRequirements") ?? "Brak dostępnych informacji.";
+                OtherInformations = dr.TryGetValue("OtherInformation");
+                IsOtherInformationsVisible = !String.IsNullOrEmpty(dr.TryGetValue("OtherInformation"));
+                IsHardwareRequirementsVisible = !String.IsNullOrEmpty(dr.TryGetValue("HardwareRequirements"));
+
+                DataSet logoData = db.con.select(@"
+select
+  l.LogoPath
+from sgsGameLogo l
+inner join sgsGames g on g.Id = l.GameId
+where g.Symbol = @p0
+", gameSymbol);
+                DataSet imagesData = db.con.select(@"
+select
+  i.ImagePath
+from sgsGameImages i
+inner join sgsGames g on g.Id = i.GameId
+where g.Symbol = @p0
+", gameSymbol);
+
+                GameLogos.Clear();
+                foreach (DataRow dr0 in logoData.Tables[0].Rows)
+                {
+                    await LoadLogoFromNextcloud(dr0, NextcloudUsername, NextcloudPassword);
+                }
+
+                GameImages.Clear();
+                foreach (DataRow dr1 in imagesData.Tables[0].Rows)
+                {
+                    await LoadImageFromNextcloud(dr1, NextcloudUsername, NextcloudPassword);
+                }
+
+                OnPropertyChanged(nameof(GameName));
+                OnPropertyChanged(nameof(GameDeveloper));
+                OnPropertyChanged(nameof(GameDescription));
+                OnPropertyChanged(nameof(HardwareRequirements));
+                OnPropertyChanged(nameof(OtherInformations));
+                OnPropertyChanged(nameof(IsOtherInformationsVisible));
+                OnPropertyChanged(nameof(IsHardwareRequirementsVisible));
+            }
+        }
+
+
+
+
+
         public string? GameName { get; private set; }
         public string? GameDeveloper { get; private set; }
         public string? GameDescription { get; private set; }
@@ -43,45 +184,9 @@ namespace SGSClient.ViewModels
         public bool IsOtherInformationsVisible { get; private set; }
         public bool IsHardwareRequirementsVisible { get; private set; }
 
-        public void InitializeGame(string gameSymbol)
-        {
-            var gamesData = GamesRepository.FetchGames(true);
-            var gameData = gamesData.FirstOrDefault(g => g.GameSymbol == gameSymbol);
-
-            if (gameData != null)
-            {
-                gameId = gameData.GameId;
-                gameZip = gameData.GameZipLink;
-                gameExe = gameData.GameExeName;
-                gameName = gameData.GameName;
-                gameIdentifier = gameData.GameSymbol;
-                gameZipLink = gameData.GameZipLink;
-                gameVersion = db.con.scalar(@"
-select
-  g.CurrentVersion
-from sgsGames g
-where g.Id = @p0
-", gameId);
-
-                LoadRatings(gameData.GameSymbol ?? "");
-                LoadGameRatingsStats(gameData.GameSymbol ?? "");
-                LoadImagesFromDatabase(gameData.GameSymbol ?? "");
-                LoadLogoFromDatabase(gameData.GameSymbol ?? "");
-
-                UpdateUI(gameData);
-            }
-
-
-            //string rootPath = ApplicationData.Current.LocalFolder.Path;
-            //gamepath = Path.Combine(rootPath, gameIdentifier ?? "DefaultGame");
-
-            ////versionFile = Path.Combine(rootPath, "versions.xml");
-            //gameZip = Path.Combine(rootPath, $"{gameIdentifier}ARCHIVE");
-            //gameExe = Path.Combine(rootPath, gameIdentifier ?? "", $"{gameExe}.exe");
-        }
         public async Task DownloadGame(ShellPage shellPage)
         {
-            if (!string.IsNullOrEmpty(gameName) && !string.IsNullOrEmpty(gameZipLink) && !string.IsNullOrEmpty(GameLogo) && !string.IsNullOrEmpty(gameExe))
+            if (!string.IsNullOrEmpty(gameName) && !string.IsNullOrEmpty(gameZipLink) && !string.IsNullOrEmpty(GameLogo.Url) && !string.IsNullOrEmpty(gameExe))
             {
                 StorageFolder? folder = null;
                 if (StorageApplicationPermissions.FutureAccessList.ContainsItem("GameInstallFolder"))
@@ -91,7 +196,7 @@ where g.Id = @p0
 
                 if (folder != null)
                 {
-                    shellPage?.AddDownload(gameName, gameZipLink, folder, GameLogo);
+                    shellPage?.AddDownload(gameName, gameZipLink, folder, GameLogo.Url);
                     await SetLocalVersion(gameName, gameVersion, gameExe, folder.Path);
                 }
                 else
@@ -206,72 +311,58 @@ where g.Id = @p0
         }
 
         #region UI
-        private void UpdateUI(Game game)
+        public async Task LoadLogoFromNextcloud(DataRow imageRow, string username, string password)
         {
-            GameName = game.GameName ?? "Brak dostępnych informacji.";
-            GameDeveloper = game.GameDeveloper ?? "Brak dostępnych informacji.";
-            GameDescription = game.GameDescription ?? "Brak dostępnych informacji.";
-            HardwareRequirements = game.HardwareRequirements ?? "Brak dostępnych informacji.";
-            OtherInformations = string.IsNullOrWhiteSpace(game.OtherInformations) ? null : game.OtherInformations;
-            IsOtherInformationsVisible = !string.IsNullOrWhiteSpace(game.OtherInformations);
-            IsHardwareRequirementsVisible = !string.IsNullOrWhiteSpace(game.HardwareRequirements);
+            string imageUrl = imageRow["LogoPath"].ToString();
 
-            OnPropertyChanged(nameof(GameName));
-            OnPropertyChanged(nameof(GameDeveloper));
-            OnPropertyChanged(nameof(GameDescription));
-            OnPropertyChanged(nameof(HardwareRequirements));
-            OnPropertyChanged(nameof(OtherInformations));
-            OnPropertyChanged(nameof(IsOtherInformationsVisible));
-            OnPropertyChanged(nameof(IsHardwareRequirementsVisible));
-        }
-        public static List<string> LoadGalleryImagesFromDatabase(string gameSymbol)
-        {
-            List<string> galleryImages = [];
-            var ds = db.con.select(@"
-select
-  i.ImagePath
-from sgsGameImages i
-inner join sgsGames g on g.Id = i.GameId
-where g.Symbol = @p0
-", gameSymbol);
-            foreach (DataRow dr in ds.Tables[0].Rows)
-                galleryImages.Add(dr.TryGetValue("ImagePath").ToString());
-
-            return galleryImages;
-        }
-        public void LoadImagesFromDatabase(string gameSymbol)
-        {
-            GameImages.Clear();
-            var gameImages = LoadGalleryImagesFromDatabase(gameSymbol);
-
-            if (gameImages == null || gameImages.Count == 0)
+            using (var client = new HttpClient())
             {
-                Debug.WriteLine("Brak obrazów galerii w bazie danych dla tej gry.");
-                return;
-            }
+                var authHeader = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}"));
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authHeader);
 
-            foreach (var imagePath in gameImages)
-            {
-                try
+                var response = await client.GetAsync(imageUrl);
+                if (response.IsSuccessStatusCode)
                 {
-                    Uri imageUri = new Uri(imagePath);
-                    GameImages.Add(new BitmapImage(imageUri));
+                    var imageStream = await response.Content.ReadAsStreamAsync();
+                    BitmapImage bitmapImage = new BitmapImage();
+                    await bitmapImage.SetSourceAsync(imageStream.AsRandomAccessStream());
+
+                    GameImage gameImage = new GameImage(imageUrl, bitmapImage);
+                    GameLogo = gameImage;
+                    GameLogos.Add(gameImage);
                 }
-                catch (Exception ex)
+                else
                 {
-                    Debug.WriteLine("Błąd wczytywania obrazu: " + ex.Message);
+                    GameImage gameImage = new GameImage(imageUrl);
+                    GameLogos.Add(gameImage);
+                    GameLogo = gameImage;
                 }
             }
 
-            OnPropertyChanged(nameof(GameImages));
         }
-        public void LoadLogoFromDatabase(string gameSymbol)
+        public async Task LoadImageFromNextcloud(DataRow imageRow, string username, string password)
         {
-            var games = GamesRepository.FetchGames(true);
-            var gameData = games.FirstOrDefault(g => g.GameSymbol == gameSymbol);
+            string imageUrl = imageRow["ImagePath"].ToString();
 
-            GameLogo = gameData?.LogoPath ?? "ms-appx:///Assets/placeholder.png";
-            OnPropertyChanged(nameof(GameLogo));
+            using (var client = new HttpClient())
+            {
+                var authHeader = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}"));
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authHeader);
+
+                var response = await client.GetAsync(imageUrl);
+                if (response.IsSuccessStatusCode)
+                {
+                    var imageStream = await response.Content.ReadAsStreamAsync();
+                    BitmapImage bitmapImage = new BitmapImage();
+                    await bitmapImage.SetSourceAsync(imageStream.AsRandomAccessStream());
+
+                    GameImages.Add(new GameImage(imageUrl, bitmapImage));
+                }
+                else
+                {
+                    GameImages.Add(new GameImage(imageUrl));
+                }
+            }
         }
         #endregion
 
@@ -378,22 +469,6 @@ select
         [ObservableProperty]
         private int count5;
 
-        public GameBaseViewModel(IAppUser appUser)
-        {
-            ratingCount = 0;
-            avgRating = "5.0";
-            count1 = 0;
-            count2 = 0;
-            count3 = 0;
-            count4 = 0;
-            count5 = 0;
-
-            _allRatings = new ObservableCollection<GameRating>();
-
-            Ratings = new ObservableCollection<GameRating>();
-            CurrentPage = 0;
-            _appUser = appUser;
-        }
 
         #endregion
         public bool UserRatingP()
