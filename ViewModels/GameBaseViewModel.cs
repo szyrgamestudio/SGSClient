@@ -4,7 +4,6 @@ using SGSClient.Core.Authorization;
 using SGSClient.Core.Database;
 using SGSClient.Core.Extensions;
 using SGSClient.Core.Utilities.LogUtility;
-using SGSClient.DataAccess.Repositories;
 using SGSClient.Models;
 using SGSClient.Views;
 using SQLite;
@@ -24,6 +23,28 @@ namespace SGSClient.ViewModels
         public string NextcloudUsername { get; set; } = "sgsclient";
         public string NextcloudPassword { get; set; } = "yGnxE-Tykxe-SwjwW-NooLc-xSwPT";
 
+        #region Variables
+        private readonly IAppUser _appUser;
+        private ObservableCollection<GameRating> _allRatings;
+        private const int PageSize = 2;
+        [ObservableProperty]
+        private ObservableCollection<GameRating> ratings;
+        [ObservableProperty]
+        private int currentPage;
+        [ObservableProperty]
+        private int ratingCount;
+        [ObservableProperty]
+        private string avgRating;
+        [ObservableProperty]
+        private int count1;
+        [ObservableProperty]
+        private int count2;
+        [ObservableProperty]
+        private int count3;
+        [ObservableProperty]
+        private int count4;
+        [ObservableProperty]
+        private int count5;
         private string? rootPath;
         private string? gamepath;
         private int? gameId;
@@ -36,6 +57,16 @@ namespace SGSClient.ViewModels
         private string gameVersion;
         private readonly HttpClient httpClient = new();
         private static readonly string DatabasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "local_game_data.db");
+
+        public string? GameName { get; private set; }
+        public string? GameDeveloper { get; private set; }
+        public string? GameDescription { get; private set; }
+        public string? HardwareRequirements { get; private set; }
+        public string? OtherInformations { get; private set; }
+        public bool IsOtherInformationsVisible { get; private set; }
+        public bool IsHardwareRequirementsVisible { get; private set; }
+        public bool CanGoToPreviousPage => CurrentPage > 0;
+        public bool CanGoToNextPage => (CurrentPage + 1) * PageSize < _allRatings.Count;
 
         #region Logo
         private GameImage _gameLogo;
@@ -66,6 +97,8 @@ namespace SGSClient.ViewModels
         public ObservableCollection<string> GameImagePaths { get; set; } = new ObservableCollection<string>();
         #endregion
 
+        #endregion
+
         public GameBaseViewModel(IAppUser appUser)
         {
             ratingCount = 0;
@@ -85,6 +118,7 @@ namespace SGSClient.ViewModels
             GameLogos = [];
             GameImages = [];
         }
+
         public async Task LoadGameData(string gameSymbol)
         {
             DataSet ds = db.con.select(@"
@@ -171,19 +205,37 @@ where g.Symbol = @p0
                 OnPropertyChanged(nameof(IsHardwareRequirementsVisible));
             }
         }
+        public (bool installedP, bool isUpdateP) CheckForUpdate()
+        {
+            try
+            {
+                string localVersion = GetLocalVersion(gameIdentifier ?? "");
 
+                if (string.IsNullOrEmpty(localVersion))
+                {
+                    Debug.WriteLine("Brak zainstalowanej wersji gry.");
+                    return (false, false);
+                }
 
+                bool isUpdateP = localVersion != gameVersion;
+                if (isUpdateP)
+                {
+                    Debug.WriteLine($"Dostępna nowa wersja: {gameVersion}. Aktualna: {localVersion}");
+                    //CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+                }
+                else
+                {
+                    Debug.WriteLine("Gra jest aktualna.");
+                }
 
-
-
-        public string? GameName { get; private set; }
-        public string? GameDeveloper { get; private set; }
-        public string? GameDescription { get; private set; }
-        public string? HardwareRequirements { get; private set; }
-        public string? OtherInformations { get; private set; }
-        public bool IsOtherInformationsVisible { get; private set; }
-        public bool IsHardwareRequirementsVisible { get; private set; }
-
+                return (true, isUpdateP);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Błąd podczas sprawdzania aktualizacji: {ex.Message}");
+                return (false, false);
+            }
+        }
         public async Task DownloadGame(ShellPage shellPage)
         {
             if (!string.IsNullOrEmpty(gameName) && !string.IsNullOrEmpty(gameZipLink) && !string.IsNullOrEmpty(GameLogo.Url) && !string.IsNullOrEmpty(gameExe))
@@ -205,21 +257,12 @@ where g.Symbol = @p0
                 }
             }
         }
-
-        public static async Task<string?> ResolveTokenToPathAsync(string token)
+        private static string GetLocalVersion(string gameIdentifier)
         {
-            try
-            {
-                var folder = await Windows.Storage.AccessCache.StorageApplicationPermissions
-                    .FutureAccessList.GetFolderAsync(token);
-                return folder.Path;
-            }
-            catch
-            {
-                return null;
-            }
+            using var db = new SQLiteConnection(DatabasePath);
+            var game = db.Table<GameVersion>().FirstOrDefault(g => g.Identifier == gameIdentifier);
+            return game?.Version ?? "0.0.0";
         }
-
         private static async Task SetLocalVersion(string gameIdentifier, string version, string gameExe, string path)
         {
             try
@@ -252,43 +295,7 @@ where g.Symbol = @p0
                 await Log.ErrorAsync("Błąd zapisu wersji gry w bazie", ex);
             }
         }
-        private static string GetLocalVersion(string gameIdentifier)
-        {
-            using var db = new SQLiteConnection(DatabasePath);
-            var game = db.Table<GameVersion>().FirstOrDefault(g => g.Identifier == gameIdentifier);
-            return game?.Version ?? "0.0.0";
-        }
-        public (bool installedP, bool isUpdateP) CheckForUpdate()
-        {
-            try
-            {
-                string localVersion = GetLocalVersion(gameIdentifier ?? "");
 
-                if (string.IsNullOrEmpty(localVersion))
-                {
-                    Debug.WriteLine("Brak zainstalowanej wersji gry.");
-                    return (false, false);
-                }
-
-                bool isUpdateP = localVersion != gameVersion;
-                if (isUpdateP)
-                {
-                    Debug.WriteLine($"Dostępna nowa wersja: {gameVersion}. Aktualna: {localVersion}");
-                    //CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-                }
-                else
-                {
-                    Debug.WriteLine("Gra jest aktualna.");
-                }
-
-                return (true, isUpdateP);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Błąd podczas sprawdzania aktualizacji: {ex.Message}");
-                return (false, false);
-            }
-        }
         public void UninstallGame()
         {
             using var db = new SQLiteConnection(DatabasePath);
@@ -433,44 +440,7 @@ select
             }
         }
 
-        #region Constructors and Properties
-        private readonly IAppUser _appUser;
-        private ObservableCollection<GameRating> _allRatings;
-        private const int PageSize = 2;
-
-
-        public bool CanGoToPreviousPage => CurrentPage > 0;
-        public bool CanGoToNextPage => (CurrentPage + 1) * PageSize < _allRatings.Count;
-
-        [ObservableProperty]
-        private ObservableCollection<GameRating> ratings;
-
-        [ObservableProperty]
-        private int currentPage;
-
-        [ObservableProperty]
-        private int ratingCount;
-
-        [ObservableProperty]
-        private string avgRating;
-
-        [ObservableProperty]
-        private int count1;
-
-        [ObservableProperty]
-        private int count2;
-
-        [ObservableProperty]
-        private int count3;
-
-        [ObservableProperty]
-        private int count4;
-
-        [ObservableProperty]
-        private int count5;
-
-
-        #endregion
+        #region User Ratings
         public bool UserRatingP()
         {
             DataSet ds = db.con.select(@"
@@ -566,7 +536,6 @@ inner join sgsDevelopers d on d.Id = r.DeveloperId
 where g.Symbol = @p0 and r.UserId = @p1
 ", gameIdentifier, _appUser.UserId);
         }
-
         public void AddRating(string gameIdentifier, GameRating gameRating)
         {
             if (gameRating.RatingId > 0)
@@ -589,7 +558,7 @@ declare @userId int =
   where  r.UserId = @p1
 )
 
-insert into GameRatings (GameId, UserId, Rating, Title, Review, CreationDateTime, ModificationDateTime)
+insert GameRatings (GameId, UserId, Rating, Title, Review, CreationDateTime, ModificationDateTime)
 select
   @gameId
 , @userId
@@ -629,5 +598,6 @@ where r.Id = @p0
             OnPropertyChanged(nameof(CanGoToPreviousPage));
             OnPropertyChanged(nameof(CanGoToNextPage));
         }
+        #endregion
     }
 }
