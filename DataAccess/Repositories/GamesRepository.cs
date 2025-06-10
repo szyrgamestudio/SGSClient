@@ -14,21 +14,19 @@ select
   g.Id       [GameId]
 , g.Title
 , g.Symbol   [GameSymbol]
-, d.Name     [GameDeveloper]
-, l.LogoPath [LogoPath]
-, t.Name	 [GameType]
-, g.PayloadName
+, u.DisplayName     [GameDeveloper]
+, gi.Url [LogoPath]
+, /*t.Name*/null	 [GameType]
 , g.ExeName
 , g.ZipLink
-, g.VersionLink
+, g.CurrentVersion
 , g.Description
 , g.HardwareRequirements
 , g.OtherInformation
 , g.DraftP
-from sgsGames g
-inner join sgsDevelopers d on d.Id = g.DeveloperId
-left join sgsGameLogo l on l.GameId = g.Id
-left join sgsGameTypes t on t.Id = g.TypeId
+from Games g
+inner join Users u on u.Id = g.UserId
+inner join GameImages gi on gi.GameId = g.Id and gi.LogoP = 1
 where g.DraftP = 0 and @p0 = 0 or @p0 = 1
 order by g.Title", bypassDraftP);
 
@@ -41,21 +39,19 @@ select
   g.Id       [GameId]
 , g.Title
 , g.Symbol   [GameSymbol]
-, d.Name     [GameDeveloper]
-, l.LogoPath [LogoPath]
-, t.Name	 [GameType]
-, g.PayloadName
+, u.DisplayName     [GameDeveloper]
+, gi.Url [LogoPath]
+, /*t.Name*/null	 [GameType]
 , g.ExeName
 , g.ZipLink
-, g.VersionLink
+, g.CurrentVersion
 , g.Description
 , g.HardwareRequirements
 , g.OtherInformation
-, g.DraftP [DraftP]
-from sgsGames g
-inner join sgsDevelopers d on d.Id = g.DeveloperId
-left join sgsGameLogo l on l.GameId = g.Id
-left join sgsGameTypes t on t.Id = g.TypeId
+, g.DraftP
+from Games g
+inner join Users u on u.Id = g.UserId
+inner join GameImages gi on gi.GameId = g.Id and gi.LogoP = 1
 where (g.DraftP = 0 and @p0 = 0 or @p0 = 1) and g.FeaturedP = 1
 order by g.Title", bypassDraftP);
 

@@ -93,8 +93,10 @@ namespace SGSClient.Models
 
             var totalSize = response.Content.Headers.ContentLength ?? 1;
             var buffer = new byte[8192];
+            string fileName = GameName.Replace(" ", "");
+            fileName = string.Concat(fileName.Split(Path.GetInvalidFileNameChars()));
 
-            StorageFile zipFile = await DestinationFolder.CreateFileAsync($"{GameName}.zip", CreationCollisionOption.ReplaceExisting);
+            StorageFile zipFile = await DestinationFolder.CreateFileAsync($"{fileName}.zip", CreationCollisionOption.ReplaceExisting);
 
             using var stream = await zipFile.OpenStreamForWriteAsync();
             using var contentStream = await response.Content.ReadAsStreamAsync();

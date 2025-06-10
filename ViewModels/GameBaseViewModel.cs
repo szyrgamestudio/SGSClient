@@ -123,25 +123,22 @@ namespace SGSClient.ViewModels
         {
             DataSet ds = db.con.select(@"
 select
-  g.Id       [GameId]
-, g.Title
-, g.Symbol   [GameSymbol]
-, d.Name     [GameDeveloper]
-, l.LogoPath [LogoPath]
-, t.Name	 [GameType]
-, g.PayloadName
+  g.Id           [GameId]
+, g.Title        [Title]
+, g.Symbol       [GameSymbol]
+, u.DisplayName  [GameDeveloper]
+, gi.Url         [LogoPath]
+, null	         [GameType]
 , g.ExeName
 , g.ZipLink
-, g.VersionLink
+, g.CurrentVersion
 , g.Description
 , g.HardwareRequirements
 , g.OtherInformation
 , g.DraftP
-, g.CurrentVersion
-from sgsGames g
-inner join sgsDevelopers d on d.Id = g.DeveloperId
-left join sgsGameLogo l on l.GameId = g.Id
-left join sgsGameTypes t on t.Id = g.TypeId
+from Games g
+inner join Users u on u.Id = g.UserId
+inner join GameImages gi on gi.GameId = g.Id and gi.LogoP = 1
 where g.Symbol = @p0
 order by g.Title
 ", gameSymbol);
@@ -158,8 +155,8 @@ order by g.Title
                 gameZipLink = dr.TryGetValue("ZipLink");
                 gameVersion = dr.TryGetValue("CurrentVersion") ?? "0.0.0"; // Default version if not found
 
-                LoadRatings(gameSymbol ?? "");
-                LoadGameRatingsStats(gameSymbol ?? "");
+                //LoadRatings(gameSymbol ?? "");
+                //LoadGameRatingsStats(gameSymbol ?? "");
 
                 GameName = dr.TryGetValue("Title") ?? "Brak dostępnych informacji.";
                 GameDeveloper = dr.TryGetValue("GameDeveloper") ?? "Brak dostępnych informacji.";
@@ -171,17 +168,17 @@ order by g.Title
 
                 DataSet logoData = db.con.select(@"
 select
-  l.LogoPath
-from sgsGameLogo l
-inner join sgsGames g on g.Id = l.GameId
-where g.Symbol = @p0
+  gi.Url
+from GameImages gi
+inner join Games g on g.Id = gi.GameId
+where g.Symbol = @p0 and gi.LogoP = 1
 ", gameSymbol);
                 DataSet imagesData = db.con.select(@"
 select
-  i.ImagePath
-from sgsGameImages i
-inner join sgsGames g on g.Id = i.GameId
-where g.Symbol = @p0
+  gi.Url
+from GameImages gi
+inner join Games g on g.Id = gi.GameId
+where g.Symbol = @p0 and gi.LogoP = 0
 ", gameSymbol);
 
                 GameLogos.Clear();
@@ -320,7 +317,7 @@ where g.Symbol = @p0
         #region UI
         public async Task LoadLogoFromNextcloud(DataRow imageRow, string username, string password)
         {
-            string imageUrl = imageRow["LogoPath"].ToString();
+            string imageUrl = imageRow["Url"].ToString();
 
             using (var client = new HttpClient())
             {
@@ -349,7 +346,7 @@ where g.Symbol = @p0
         }
         public async Task LoadImageFromNextcloud(DataRow imageRow, string username, string password)
         {
-            string imageUrl = imageRow["ImagePath"].ToString();
+            string imageUrl = imageRow["Url"].ToString();
 
             using (var client = new HttpClient())
             {
@@ -447,8 +444,8 @@ select
 select
   gr.Id
 from GameRatings gr
-inner join Registration r on r.Id = gr.UserId
-where r.UserId = @p0
+inner join Users u on u.Id = gr.UserId
+where u.UserId = @p0
 ", _appUser.UserId);
 
             if (ds.Tables[0].Rows.Count > 0)
@@ -463,15 +460,14 @@ where r.UserId = @p0
             DataSet ds = db.con.select(@"
 select
   gr.Id
-, d.Id [DeveloperId]
+, u.Id [DeveloperId]
 , d.Name
 , gr.Rating
 , gr.Title
 , gr.Review
 from GameRatings gr
-inner join sgsGames g on g.Id = gr.GameId
-inner join Registration r on r.Id = gr.UserId
-inner join sgsDevelopers d on d.Id = r.DeveloperId
+inner join Games g on g.Id = gr.GameId
+inner join Users u on u.Id = gr.UserId
 where g.Symbol = @p0
 ", gameIdentifier);
 

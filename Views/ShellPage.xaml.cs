@@ -7,6 +7,7 @@ using SGSClient.Core.Utilities.LogUtility;
 using SGSClient.Helpers;
 using SGSClient.Models;
 using SGSClient.ViewModels;
+using System;
 using Windows.Storage;
 using Windows.System;
 
@@ -137,10 +138,13 @@ public sealed partial class ShellPage : Page
     {
         try
         {
+            string fileName = item.GameName.Replace(" ", "");
+            fileName = string.Concat(fileName.Split(Path.GetInvalidFileNameChars()));
+
             await Task.Run(async () =>
             {
-                StorageFile zipFile = await item.DestinationFolder.GetFileAsync($"{item.GameName}.zip");
-                StorageFolder extractFolder = await item.DestinationFolder.CreateFolderAsync(item.GameName, CreationCollisionOption.ReplaceExisting);
+                StorageFile zipFile = await item.DestinationFolder.GetFileAsync($"{fileName}.zip");
+                StorageFolder extractFolder = await item.DestinationFolder.CreateFolderAsync(fileName, CreationCollisionOption.ReplaceExisting);
 
                 using (var archive = new ArchiveFile(zipFile.Path))
                 {
