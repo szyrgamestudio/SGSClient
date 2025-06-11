@@ -1,5 +1,4 @@
-﻿using System.Configuration;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -10,10 +9,10 @@ using SGSClient.Contracts.Services;
 using SGSClient.Core;
 using SGSClient.Core.Authorization;
 using SGSClient.Core.Contracts.Services;
-using SGSClient.Core.Database;
 using SGSClient.Core.Interface;
 using SGSClient.Core.Services;
 using SGSClient.Core.Utilities;
+using SGSClient.Core.Utilities.AppInfoUtility.Interfaces;
 using SGSClient.Core.Utilities.AppInfoUtility.Models;
 using SGSClient.Core.Utilities.LogUtility;
 using SGSClient.Models;
@@ -64,6 +63,7 @@ public partial class App : Application
         ConfigureServices((context, services) =>
         {
             services.AddSingleton<IAppUser, AppUser>();
+            services.AddSingleton<IAppInfo, AppInfo>();
 
             // Default Activation Handler
             services.AddTransient<ActivationHandler<LaunchActivatedEventArgs>, DefaultActivationHandler>();

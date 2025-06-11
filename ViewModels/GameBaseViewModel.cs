@@ -1,8 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Extensions.Options;
 using Microsoft.UI.Xaml.Media.Imaging;
 using SGSClient.Core.Authorization;
 using SGSClient.Core.Database;
 using SGSClient.Core.Extensions;
+using SGSClient.Core.Utilities.AppInfoUtility.Models;
+using SGSClient.Core.Utilities;
 using SGSClient.Core.Utilities.LogUtility;
 using SGSClient.Models;
 using SGSClient.Views;
@@ -15,16 +18,15 @@ using System.Text;
 using Windows.ApplicationModel.Core;
 using Windows.Storage;
 using Windows.Storage.AccessCache;
+using SGSClient.Core.Utilities.AppInfoUtility.Interfaces;
 
 namespace SGSClient.ViewModels
 {
     public partial class GameBaseViewModel : ObservableRecipient
     {
-        public string NextcloudUsername { get; set; } = "sgsclient";
-        public string NextcloudPassword { get; set; } = "yGnxE-Tykxe-SwjwW-NooLc-xSwPT";
-
         #region Variables
         private readonly IAppUser _appUser;
+        private readonly IAppInfo _appInfo;
         private ObservableCollection<GameRating> _allRatings;
         private const int PageSize = 2;
         [ObservableProperty]
@@ -99,7 +101,7 @@ namespace SGSClient.ViewModels
 
         #endregion
 
-        public GameBaseViewModel(IAppUser appUser)
+        public GameBaseViewModel(IAppUser appUser, IAppInfo appInfo)
         {
             ratingCount = 0;
             avgRating = "5.0";
@@ -114,6 +116,7 @@ namespace SGSClient.ViewModels
             Ratings = new ObservableCollection<GameRating>();
             CurrentPage = 0;
             _appUser = appUser;
+            _appInfo = appInfo;
 
             GameLogos = [];
             GameImages = [];
@@ -184,13 +187,13 @@ where g.Symbol = @p0 and gi.LogoP = 0
                 GameLogos.Clear();
                 foreach (DataRow dr0 in logoData.Tables[0].Rows)
                 {
-                    await LoadLogoFromNextcloud(dr0, NextcloudUsername, NextcloudPassword);
+                    await LoadLogoFromNextcloud(dr0, _appInfo.GetAppSetting("NextcloudLogin").Value, _appInfo.GetAppSetting("NextcloudPassword").Value);
                 }
 
                 GameImages.Clear();
                 foreach (DataRow dr1 in imagesData.Tables[0].Rows)
                 {
-                    await LoadImageFromNextcloud(dr1, NextcloudUsername, NextcloudPassword);
+                    await LoadImageFromNextcloud(dr1, _appInfo.GetAppSetting("NextcloudLogin").Value, _appInfo.GetAppSetting("NextcloudPassword").Value);
                 }
 
                 OnPropertyChanged(nameof(GameName));
@@ -247,10 +250,6 @@ where g.Symbol = @p0 and gi.LogoP = 0
                 {
                     shellPage?.AddDownload(gameName, gameZipLink, folder, GameLogo.Url);
                     await SetLocalVersion(gameName, gameVersion, gameExe, folder.Path);
-                }
-                else
-                {
-                    // fallback: np. do LocalFolder
                 }
             }
         }
@@ -388,9 +387,8 @@ where g.Symbol = @p0 and gi.LogoP = 0
                 int dbTime = db.con.scalar<int>(@"
 select
   ugt.TotalTime
-from sgsUsersGameTime ugt
-inner join Registration r on r.Id = ugt.UserId
-where ugt.GameId = @p0 and r.UserId = @p1", gameId, "a8fcd7ae-2410-46f4-9943-fc790905d9bb") ?? -1;
+from UsersGameTime ugt
+where ugt.GameId = @p0 and r.UserId = @p1", gameId, _appUser.GetCurrentUser().Id) ?? -1;
 
                 double totalTime = 0;
                 totalTime = Convert.ToDouble(dbTime < 0 ? 0 : dbTime);
@@ -402,28 +400,19 @@ where ugt.GameId = @p0 and r.UserId = @p1", gameId, "a8fcd7ae-2410-46f4-9943-fc7
 update ugt set 
   ugt.TotalTime = @p0
 , ugt.LastPlayed = @p1
-from sgsUsersGameTime ugt
-inner join Registration r on r.Id = ugt.UserId
-where ugt.GameId = @p2 and r.UserId = @p3", totalTime, DateTime.Now, gameId, "a8fcd7ae-2410-46f4-9943-fc790905d9bb");
+from UsersGameTime ugt
+where ugt.GameId = @p2 and r.UserId = @p3", totalTime, DateTime.Now, gameId, _appUser.GetCurrentUser().Id);
                 }
                 else
                 {
                     db.con.exec(@"
-declare @userId int = 
-(
-  select
-    r.Id
-  from Registration r
-  where r.UserId = @p0
-)
-
-insert sgsUsersGameTime (UserId, GameId, LastPlayed, TotalTime)
+insert UsersGameTime (UserId, GameId, LastPlayed, TotalTime)
 select
-  @userId
+  @p0
 , @p1
 , @p2
 , @p3
-", "a8fcd7ae-2410-46f4-9943-fc790905d9bb", gameId, DateTime.Now, totalTime);
+", _appUser.GetCurrentUser().Id, gameId, DateTime.Now, totalTime);
                 }
 
                 //MessageBox.Show($"Łączny czas działania: {TimeSpan.FromSeconds(totalTime)}");
@@ -446,7 +435,7 @@ select
 from GameRatings gr
 inner join Users u on u.Id = gr.UserId
 where u.UserId = @p0
-", _appUser.UserId);
+", _appUser.GetCurrentUser().Id);
 
             if (ds.Tables[0].Rows.Count > 0)
                 return true;
@@ -498,7 +487,7 @@ select
 , SUM(CASE WHEN gr.Rating = 4 THEN 1 ELSE 0 END) * 100 / COUNT(gr.Id) Count4
 , SUM(CASE WHEN gr.Rating = 5 THEN 1 ELSE 0 END) * 100 / COUNT(gr.Id) Count5
 from GameRatings gr
-inner join sgsGames g on g.Id = gr.GameId
+inner join Games g on g.Id = gr.GameId
 where g.Symbol = @p0
 group by gr.GameId
 ", gameIdentifier);
@@ -526,11 +515,10 @@ select
 , gr.Title
 , gr.Review
 from GameRatings gr
-inner join sgsGames g on g.Id = gr.GameId
-inner join Registration r on r.Id = gr.UserId
+inner join Games g on g.Id = gr.GameId
 inner join sgsDevelopers d on d.Id = r.DeveloperId
-where g.Symbol = @p0 and r.UserId = @p1
-", gameIdentifier, _appUser.UserId);
+where g.Symbol = @p0 and gr.UserId = @p1
+", gameIdentifier, _appUser.GetCurrentUser().Id);
         }
         public void AddRating(string gameIdentifier, GameRating gameRating)
         {
