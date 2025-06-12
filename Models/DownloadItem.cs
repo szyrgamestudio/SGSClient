@@ -23,6 +23,7 @@ namespace SGSClient.Models
         }
 
         public string GameName { get; }
+        public string GameIdentifier { get; }
         public string DownloadUrl { get; }
         public StorageFolder DestinationFolder { get; }
 
@@ -73,9 +74,10 @@ namespace SGSClient.Models
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public DownloadItem(string gameName, string downloadUrl, StorageFolder destinationFolder, string gameIcon = "ms-appx:///Assets/placeholder.png")
+        public DownloadItem(string gameName, string gameIdentifier, string downloadUrl, StorageFolder destinationFolder, string gameIcon = "ms-appx:///Assets/placeholder.png")
         {
             GameName = gameName;
+            GameIdentifier = gameIdentifier;
             DownloadUrl = downloadUrl;
             DestinationFolder = destinationFolder;
             GameIcon = gameIcon;
@@ -96,7 +98,7 @@ namespace SGSClient.Models
             string fileName = GameName.Replace(" ", "");
             fileName = string.Concat(fileName.Split(Path.GetInvalidFileNameChars()));
 
-            StorageFile zipFile = await DestinationFolder.CreateFileAsync($"{fileName}.zip", CreationCollisionOption.ReplaceExisting);
+            StorageFile zipFile = await DestinationFolder.CreateFileAsync($"{GameIdentifier}.zip", CreationCollisionOption.ReplaceExisting);
 
             using var stream = await zipFile.OpenStreamForWriteAsync();
             using var contentStream = await response.Content.ReadAsStreamAsync();

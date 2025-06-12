@@ -118,14 +118,14 @@ public sealed partial class ShellPage : Page
 
         flyout.ShowAt((FrameworkElement)sender);
     }
-    public async Task AddDownload(string gameName, string url, StorageFolder folder, string gameLogo)
+    public async Task AddDownload(string gameName, string gameIdentifier, string url, StorageFolder folder, string gameLogo)
     {
         if (folder == null)
         {
             throw new ArgumentNullException(nameof(folder), "Destination folder cannot be null.");
         }
 
-        var downloadItem = new DownloadItem(gameName, url, folder, gameLogo);
+        var downloadItem = new DownloadItem(gameName, gameIdentifier, url, folder, gameLogo);
         DownloadViewModel.Instance.ActiveDownloads.Add(downloadItem);
 
         DownloadBar.Visibility = Visibility.Visible;

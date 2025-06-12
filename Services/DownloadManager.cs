@@ -20,9 +20,9 @@ public class DownloadManager
     #endregion
 
     #region Methods
-    public static Task StartDownloadAsync(ShellPage shellPage, string gameName, string url, StorageFolder destinationPath, string gameLogo)
+    public static Task StartDownloadAsync(ShellPage shellPage, string gameName, string gameIdentifier, string url, StorageFolder destinationPath, string gameLogo)
     {
-        return shellPage?.AddDownload(gameName, url, destinationPath, gameLogo) ?? Task.CompletedTask;
+        return shellPage?.AddDownload(gameName, gameIdentifier, url, destinationPath, gameLogo) ?? Task.CompletedTask;
     }
     #endregion
 }

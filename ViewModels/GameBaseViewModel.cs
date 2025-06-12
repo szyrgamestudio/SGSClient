@@ -4,8 +4,9 @@ using Microsoft.UI.Xaml.Media.Imaging;
 using SGSClient.Core.Authorization;
 using SGSClient.Core.Database;
 using SGSClient.Core.Extensions;
-using SGSClient.Core.Utilities.AppInfoUtility.Models;
 using SGSClient.Core.Utilities;
+using SGSClient.Core.Utilities.AppInfoUtility.Interfaces;
+using SGSClient.Core.Utilities.AppInfoUtility.Models;
 using SGSClient.Core.Utilities.LogUtility;
 using SGSClient.Models;
 using SGSClient.Views;
@@ -15,10 +16,10 @@ using System.Data;
 using System.Diagnostics;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Xml.Linq;
 using Windows.ApplicationModel.Core;
 using Windows.Storage;
 using Windows.Storage.AccessCache;
-using SGSClient.Core.Utilities.AppInfoUtility.Interfaces;
 
 namespace SGSClient.ViewModels
 {
@@ -254,8 +255,8 @@ where g.Symbol = @p0 and gi.LogoP = 0
 
                 if (folder != null)
                 {
-                    shellPage?.AddDownload(gameName, gameZipLink, folder, GameLogo.Url);
-                    await SetLocalVersion(gameIdentifier, gameVersion, gameExe, folder.Path);
+                    shellPage?.AddDownload(gameName, gameIdentifier, gameZipLink, folder, GameLogo.Url);
+                    await SetLocalVersion(gameIdentifier, gameVersion, gameExe, Path.Combine(folder.Path, gameIdentifier));
                 }
             }
         }
@@ -377,46 +378,78 @@ where g.Symbol = @p0 and gi.LogoP = 0
 
         public void PlayGame()
         {
-            using var db2 = new SQLiteConnection(DatabasePath);
-            var game = db2.Table<GameVersion>().FirstOrDefault(g => g.Identifier == gameIdentifier);
-            string pa =  game?.Path ?? "0.0.0";
-
-
-            if (File.Exists(gameExe))
+            // Pobranie informacji o grze z bazy
+            GameVersion game;
+            using (var db2 = new SQLiteConnection(DatabasePath))
             {
-                ProcessStartInfo startInfo = new(gameExe)
+                game = db2.Table<GameVersion>().FirstOrDefault(g => g.Identifier == gameIdentifier);
+            }
+
+            if (game == null || string.IsNullOrWhiteSpace(game.Path) || string.IsNullOrWhiteSpace(game.Exe))
+            {
+                Console.WriteLine("Nie można odnaleźć informacji o grze lub pliku exe.");
+                return;
+            }
+
+            // Szukanie pliku exe
+            string[] exeFiles;
+            try
+            {
+                exeFiles = Directory.GetFiles(game.Path, game.Exe + ".exe", SearchOption.AllDirectories);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Błąd podczas przeszukiwania folderu: " + ex.Message);
+                return;
+            }
+
+            if (exeFiles.Length == 0)
+            {
+                Console.WriteLine("Plik exe nie został znaleziony.");
+                return;
+            }
+
+            string exePath = exeFiles[0];
+            DateTime startTime = DateTime.Now;
+
+            try
+            {
+                var process = Process.Start(new ProcessStartInfo
                 {
-                    WorkingDirectory = Path.Combine(rootPath ?? "")
-                };
+                    FileName = exePath,
+                    UseShellExecute = true
+                });
 
-                DateTime startTime = DateTime.Now;
-                Process process = Process.Start(startInfo);
-                process.WaitForExit();
+                process?.WaitForExit();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Błąd podczas uruchamiania gry: " + ex.Message);
+                return;
+            }
 
-                TimeSpan elapsedTime = DateTime.Now - startTime;
+            TimeSpan elapsedTime = DateTime.Now - startTime;
 
-                int dbTime = db.con.scalar<int>(@"
+            int? dbTime = db.con.scalar<int>(@"
 select
   ugt.TotalTime
 from UsersGameTime ugt
 where ugt.GameId = @p0 and r.UserId = @p1", gameId, _appUser.GetCurrentUser().Id) ?? -1;
 
-                double totalTime = 0;
-                totalTime = Convert.ToDouble(dbTime < 0 ? 0 : dbTime);
-                totalTime += elapsedTime.TotalSeconds;
+            double totalTime = (dbTime ?? 0) + elapsedTime.TotalSeconds;
 
-                if (dbTime >= 0)
-                {
-                    db.con.exec(@"
+            if (dbTime >= 0)
+            {
+                db.con.exec(@"
 update ugt set 
   ugt.TotalTime = @p0
 , ugt.LastPlayed = @p1
 from UsersGameTime ugt
 where ugt.GameId = @p2 and r.UserId = @p3", totalTime, DateTime.Now, gameId, _appUser.GetCurrentUser().Id);
-                }
-                else
-                {
-                    db.con.exec(@"
+            }
+            else
+            {
+                db.con.exec(@"
 insert UsersGameTime (UserId, GameId, LastPlayed, TotalTime)
 select
   @p0
@@ -424,17 +457,12 @@ select
 , @p2
 , @p3
 ", _appUser.GetCurrentUser().Id, gameId, DateTime.Now, totalTime);
-                }
-
-                //MessageBox.Show($"Łączny czas działania: {TimeSpan.FromSeconds(totalTime)}");
-
-                CoreApplication.Exit();
-
             }
-            else
-            {
-                Debug.WriteLine("Brak pliku exe gry.");
-            }
+
+            //MessageBox.Show($"Łączny czas działania: {TimeSpan.FromSeconds(totalTime)}");
+
+            CoreApplication.Exit();
+
         }
 
         #region User Ratings
