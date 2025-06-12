@@ -103,6 +103,10 @@ namespace SGSClient.ViewModels
 
         public GameBaseViewModel(IAppUser appUser, IAppInfo appInfo)
         {
+            _appUser = appUser;
+            _appInfo = appInfo;
+
+            _allRatings = [];
             ratingCount = 0;
             avgRating = "5.0";
             count1 = 0;
@@ -111,20 +115,21 @@ namespace SGSClient.ViewModels
             count4 = 0;
             count5 = 0;
 
-            _allRatings = new ObservableCollection<GameRating>();
 
-            Ratings = new ObservableCollection<GameRating>();
             CurrentPage = 0;
-            _appUser = appUser;
-            _appInfo = appInfo;
 
             GameLogos = [];
             GameImages = [];
+            Ratings = [];
         }
 
         public async Task LoadGameData(string gameSymbol)
         {
+            string nextcloudLogin = _appInfo.GetAppSetting("NextcloudLogin").Value;
+            string nextcloudPassword = _appInfo.GetAppSetting("NextcloudPassword").Value;
+
             DataSet ds = db.con.select(@"
+/*0*/
 select
   g.Id           [GameId]
 , g.Title        [Title]
@@ -144,6 +149,20 @@ inner join Users u on u.Id = g.UserId
 inner join GameImages gi on gi.GameId = g.Id and gi.LogoP = 1
 where g.Symbol = @p0
 order by g.Title
+
+/*1*/
+select
+  gi.Url
+from GameImages gi
+inner join Games g on g.Id = gi.GameId
+where g.Symbol = @p0 and gi.LogoP = 1
+
+/*2*/
+select
+  gi.Url
+from GameImages gi
+inner join Games g on g.Id = gi.GameId
+where g.Symbol = @p0 and gi.LogoP = 0
 ", gameSymbol);
 
             if (ds.Tables[0].Rows.Count > 0)
@@ -156,45 +175,18 @@ order by g.Title
                 gameName = dr.TryGetValue("Title");
                 gameIdentifier = dr.TryGetValue("GameSymbol");
                 gameZipLink = dr.TryGetValue("ZipLink");
-                gameVersion = dr.TryGetValue("CurrentVersion") ?? "0.0.0"; // Default version if not found
+                gameVersion = dr.TryGetValue("CurrentVersion") ?? "0.0.0";
 
                 //LoadRatings(gameSymbol ?? "");
                 //LoadGameRatingsStats(gameSymbol ?? "");
 
-                GameName = dr.TryGetValue("Title") ?? "Brak dostępnych informacji.";
+                GameName = gameName;
                 GameDeveloper = dr.TryGetValue("GameDeveloper") ?? "Brak dostępnych informacji.";
                 GameDescription = dr.TryGetValue("Description") ?? "Brak dostępnych informacji.";
                 HardwareRequirements = dr.TryGetValue("HardwareRequirements") ?? "Brak dostępnych informacji.";
                 OtherInformations = dr.TryGetValue("OtherInformation");
                 IsOtherInformationsVisible = !String.IsNullOrEmpty(dr.TryGetValue("OtherInformation"));
                 IsHardwareRequirementsVisible = !String.IsNullOrEmpty(dr.TryGetValue("HardwareRequirements"));
-
-                DataSet logoData = db.con.select(@"
-select
-  gi.Url
-from GameImages gi
-inner join Games g on g.Id = gi.GameId
-where g.Symbol = @p0 and gi.LogoP = 1
-", gameSymbol);
-                DataSet imagesData = db.con.select(@"
-select
-  gi.Url
-from GameImages gi
-inner join Games g on g.Id = gi.GameId
-where g.Symbol = @p0 and gi.LogoP = 0
-", gameSymbol);
-
-                GameLogos.Clear();
-                foreach (DataRow dr0 in logoData.Tables[0].Rows)
-                {
-                    await LoadLogoFromNextcloud(dr0, _appInfo.GetAppSetting("NextcloudLogin").Value, _appInfo.GetAppSetting("NextcloudPassword").Value);
-                }
-
-                GameImages.Clear();
-                foreach (DataRow dr1 in imagesData.Tables[0].Rows)
-                {
-                    await LoadImageFromNextcloud(dr1, _appInfo.GetAppSetting("NextcloudLogin").Value, _appInfo.GetAppSetting("NextcloudPassword").Value);
-                }
 
                 OnPropertyChanged(nameof(GameName));
                 OnPropertyChanged(nameof(GameDeveloper));
@@ -203,6 +195,20 @@ where g.Symbol = @p0 and gi.LogoP = 0
                 OnPropertyChanged(nameof(OtherInformations));
                 OnPropertyChanged(nameof(IsOtherInformationsVisible));
                 OnPropertyChanged(nameof(IsHardwareRequirementsVisible));
+
+                GameLogos.Clear();
+                GameImages.Clear();
+
+                foreach (DataRow dr0 in ds.Tables[1].Rows)
+                {
+                    await LoadLogoFromNextcloud(dr0, nextcloudLogin, nextcloudPassword);
+                }
+
+                GameImages.Clear();
+                foreach (DataRow dr1 in ds.Tables[2].Rows)
+                {
+                    await LoadImageFromNextcloud(dr1, nextcloudLogin, nextcloudPassword);
+                }
             }
         }
         public (bool installedP, bool isUpdateP) CheckForUpdate()
@@ -249,7 +255,7 @@ where g.Symbol = @p0 and gi.LogoP = 0
                 if (folder != null)
                 {
                     shellPage?.AddDownload(gameName, gameZipLink, folder, GameLogo.Url);
-                    await SetLocalVersion(gameName, gameVersion, gameExe, folder.Path);
+                    await SetLocalVersion(gameIdentifier, gameVersion, gameExe, folder.Path);
                 }
             }
         }
@@ -371,6 +377,11 @@ where g.Symbol = @p0 and gi.LogoP = 0
 
         public void PlayGame()
         {
+            using var db2 = new SQLiteConnection(DatabasePath);
+            var game = db2.Table<GameVersion>().FirstOrDefault(g => g.Identifier == gameIdentifier);
+            string pa =  game?.Path ?? "0.0.0";
+
+
             if (File.Exists(gameExe))
             {
                 ProcessStartInfo startInfo = new(gameExe)

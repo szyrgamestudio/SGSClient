@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
+using SGSClient.Core.Authorization;
 using SGSClient.ViewModels;
 using System.Net.Http.Headers;
 using System.Text;
@@ -22,7 +23,7 @@ public sealed partial class UploadGamePage : Page
     {
         get;
     }
-    public UploadGamePage()
+    public UploadGamePage(IAppUser appUser)
     {
         ViewModel = App.GetService<UploadGameViewModel>();
         ShellViewModel = App.GetService<ShellViewModel>();
@@ -68,7 +69,7 @@ public sealed partial class UploadGamePage : Page
     private async void ButtonAdd_Click(object sender, RoutedEventArgs e)
     {
         string userId = ShellViewModel.GetUserDisplayNameAsync();
-        bool success = await ViewModel.AddGameData(userId);
+        bool success = await ViewModel.AddGameData();
 
         if (success)
             Frame.Navigate(typeof(MyGamesPage), new DrillInNavigationTransitionInfo());

@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Data.SqlClient;
 using Microsoft.UI.Xaml.Controls;
+using SGSClient.Core.Authorization;
 using SGSClient.Core.Database;
 using SGSClient.Core.Extensions;
 using SGSClient.Core.Helpers;
@@ -15,6 +16,7 @@ namespace SGSClient.ViewModels;
 
 public partial class UploadGameViewModel : ObservableRecipient
 {
+    private readonly IAppUser _appUser;
     private StorageFile _zipFile;
     public StorageFile ZipFile
     {
@@ -110,8 +112,9 @@ public partial class UploadGameViewModel : ObservableRecipient
     public ObservableCollection<string> GameImagePaths { get; set; } = new ObservableCollection<string>();
     #endregion
 
-    public UploadGameViewModel()
+    public UploadGameViewModel(IAppUser appUser)
     {
+        _appUser = appUser;
         GameLogos = [];
         GameImages = [];
     }
@@ -179,7 +182,7 @@ from sgsGameEngines ge
 
         return Task.CompletedTask;
     }
-    public async Task<bool> AddGameData(string userId)
+    public async Task<bool> AddGameData()
     {
         if (string.IsNullOrEmpty(GameName) ||
             string.IsNullOrEmpty(CurrentVersion) ||
@@ -221,7 +224,7 @@ from sgsGameEngines ge
         if (GameLogos.FirstOrDefault() is GameImage logoImage && Path.IsPathRooted(logoImage.Url))
         {
             string ext = Path.GetExtension(logoImage.Url);
-            GameLogoUrl = await uploader.UploadFileAsync(logoImage.Url, nextcloudFolder, $"logo{ext}", userId);
+            GameLogoUrl = await uploader.UploadFileAsync(logoImage.Url, nextcloudFolder, $"logo{ext}", _appUser.GetCurrentUser().UserId);
         }
         #endregion
 
@@ -235,7 +238,7 @@ from sgsGameEngines ge
             if (Path.IsPathRooted(path.Url))
             {
                 string ext = Path.GetExtension(path.Url);
-                string uploadedUrl = await uploader.UploadFileAsync(path.Url, nextcloudFolder, $"zrzutEkranu_{index++}{ext}", userId);
+                string uploadedUrl = await uploader.UploadFileAsync(path.Url, nextcloudFolder, $"zrzutEkranu_{index++}{ext}", _appUser.GetCurrentUser().UserId);
                 if (uploadedUrl != null)
                     uploadedGalleryUrls.Add(uploadedUrl);
             }
@@ -269,7 +272,7 @@ select
 ", db.con);
 
         cmd.Parameters.AddWithValue("gameName", GameName.ToSqlParameter());
-        cmd.Parameters.AddWithValue("userId", userId.ToSqlParameter());
+        cmd.Parameters.AddWithValue("userId", _appUser.GetCurrentUser().UserId.ToSqlParameter());
         cmd.Parameters.AddWithValue("exeName", ExeName.ToSqlParameter());
         cmd.Parameters.AddWithValue("zipLink", ZipLink.ToSqlParameter());
         cmd.Parameters.AddWithValue("currentVersion", CurrentVersion.ToSqlParameter());

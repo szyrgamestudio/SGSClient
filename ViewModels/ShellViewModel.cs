@@ -69,36 +69,13 @@ public partial class ShellViewModel : ObservableRecipient
         {
             Selected = selectedItem;
         }
-
-        #region Database Update
-
-        if (!string.IsNullOrWhiteSpace(_appUser.DisplayName) && !string.IsNullOrWhiteSpace(_appUser.UserId))
-        {
-            db.con.exec(@"
-insert Users(DisplayName, UserId)
-select
-  @p0
-, @p1
-from (select 1 x) x
-left join Users u on u.UserId = @p1
-where u.UserId is null
-
-update u set
-  u.DisplayName = @p0
-from Users u
-where u.UserId = @p1 and u.DisplayName != @p0
-", _appUser.DisplayName.ToString(), _appUser.UserId.ToString());
-        }
-        #endregion
-
     }
 
     private void UpdateUserData()
     {
         IsUserLoggedIn = _appUser.IsLoggedIn;
-        UserDisplayName = IsUserLoggedIn ? _appUser.DisplayName : "Zaloguj się";
-        UserEmail = IsUserLoggedIn ? _appUser.Email : null;
-        UserMenuText = IsUserLoggedIn ? _appUser.DisplayName : "Zaloguj się";
+        UserDisplayName = IsUserLoggedIn ? _appUser.GetCurrentUser().DisplayName : "Zaloguj się";
+        UserMenuText = IsUserLoggedIn ? _appUser.GetCurrentUser().DisplayName : "Zaloguj się";
     }
 
     private async Task ExecuteLoginAsync()

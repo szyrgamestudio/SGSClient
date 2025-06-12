@@ -63,12 +63,15 @@
 
                     <!--  1 - Nazwa Gry  -->
                     <TextBlock
-              Grid.Row="1"
-              HorizontalAlignment="Center"
-              FontSize="24"
-              Style="{StaticResource TitleTextBlockStyle}"
-              x:Name="GameNameTextBlock"
-              Text="{Binding GameName}">
+                        Grid.Row="1"
+                        HorizontalAlignment="Center"
+                        FontSize="24"
+                        Style="{StaticResource TitleTextBlockStyle}"
+                        x:Name="GameNameTextBlock"
+                        Text="{Binding GameName}"
+                        TextWrapping="Wrap"
+                        TextAlignment="Center"
+                        MaxWidth="280">
                     </TextBlock>
 
                     <!--  2 - Autor  -->
@@ -104,7 +107,7 @@
                 ClickMode="Press"
                 Content="Graj"
                 Style="{StaticResource AccentButtonStyle}" />
-                        
+
                     </StackPanel>
 
                     <!--  5 - Przycisk aktualizuj  -->
@@ -364,7 +367,7 @@
                                 </DataTemplate>
                             </ListView.ItemTemplate>
                         </ListView>
-                        <HyperlinkButton Content="Wyświetl wszystko" HorizontalAlignment="Left" Click="ShowAllReviewsButton_Click" />
+                        <HyperlinkButton x:Name="AllReviewButton" Content="Wyświetl wszystko" HorizontalAlignment="Left" Click="ShowAllReviewsButton_Click" />
                     </StackPanel>
                 </StackPanel>
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using SGSClient.Controls;
+using SGSClient.Core.Authorization;
 using SGSClient.Helpers;
 using SGSClient.Models;
 using SGSClient.ViewModels;
@@ -9,6 +10,7 @@ using System.Data;
 namespace SGSClient.Views;
 public sealed partial class GameBasePage : Page
 {
+    private readonly IAppUser _appUser;
     private LauncherStatus _status;
     private readonly string? gameZip = "";
     private readonly string? gameIdentifier = "";
@@ -37,6 +39,7 @@ public sealed partial class GameBasePage : Page
     }
     public GameBasePage()
     {
+        //_appUser = appUser;
         ViewModel = App.GetService<GameBaseViewModel>();
         InitializeComponent();
 
@@ -49,6 +52,11 @@ public sealed partial class GameBasePage : Page
         if (updateP)
             CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
 
+        //if (!_appUser.IsLoggedIn)
+        //{
+        //    AddReviewButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+        //    AllReviewButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
+        //}
     }
 
     #region Rating
