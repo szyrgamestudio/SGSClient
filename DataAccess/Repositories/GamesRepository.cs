@@ -11,12 +11,12 @@ namespace SGSClient.DataAccess.Repositories
         {
             DataSet ds = db.con.select(@"
 select
-  g.Id       [GameId]
-, g.Title
-, g.Symbol   [GameSymbol]
-, u.DisplayName     [GameDeveloper]
-, gi.Url [LogoPath]
-, /*t.Name*/null	 [GameType]
+  g.Id             [GameId]
+, g.Title          [Title]
+, g.Symbol         [GameSymbol]
+, u.DisplayName    [GameDeveloper]
+, gi.Url           [LogoPath]
+, /*t.Name*/null   [GameType]
 , g.ExeName
 , g.ZipLink
 , g.CurrentVersion
@@ -36,12 +36,12 @@ order by g.Title", bypassDraftP);
         {
             DataSet ds = db.con.select(@"
 select
-  g.Id       [GameId]
-, g.Title
-, g.Symbol   [GameSymbol]
-, u.DisplayName     [GameDeveloper]
-, gi.Url [LogoPath]
-, /*t.Name*/null	 [GameType]
+  g.Id             [GameId]
+, g.Title          [Title]
+, g.Symbol         [GameSymbol]
+, u.DisplayName    [GameDeveloper]
+, gi.Url           [LogoPath]
+, /*t.Name*/null   [GameType]
 , g.ExeName
 , g.ZipLink
 , g.CurrentVersion

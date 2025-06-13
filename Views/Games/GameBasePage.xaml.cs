@@ -1,22 +1,20 @@
 ﻿using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using SGSClient.Controls;
-using SGSClient.Core.Authorization;
 using SGSClient.Helpers;
 using SGSClient.Models;
 using SGSClient.ViewModels;
 using System.Data;
+using System.Diagnostics;
 
 namespace SGSClient.Views;
 public sealed partial class GameBasePage : Page
 {
-    private readonly IAppUser _appUser;
     private LauncherStatus _status;
     private readonly string? gameZip = "";
     private readonly string? gameIdentifier = "";
 
     private GameRating? _gameRating;
-    private readonly HttpClient httpClient = new();
     public GameBaseViewModel ViewModel { get; }
 
     internal LauncherStatus Status
@@ -35,28 +33,23 @@ public sealed partial class GameBasePage : Page
         DataContext = ViewModel;
 
         if (e.Parameter is string gameSymbol && !string.IsNullOrWhiteSpace(gameSymbol))
+        {
             ViewModel.LoadGameData(gameSymbol);
+            (bool installedP, bool updateP) = ViewModel.CheckForUpdate(gameSymbol);
+
+            if (installedP)
+                Status = LauncherStatus.ready;
+            else
+                Status = LauncherStatus.readyNoGame;
+
+            if (updateP)
+                CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+        }
     }
     public GameBasePage()
     {
-        //_appUser = appUser;
         ViewModel = App.GetService<GameBaseViewModel>();
         InitializeComponent();
-
-        (bool installedP, bool updateP) = ViewModel.CheckForUpdate();
-        if (installedP)
-            Status = LauncherStatus.ready;
-        else
-            Status = LauncherStatus.readyNoGame;
-
-        if (updateP)
-            CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-
-        //if (!_appUser.IsLoggedIn)
-        //{
-        //    AddReviewButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-        //    AllReviewButton.Visibility = Microsoft.UI.Xaml.Visibility.Collapsed;
-        //}
     }
 
     #region Rating
@@ -131,7 +124,11 @@ public sealed partial class GameBasePage : Page
     #region Buttons
     private async void PlayButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
-        var shellPage = (ShellPage)App.MainWindow.Content;
+        if (App.MainWindow.Content is not ShellPage shellPage)
+        {
+            Debug.WriteLine("Nie udało się uzyskać ShellPage.");
+            return;
+        }
 
         switch (Status)
         {
@@ -140,16 +137,21 @@ public sealed partial class GameBasePage : Page
                 {
                     XamlRoot = XamlRoot
                 };
+
                 var result = await dialog.ShowAsync();
 
                 if (result == ContentDialogResult.Primary && dialog.SelectedFolder != null)
                 {
-                    await ViewModel.DownloadGame(shellPage);
+                    await ViewModel.DownloadGameAsync(shellPage);
                 }
                 break;
 
             case LauncherStatus.ready:
                 ViewModel.PlayGame();
+                break;
+
+            default:
+                Debug.WriteLine($"Nieobsługiwany status: {Status}");
                 break;
         }
     }
@@ -159,48 +161,23 @@ public sealed partial class GameBasePage : Page
         {
             XamlRoot = XamlRoot
         };
+
         var result = await dialog.ShowAsync();
 
-        if (result == ContentDialogResult.Primary)
+        if (result != ContentDialogResult.Primary || dialog.SelectedFolder is null)
+            return;
+
+        if (App.MainWindow.Content is not ShellPage shellPage)
         {
-            // Pobranie ścieżki z wybranego folderu
-            var installPath = dialog.SelectedFolder?.Path;
-            if (installPath != null)
-            {
-                var shellPage = (ShellPage)App.MainWindow.Content;
-                await ViewModel.DownloadGame(shellPage);
-            }
+            Debug.WriteLine("Nie udało się uzyskać ShellPage.");
+            return;
         }
+
+        await ViewModel.DownloadGameAsync(shellPage);
     }
     private void UninstallButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
         ViewModel.UninstallGame();
     }
-    #endregion
-
-    #region ButtonsOld
-    //private void UninstallClickButton(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
-    //{
-    //    if (Directory.Exists(gamepath))
-    //    {
-    //        uninstallFlyout.Hide();
-    //        Directory.Delete(gamepath, true);
-
-    //        if (File.Exists(Path.Combine(rootPath ?? "", "versions.xml")))
-    //        {
-    //            XDocument versionXml = XDocument.Load(Path.Combine(rootPath ?? "", "versions.xml"));
-    //            XElement? gameVersionElement = versionXml.Root?.Element(gameIdentifier);
-
-    //            if (gameVersionElement != null)
-    //            {
-    //                gameVersionElement.Remove();
-    //                versionXml.Save(Path.Combine(rootPath ?? "", "versions.xml"));
-    //            }
-    //        }
-
-    //        File.Delete(gameZip ?? "");
-    //        Status = LauncherStatus.readyNoGame;
-    //    }
-    //}
     #endregion
 }

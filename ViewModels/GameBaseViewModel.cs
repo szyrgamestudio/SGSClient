@@ -1,12 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.Extensions.Options;
 using Microsoft.UI.Xaml.Media.Imaging;
 using SGSClient.Core.Authorization;
 using SGSClient.Core.Database;
 using SGSClient.Core.Extensions;
-using SGSClient.Core.Utilities;
 using SGSClient.Core.Utilities.AppInfoUtility.Interfaces;
-using SGSClient.Core.Utilities.AppInfoUtility.Models;
 using SGSClient.Core.Utilities.LogUtility;
 using SGSClient.Models;
 using SGSClient.Views;
@@ -16,7 +13,6 @@ using System.Data;
 using System.Diagnostics;
 using System.Net.Http.Headers;
 using System.Text;
-using System.Xml.Linq;
 using Windows.ApplicationModel.Core;
 using Windows.Storage;
 using Windows.Storage.AccessCache;
@@ -212,30 +208,20 @@ where g.Symbol = @p0 and gi.LogoP = 0
                 }
             }
         }
-        public (bool installedP, bool isUpdateP) CheckForUpdate()
+        public (bool IsInstalled, bool IsUpdateAvailable) CheckForUpdate(string gameIdentifier)
         {
             try
             {
-                string localVersion = GetLocalVersion(gameIdentifier ?? "");
+                string localVersion = GetLocalVersion(gameIdentifier ?? string.Empty);
 
-                if (string.IsNullOrEmpty(localVersion))
+                if (string.IsNullOrWhiteSpace(localVersion) || localVersion == "0.0.0")
                 {
                     Debug.WriteLine("Brak zainstalowanej wersji gry.");
                     return (false, false);
                 }
 
-                bool isUpdateP = localVersion != gameVersion;
-                if (isUpdateP)
-                {
-                    Debug.WriteLine($"Dostępna nowa wersja: {gameVersion}. Aktualna: {localVersion}");
-                    //CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
-                }
-                else
-                {
-                    Debug.WriteLine("Gra jest aktualna.");
-                }
-
-                return (true, isUpdateP);
+                bool isUpdateAvailable = !string.Equals(localVersion, gameVersion, StringComparison.Ordinal);
+                return (true, isUpdateAvailable);
             }
             catch (Exception ex)
             {
@@ -243,22 +229,32 @@ where g.Symbol = @p0 and gi.LogoP = 0
                 return (false, false);
             }
         }
-        public async Task DownloadGame(ShellPage shellPage)
+        public async Task DownloadGameAsync(ShellPage shellPage)
         {
-            if (!string.IsNullOrEmpty(gameName) && !string.IsNullOrEmpty(gameZipLink) && !string.IsNullOrEmpty(GameLogo.Url) && !string.IsNullOrEmpty(gameExe))
+            if (string.IsNullOrWhiteSpace(gameName) ||
+                string.IsNullOrWhiteSpace(gameZipLink) ||
+                string.IsNullOrWhiteSpace(GameLogo?.Url) ||
+                string.IsNullOrWhiteSpace(gameExe))
             {
-                StorageFolder? folder = null;
-                if (StorageApplicationPermissions.FutureAccessList.ContainsItem("GameInstallFolder"))
-                {
-                    folder = await StorageApplicationPermissions.FutureAccessList.GetFolderAsync("GameInstallFolder");
-                }
-
-                if (folder != null)
-                {
-                    shellPage?.AddDownload(gameName, gameIdentifier, gameZipLink, folder, GameLogo.Url);
-                    await SetLocalVersion(gameIdentifier, gameVersion, gameExe, Path.Combine(folder.Path, gameIdentifier));
-                }
+                Debug.WriteLine("Brakuje wymaganych danych gry.");
+                return;
             }
+
+            StorageFolder? installFolder = null;
+
+            if (StorageApplicationPermissions.FutureAccessList.ContainsItem("GameInstallFolder"))
+                installFolder = await StorageApplicationPermissions.FutureAccessList.GetFolderAsync("GameInstallFolder");
+
+            if (installFolder is null)
+            {
+                Debug.WriteLine("Folder instalacyjny nie został odnaleziony.");
+                return;
+            }
+
+            shellPage?.AddDownload(gameName, gameIdentifier, gameZipLink, installFolder, GameLogo.Url);
+
+            string installPath = Path.Combine(installFolder.Path, gameIdentifier);
+            await SetLocalVersion(gameIdentifier, gameVersion, gameExe, installPath);
         }
         private static string GetLocalVersion(string gameIdentifier)
         {
@@ -302,7 +298,7 @@ where g.Symbol = @p0 and gi.LogoP = 0
         public void UninstallGame()
         {
             using var db = new SQLiteConnection(DatabasePath);
-            var game = db.Table<GameVersion>().FirstOrDefault(g => g.Identifier == gameName);
+            var game = db.Table<GameVersion>().FirstOrDefault(g => g.Identifier == gameIdentifier);
             string path = game?.Path ?? string.Empty;
 
             try
@@ -391,11 +387,16 @@ where g.Symbol = @p0 and gi.LogoP = 0
                 return;
             }
 
-            // Szukanie pliku exe
-            string[] exeFiles;
+            string exePath;
             try
             {
-                exeFiles = Directory.GetFiles(game.Path, game.Exe + ".exe", SearchOption.AllDirectories);
+                var exeFiles = Directory.GetFiles(game.Path, game.Exe + ".exe", SearchOption.AllDirectories);
+                if (exeFiles.Length == 0)
+                {
+                    Console.WriteLine("Plik exe nie został znaleziony.");
+                    return;
+                }
+                exePath = exeFiles[0];
             }
             catch (Exception ex)
             {
@@ -403,13 +404,6 @@ where g.Symbol = @p0 and gi.LogoP = 0
                 return;
             }
 
-            if (exeFiles.Length == 0)
-            {
-                Console.WriteLine("Plik exe nie został znaleziony.");
-                return;
-            }
-
-            string exePath = exeFiles[0];
             DateTime startTime = DateTime.Now;
 
             try
@@ -434,7 +428,7 @@ where g.Symbol = @p0 and gi.LogoP = 0
 select
   ugt.TotalTime
 from UsersGameTime ugt
-where ugt.GameId = @p0 and r.UserId = @p1", gameId, _appUser.GetCurrentUser().Id) ?? -1;
+where ugt.GameId = @p0 and ugt.UserId = @p1", gameId, _appUser.GetCurrentUser().Id) ?? -1;
 
             double totalTime = (dbTime ?? 0) + elapsedTime.TotalSeconds;
 
@@ -445,7 +439,7 @@ update ugt set
   ugt.TotalTime = @p0
 , ugt.LastPlayed = @p1
 from UsersGameTime ugt
-where ugt.GameId = @p2 and r.UserId = @p3", totalTime, DateTime.Now, gameId, _appUser.GetCurrentUser().Id);
+where ugt.GameId = @p2 and ugt.UserId = @p3", totalTime, DateTime.Now, gameId, _appUser.GetCurrentUser().Id);
             }
             else
             {
@@ -459,8 +453,6 @@ select
 ", _appUser.GetCurrentUser().Id, gameId, DateTime.Now, totalTime);
             }
 
-            //MessageBox.Show($"Łączny czas działania: {TimeSpan.FromSeconds(totalTime)}");
-
             CoreApplication.Exit();
 
         }
@@ -472,8 +464,7 @@ select
 select
   gr.Id
 from GameRatings gr
-inner join Users u on u.Id = gr.UserId
-where u.UserId = @p0
+where gr.UserId = @p0
 ", _appUser.GetCurrentUser().Id);
 
             if (ds.Tables[0].Rows.Count > 0)
@@ -488,8 +479,8 @@ where u.UserId = @p0
             DataSet ds = db.con.select(@"
 select
   gr.Id
-, u.Id [DeveloperId]
-, d.Name
+, u.Id  [UserId]
+, u.DisplayName
 , gr.Rating
 , gr.Title
 , gr.Review
@@ -504,7 +495,7 @@ where g.Symbol = @p0
                 _allRatings.Add(new GameRating
                 {
                     RatingId = dr.TryGetValue("Id"),
-                    UserId = dr.TryGetValue("DeveloperId"),
+                    UserId = dr.TryGetValue("UserId"),
                     Author = dr.TryGetValue("Name"),
                     Rating = dr.TryGetValue("Rating"),
                     Title = dr.TryGetValue("Title"),
@@ -519,12 +510,12 @@ where g.Symbol = @p0
             DataSet ds = db.con.select(@"
 select 
   COUNT(gr.Id) RatingCount
-, CAST(ROUND(CAST(AVG(gr.Rating) AS DECIMAL(10, 1)), 1) as nvarchar) AvgRating
-, SUM(CASE WHEN gr.Rating = 1 THEN 1 ELSE 0 END) * 100 / COUNT(gr.Id) Count1
-, SUM(CASE WHEN gr.Rating = 2 THEN 1 ELSE 0 END) * 100 / COUNT(gr.Id) Count2
-, SUM(CASE WHEN gr.Rating = 3 THEN 1 ELSE 0 END) * 100 / COUNT(gr.Id) Count3
-, SUM(CASE WHEN gr.Rating = 4 THEN 1 ELSE 0 END) * 100 / COUNT(gr.Id) Count4
-, SUM(CASE WHEN gr.Rating = 5 THEN 1 ELSE 0 END) * 100 / COUNT(gr.Id) Count5
+, CAST(ROUND(CAST(AVG(gr.Rating) as decimal(10, 1)), 1) as nvarchar) AvgRating
+, SUM(case when gr.Rating = 1 then 1 else 0 end) * 100 / COUNT(gr.Id) Count1
+, SUM(case when gr.Rating = 2 then 1 else 0 end) * 100 / COUNT(gr.Id) Count2
+, SUM(case when gr.Rating = 3 then 1 else 0 end) * 100 / COUNT(gr.Id) Count3
+, SUM(case when gr.Rating = 4 then 1 else 0 end) * 100 / COUNT(gr.Id) Count4
+, SUM(case when gr.Rating = 5 then 1 else 0 end) * 100 / COUNT(gr.Id) Count5
 from GameRatings gr
 inner join Games g on g.Id = gr.GameId
 where g.Symbol = @p0
@@ -548,14 +539,14 @@ group by gr.GameId
             return db.con.select(@"
 select
   gr.Id
-, d.Id [DeveloperId]
-, d.Name
+, u.Id [UserId]
+, u.DisplayName
 , gr.Rating
 , gr.Title
 , gr.Review
 from GameRatings gr
 inner join Games g on g.Id = gr.GameId
-inner join sgsDevelopers d on d.Id = r.DeveloperId
+inner join Users u on u.Id = gr.UserId
 where g.Symbol = @p0 and gr.UserId = @p1
 ", gameIdentifier, _appUser.GetCurrentUser().Id);
         }
@@ -573,18 +564,10 @@ declare @gameId int =
   where g.Symbol = @p0
 )
 
-declare @userId int = 
-(
-  select
-    r.Id
-  from Registration r
-  where  r.UserId = @p1
-)
-
 insert GameRatings (GameId, UserId, Rating, Title, Review, CreationDateTime, ModificationDateTime)
 select
   @gameId
-, @userId
+, @p1
 , @p2
 , @p3
 , @p4
