@@ -23,7 +23,7 @@ public sealed partial class UploadGamePage : Page
     {
         get;
     }
-    public UploadGamePage(IAppUser appUser)
+    public UploadGamePage()
     {
         ViewModel = App.GetService<UploadGameViewModel>();
         ShellViewModel = App.GetService<ShellViewModel>();
