@@ -64,6 +64,8 @@ namespace SGSClient.ViewModels
         public string? OtherInformations { get; private set; }
         public bool IsOtherInformationsVisible { get; private set; }
         public bool IsHardwareRequirementsVisible { get; private set; }
+        public bool IsDLCVisible { get; private set; }
+        public bool IsAddRatingVisible { get; private set; }
         public bool CanGoToPreviousPage => CurrentPage > 0;
         public bool CanGoToNextPage => (CurrentPage + 1) * PageSize < _allRatings.Count;
 
@@ -184,6 +186,8 @@ where g.Symbol = @p0 and gi.LogoP = 0
                 OtherInformations = dr.TryGetValue("OtherInformation");
                 IsOtherInformationsVisible = !String.IsNullOrEmpty(dr.TryGetValue("OtherInformation"));
                 IsHardwareRequirementsVisible = !String.IsNullOrEmpty(dr.TryGetValue("HardwareRequirements"));
+                IsDLCVisible = false; //TODO
+                IsAddRatingVisible = _appUser.GetCurrentUser().Id != default;
 
                 OnPropertyChanged(nameof(GameName));
                 OnPropertyChanged(nameof(GameDeveloper));
@@ -192,6 +196,8 @@ where g.Symbol = @p0 and gi.LogoP = 0
                 OnPropertyChanged(nameof(OtherInformations));
                 OnPropertyChanged(nameof(IsOtherInformationsVisible));
                 OnPropertyChanged(nameof(IsHardwareRequirementsVisible));
+                OnPropertyChanged(nameof(IsDLCVisible));
+                OnPropertyChanged(nameof(IsAddRatingVisible));
 
                 GameLogos.Clear();
                 GameImages.Clear();

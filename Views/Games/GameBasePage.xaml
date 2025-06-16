@@ -165,6 +165,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <StackPanel
             Grid.Row="0"
@@ -285,15 +286,39 @@
               Text="{Binding OtherInformations}">
                     </TextBlock>
                 </StackPanel>
+
+                <!--DLC LIST-->
+                <StackPanel
+            Grid.Row="4"
+            Margin="5"
+            Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
+            BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+            BorderThickness="0.5"
+            CornerRadius="5"
+            x:Name="DLCStackPanel"
+                    Visibility="{Binding IsDLCVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <TextBlock
+              Margin="5"
+              Padding="5"
+              FontSize="20"
+              Style="{ThemeResource BodyStrongTextBlockStyle}"
+              Text="DLC"
+              />
+                    <Rectangle
+              Height="1"
+              HorizontalAlignment="Stretch"
+              Fill="{ThemeResource ControlElevationBorderBrush}" />
+                </StackPanel>
+
                 <!--Comments-->
-                <StackPanel Grid.Row="4" Margin="5" Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="0.5" CornerRadius="5" x:Name="ReviewsStackPanel">
+                <StackPanel Grid.Row="5" Margin="5" Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="0.5" CornerRadius="5" x:Name="ReviewsStackPanel">
                     <Grid Margin="5" Padding="5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" FontSize="20" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Oceny i recenzje" VerticalAlignment="Center" />
-                        <Button x:Name="AddReviewButton" Grid.Column="1" Click="AddRatingButton_Click" HorizontalAlignment="Right" Style="{StaticResource AccentButtonStyle}">
+                        <Button Visibility="{Binding IsAddRatingVisible, Converter={StaticResource BooleanToVisibilityConverter}}" x:Name="AddReviewButton" Grid.Column="1" Click="AddRatingButton_Click" HorizontalAlignment="Right" Style="{StaticResource AccentButtonStyle}">
                             <Button.Content>
                                 <FontIcon Glyph="&#xE734;" />
                             </Button.Content>
