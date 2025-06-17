@@ -37,6 +37,13 @@ namespace SGSClient.Views
         }
 
         #region Filters
+
+        private void OpenFilterPanel_Click(object sender, RoutedEventArgs e)
+        {
+            FilterExpander.IsExpanded = !FilterExpander.IsExpanded;
+        }
+
+
         private void SearchTextBox_KeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
         {
             if (e.Key == Windows.System.VirtualKey.Enter)

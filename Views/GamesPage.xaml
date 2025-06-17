@@ -13,18 +13,24 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="16">
-            <TextBox x:Name="SearchTextBox" PlaceholderText="Szukaj po nazwie" Width="200" Margin="0,0,12,0" KeyDown="SearchTextBox_KeyDown"/>
-            <TextBox x:Name="SearchAuthorTextBox" PlaceholderText="Szukaj po autorze" Width="200" Margin="0,0,12,0" KeyDown="SearchAuthorTextBox_KeyDown"/>
-            <ComboBox x:Name="CategoryComboBox" PlaceholderText="Wybierz kategorię" Width="200" Margin="0,0,12,0" KeyDown="CategoryComboBox_KeyDown" Visibility="Collapsed" >
-                <ComboBoxItem Content="Wszystkie"/>
-                <ComboBoxItem Content="Akcja"/>
-                <ComboBoxItem Content="Przygodowe"/>
-                <ComboBoxItem Content="Strategia"/>
-            </ComboBox>
-            <Button Content="Filtruj" Click="FilterButton_Click" Margin="0,0,12,0" Style="{StaticResource AccentButtonStyle}"/>
-            <Button Content="Wyczyść filtry" Click="ClearFilterButton_Click" Style="{StaticResource AccentButtonStyle}"/>
-        </StackPanel>
+        <Expander Grid.Row="0" x:Name="FilterExpander" Header="Filtry" IsExpanded="False" Margin="16,0,0,16" Width="300">
+            <StackPanel Spacing="8">
+                <TextBox x:Name="SearchTextBox" PlaceholderText="Szukaj po nazwie" Width="200" Margin="0,0,12,0"/>
+                <TextBox x:Name="SearchAuthorTextBox" PlaceholderText="Szukaj po autorze"/>
+                <ComboBox x:Name="CategoryComboBox" KeyDown="CategoryComboBox_KeyDown" PlaceholderText="Wybierz kategorię">
+                </ComboBox>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Button Content="Filtruj" Click="FilterButton_Click" Style="{StaticResource AccentButtonStyle}"/>
+                    <Button Content="Wyczyść filtry" Click="ClearFilterButton_Click" Style="{StaticResource AccentButtonStyle}"/>
+                </StackPanel>
+            </StackPanel>
+        </Expander>
+
+
+
+
+
+
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible">
             <Grid>
                 <Grid.RowDefinitions>
