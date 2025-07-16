@@ -127,7 +127,7 @@ public partial class UploadGameViewModel : ObservableRecipient
 select
   gt.Id
 , gt.Name
-from sgsGameTypes gt
+from GameTypes gt
 ");
             if (ds.Tables.Count > 0)
             {
@@ -158,7 +158,7 @@ from sgsGameTypes gt
 select
   ge.Id
 , ge.Name
-from sgsGameEngines ge
+from GameEngines ge
 ");
             if (ds.Tables.Count > 0)
             {
