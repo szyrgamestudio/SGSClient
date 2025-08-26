@@ -7,7 +7,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     xmlns:local="using:SGSClient.Models"
-    xmlns:helpers="using:SGSClient.Helpers">
+    xmlns:helpers="using:SGSClient.Helpers"
+    behaviors:NavigationViewHeaderBehavior.HeaderMode="Never">
 
     <Grid Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}">
         <Grid.RowDefinitions>
@@ -48,15 +49,8 @@
                     <Button.Flyout>
                         <Flyout x:Name="uninstallFlyout">
                             <StackPanel>
-                                <TextBlock
-                        Margin="0,0,0,12"
-                        Style="{ThemeResource BaseTextBlockStyle}"
-                        Text="Ta aplikacja i powiązane z nią informacje zostaną odinstalowane." />
-                                <Button
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Click="UninstallButton_Click"
-                        Content="Odinstaluj" />
+                                <TextBlock Margin="0,0,0,12" Style="{ThemeResource BaseTextBlockStyle}" Text="Ta aplikacja i powiązane z nią informacje zostaną odinstalowane." />
+                                <Button HorizontalAlignment="Center" VerticalAlignment="Center" Click="UninstallButton_Click" Content="Odinstaluj" />
                             </StackPanel>
                         </Flyout>
                     </Button.Flyout>
@@ -69,7 +63,7 @@
             <StackPanel>
 
                 <!-- Zrzuty ekranu -->
-                <ScrollViewer Margin="18,6" HorizontalScrollMode="Auto" HorizontalScrollBarVisibility="Hidden" VerticalScrollMode="Disabled">
+                <ScrollViewer Margin="18,6" HorizontalScrollMode="Auto" HorizontalScrollBarVisibility="Visible" VerticalScrollMode="Disabled">
                     <ItemsRepeater ItemsSource="{Binding GameImages}">
                         <ItemsRepeater.Layout>
                             <StackLayout Orientation="Horizontal" Spacing="10"/>
