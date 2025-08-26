@@ -53,6 +53,7 @@ public sealed partial class GameBasePage : Page
     }
 
     #region Rating
+    /*
     private void RatingRatingControl_ValueChanged(RatingControl sender, object args)
     {
         ArgumentNullException.ThrowIfNull(sender);
@@ -115,6 +116,7 @@ public sealed partial class GameBasePage : Page
 
         }
     }
+    */
     private void ShowAllReviewsButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
 
