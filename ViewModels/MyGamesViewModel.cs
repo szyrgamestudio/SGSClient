@@ -10,7 +10,7 @@ namespace SGSClient.ViewModels
 {
     public partial class MyGamesViewModel : ObservableRecipient
     {
-        #region Constructors and Properties
+        #region Ctors and Properties
         private readonly IAppUser _appUser;
         public ObservableCollection<Game> MyGamesList { get; private set; } = new();
         public MyGamesViewModel(IAppUser appUser)

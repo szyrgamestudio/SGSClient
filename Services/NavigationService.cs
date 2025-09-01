@@ -41,6 +41,9 @@ public class NavigationService : INavigationService
     [MemberNotNullWhen(true, nameof(Frame), nameof(_frame))]
     public bool CanGoBack => Frame != null && Frame.CanGoBack;
 
+    [MemberNotNullWhen(true, nameof(Frame), nameof(_frame))]
+    public bool CanGoForward => _frame.CanGoForward;
+
     public NavigationService(IPageService pageService)
     {
         _pageService = pageService;
@@ -68,6 +71,23 @@ public class NavigationService : INavigationService
         {
             var vmBeforeNavigation = _frame.GetPageViewModel();
             _frame.GoBack();
+            if (vmBeforeNavigation is INavigationAware navigationAware)
+            {
+                navigationAware.OnNavigatedFrom();
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public bool GoForward()
+    {
+        if (CanGoForward)
+        {
+            var vmBeforeNavigation = _frame.GetPageViewModel();
+            _frame.GoForward();
             if (vmBeforeNavigation is INavigationAware navigationAware)
             {
                 navigationAware.OnNavigatedFrom();

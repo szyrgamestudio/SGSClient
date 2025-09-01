@@ -12,6 +12,11 @@ public interface INavigationService
         get;
     }
 
+    bool CanGoForward
+    {
+        get;
+    }
+
     Frame? Frame
     {
         get; set;
@@ -20,4 +25,6 @@ public interface INavigationService
     bool NavigateTo(string pageKey, object? parameter = null, bool clearNavigation = false);
 
     bool GoBack();
+    bool GoForward();
+
 }

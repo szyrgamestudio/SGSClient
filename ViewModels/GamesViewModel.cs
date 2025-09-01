@@ -6,7 +6,7 @@ namespace SGSClient.ViewModels
 {
     public partial class GamesViewModel : ObservableRecipient
     {
-        #region Constructors and Properties
+        #region Ctors and Properties
         public ObservableCollection<Game> GamesList { get; private set; } = new();
         public ObservableCollection<Game> GamesFeaturedList { get; private set; } = new();
         public GamesViewModel() { }

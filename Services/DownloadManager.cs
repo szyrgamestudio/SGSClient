@@ -15,7 +15,7 @@ public class DownloadManager
     public ObservableCollection<DownloadItem> ActiveDownloads { get; } = new();
     #endregion
 
-    #region Constructor
+    #region Ctor
     private DownloadManager() { }
     #endregion
 

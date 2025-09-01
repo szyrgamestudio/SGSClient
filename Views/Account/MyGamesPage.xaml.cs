@@ -15,7 +15,7 @@ namespace SGSClient.Views
         public MyGamesViewModel ViewModel { get; }
         #endregion
 
-        #region Constructor
+        #region Ctor
         public MyGamesPage()
         {
             ViewModel = App.GetService<MyGamesViewModel>();

@@ -8,7 +8,7 @@ namespace SGSClient.Views
 {
     public sealed partial class GamesPage : Page
     {
-        #region Constructors and properties
+        #region Ctors and properties
         public GamesViewModel ViewModel { get; }
         public GamesPage()
         {

@@ -12,7 +12,7 @@ namespace SGSClient.Controls
         private bool IsDownloadsVisible = true;
         #endregion
 
-        #region Constructor
+        #region Ctor
         public DownloadBar()
         {
             InitializeComponent();

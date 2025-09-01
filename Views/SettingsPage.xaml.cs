@@ -19,7 +19,7 @@ public sealed partial class SettingsPage : Page
     public SettingsViewModel ViewModel { get; }
     #endregion
 
-    #region Constructor
+    #region Ctor
     public SettingsPage()
     {
         ViewModel = App.GetService<SettingsViewModel>();

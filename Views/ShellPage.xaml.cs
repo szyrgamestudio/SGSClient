@@ -7,7 +7,6 @@ using SGSClient.Core.Utilities.LogUtility;
 using SGSClient.Helpers;
 using SGSClient.Models;
 using SGSClient.ViewModels;
-using System;
 using Windows.Storage;
 using Windows.System;
 
@@ -22,6 +21,7 @@ public sealed partial class ShellPage : Page
         get;
     }
 
+    #region Ctor
     public ShellPage(ShellViewModel viewModel)
     {
         ViewModel = viewModel;
@@ -39,10 +39,9 @@ public sealed partial class ShellPage : Page
         AppTitleBarText.Text = "AppDisplayName".GetLocalized();
         this.PointerPressed += ShellPage_PointerPressed;
         DownloadBar.DataContext = DownloadViewModel.Instance;
-
     }
-
-    private void OnLoaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    #endregion
+    private void OnLoaded(object sender, RoutedEventArgs e)
     {
         TitleBarHelper.UpdateTitleBar(RequestedTheme);
 
@@ -94,9 +93,10 @@ public sealed partial class ShellPage : Page
         }
         else if (properties.IsXButton2Pressed)
         {
-            // Handle the forward navigation (if applicable)
-            // You may need to implement a forward navigation method in your ViewModel
-            // ViewModel.NavigationService.GoForward();
+            if (ViewModel.NavigationService.CanGoForward)
+            {
+                ViewModel.NavigationService.GoForward();
+            }
         }
     }
     private void UserAccountItem_Tapped(object sender, TappedRoutedEventArgs e)

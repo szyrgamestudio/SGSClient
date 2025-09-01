@@ -27,15 +27,15 @@ public sealed partial class GameBasePage : Page
         }
     }
 
-    protected override void OnNavigatedTo(NavigationEventArgs e)
+    protected async override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
         DataContext = ViewModel;
 
         if (e.Parameter is string gameSymbol && !string.IsNullOrWhiteSpace(gameSymbol))
         {
-            ViewModel.LoadGameData(gameSymbol);
-            (bool installedP, bool updateP) = ViewModel.CheckForUpdate(gameSymbol);
+            await ViewModel.LoadGameData(gameSymbol);
+            (bool installedP, bool updateP) = ViewModel.CheckForUpdate(gameSymbol); 
 
             if (installedP)
                 Status = LauncherStatus.ready;
@@ -46,6 +46,7 @@ public sealed partial class GameBasePage : Page
                 CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
         }
     }
+
     public GameBasePage()
     {
         ViewModel = App.GetService<GameBaseViewModel>();
