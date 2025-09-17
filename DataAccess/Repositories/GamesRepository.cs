@@ -68,7 +68,6 @@ order by g.Title", bypassDraftP);
                     GameName = dr.TryGetValue<string>("Title"),
                     GameDeveloper = dr.TryGetValue<string>("GameDeveloper"),
                     GameTitle = dr.TryGetValue<string>("Title"),
-                    ImageSource = new Uri(dr.TryGetValue<string>("LogoPath") ?? "about:blank"),
                     GameVersion = string.Empty,
                     GamePayloadName = dr.TryGetValue<string>("PayloadName"),
                     GameExeName = dr.TryGetValue<string>("ExeName"),

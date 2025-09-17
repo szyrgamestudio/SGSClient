@@ -2,9 +2,7 @@
 using Microsoft.UI.Xaml.Navigation;
 using SGSClient.Controls;
 using SGSClient.Helpers;
-using SGSClient.Models;
 using SGSClient.ViewModels;
-using System.Data;
 using System.Diagnostics;
 
 namespace SGSClient.Views;
@@ -12,9 +10,7 @@ public sealed partial class GameBasePage : Page
 {
     private LauncherStatus _status;
     private readonly string? gameZip = "";
-    private readonly string? gameIdentifier = "";
 
-    private GameRating? _gameRating;
     public GameBaseViewModel ViewModel { get; }
 
     internal LauncherStatus Status
@@ -23,7 +19,8 @@ public sealed partial class GameBasePage : Page
         set
         {
             _status = value;
-            LauncherStatusHelper.UpdateStatus(PlayButton, CheckUpdateButton, UninstallButton, DownloadProgressBorder, _status, gameZip ?? "");
+            //LauncherStatusHelper.UpdateStatus(PlayButton, CheckUpdateButton, UninstallButton, DownloadProgressBorder, _status, gameZip ?? "");
+            LauncherStatusHelper.UpdateStatus(PlayButton, CheckUpdateButton, UninstallButton, null, _status, gameZip ?? "");
         }
     }
 

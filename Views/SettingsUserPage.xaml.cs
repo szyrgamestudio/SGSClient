@@ -22,9 +22,9 @@ public sealed partial class SettingsUserPage : Page
     {
         //Frame.Navigate(typeof(LoginPage));
     }
-    private void ChangePasswordButton_Click(object sender, RoutedEventArgs e)
+    private async void ChangePasswordButton_Click(object sender, RoutedEventArgs e)
     {
-        ViewModel.ChangePasswordCommand();
+        await ViewModel.ChangePasswordCommand();
         //Frame.Navigate(typeof(LoginPage));
     }
 

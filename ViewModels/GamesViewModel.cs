@@ -8,7 +8,6 @@ namespace SGSClient.ViewModels
     {
         #region Ctors and Properties
         public ObservableCollection<Game> GamesList { get; private set; } = new();
-        public ObservableCollection<Game> GamesFeaturedList { get; private set; } = new();
         public GamesViewModel() { }
 
         #endregion
@@ -19,7 +18,6 @@ namespace SGSClient.ViewModels
             try
             {
                 GamesList = new ObservableCollection<Game>(GamesRepository.FetchGames(false));
-                GamesFeaturedList = new ObservableCollection<Game>(GamesRepository.FetchFeaturedGames(false));
             }
             catch (Exception ex)
             {

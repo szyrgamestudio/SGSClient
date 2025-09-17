@@ -14,7 +14,7 @@
             <Image Grid.Column="1" Width="16" Height="16" HorizontalAlignment="Left" Source="/Assets/WindowIcon.ico" />
             <TextBlock x:Name="AppTitleBarText" Grid.Column="2" Margin="28,0,0,0" VerticalAlignment="Center" Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="NoWrap" />
         </Grid>
-        <NavigationView x:Name="NavigationViewControl" Canvas.ZIndex="0" DisplayModeChanged="NavigationViewControl_DisplayModeChanged" ExpandedModeThresholdWidth="1280" Header="{x:Bind ((ContentControl)ViewModel.Selected).Content, Mode=OneWay}" IsBackButtonVisible="Visible" IsBackEnabled="{x:Bind ViewModel.IsBackEnabled, Mode=OneWay}" IsPaneToggleButtonVisible="True" IsSettingsVisible="True" SelectedItem="{x:Bind ViewModel.Selected, Mode=OneWay}">
+        <NavigationView x:Name="NavigationViewControl" Canvas.ZIndex="0" DisplayModeChanged="NavigationViewControl_DisplayModeChanged" ExpandedModeThresholdWidth="1920" Header="{x:Bind ((ContentControl)ViewModel.Selected).Content, Mode=OneWay}" IsBackButtonVisible="Visible" IsBackEnabled="{x:Bind ViewModel.IsBackEnabled, Mode=OneWay}" IsPaneToggleButtonVisible="True" IsSettingsVisible="True" SelectedItem="{x:Bind ViewModel.Selected, Mode=OneWay}">
             <NavigationView.MenuItems>
                 <NavigationViewItem x:Uid="Shell_Home" helpers:NavigationHelper.NavigateTo="SGSClient.ViewModels.HomeViewModel">
                     <NavigationViewItem.Icon>

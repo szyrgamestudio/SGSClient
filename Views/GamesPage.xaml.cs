@@ -38,12 +38,6 @@ namespace SGSClient.Views
 
         #region Filters
 
-        private void OpenFilterPanel_Click(object sender, RoutedEventArgs e)
-        {
-            FilterExpander.IsExpanded = !FilterExpander.IsExpanded;
-        }
-
-
         private void SearchTextBox_KeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
         {
             if (e.Key == Windows.System.VirtualKey.Enter)
@@ -83,9 +77,13 @@ namespace SGSClient.Views
             string? selectedCategory = (CategoryComboBox.SelectedItem as ComboBoxItem)?.Content.ToString();
 
             var filteredGames = ViewModel.GamesList.Where(game =>
-(string.IsNullOrEmpty(searchTitleText) || game.GameTitle.ToLower().Contains(searchTitleText))
-&& (string.IsNullOrEmpty(searchAuthorText) || game.GameDeveloper.ToLower().Contains(searchAuthorText))
-).ToList();
+                (string.IsNullOrEmpty(searchTitleText) || 
+                    (!string.IsNullOrEmpty(game.GameTitle) && 
+                     game.GameTitle.Contains(searchTitleText, StringComparison.OrdinalIgnoreCase)))
+                && (string.IsNullOrEmpty(searchAuthorText) || 
+                    (!string.IsNullOrEmpty(game.GameDeveloper) && 
+                     game.GameDeveloper.Contains(searchAuthorText, StringComparison.OrdinalIgnoreCase)))
+            ).ToList();
 
             GamesItemsControl.ItemsSource = filteredGames;
         }
