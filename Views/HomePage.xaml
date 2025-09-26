@@ -20,7 +20,7 @@
             </Grid>
 
             <!--  CONTENT  -->
-            <ScrollViewer Grid.Row="1" Margin="20" HorizontalScrollBarVisibility="Disabled" VerticalScrollMode="Auto">
+            <ScrollViewer Grid.Row="1" Margin="20" HorizontalScrollBarVisibility="Auto" HorizontalScrollMode="Enabled" Loaded="GamesScrollViewer_Loaded">
                 <StackPanel Spacing="30">
 
                     <!--  Polecane gry  -->
@@ -50,20 +50,12 @@
                                     <StackPanel Padding="12" VerticalAlignment="Bottom" Spacing="8">
                                         <TextBlock FontWeight="Bold" Foreground="White" Text="{x:Bind GameName}" />
                                         <TextBlock FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind GameDeveloper}" TextWrapping="Wrap" />
-                                        <Button Height="32" HorizontalAlignment="Left" Background="{ThemeResource AccentFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}" Content="Zobacz więcej" CornerRadius="{StaticResource ControlCornerRadius}" />
+                                        <Button Height="32" HorizontalAlignment="Left" Background="{ThemeResource AccentFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}" Click="ButtonGame_Click" Content="Zobacz więcej" CornerRadius="{StaticResource ControlCornerRadius}" Tag="{Binding GameSymbol}" />
                                     </StackPanel>
                                 </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
-
-                    <!--  Dodatkowe opcje  -->
-                    <TextBlock FontSize="24" FontWeight="Bold" Foreground="White" Text="Dodatkowe opcje" />
-                    <StackPanel Orientation="Horizontal" Spacing="20">
-                        <Button Width="140" Height="44" Background="{ThemeResource ControlFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="1" Content="Zgłoś błąd" CornerRadius="{StaticResource ControlCornerRadius}" Foreground="White" />
-                        <Button Width="140" Height="44" Background="{ThemeResource ControlFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="1" Content="Otwórz GitHub" CornerRadius="{StaticResource ControlCornerRadius}" Foreground="White" />
-                    </StackPanel>
-
                 </StackPanel>
             </ScrollViewer>
 

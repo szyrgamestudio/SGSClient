@@ -4,6 +4,7 @@ using SGSClient.Controls;
 using SGSClient.Helpers;
 using SGSClient.ViewModels;
 using System.Diagnostics;
+using Windows.Storage;
 
 namespace SGSClient.Views;
 public sealed partial class GameBasePage : Page
@@ -133,14 +134,8 @@ public sealed partial class GameBasePage : Page
         switch (Status)
         {
             case LauncherStatus.readyNoGame:
-                var dialog = new ChooseInstallLocationDialog
-                {
-                    XamlRoot = XamlRoot
-                };
-
-                var result = await dialog.ShowAsync();
-
-                if (result == ContentDialogResult.Primary && dialog.SelectedFolder != null)
+                var folder = await ShowInstallLocationDialogAsync();
+                if (folder != null)
                 {
                     await ViewModel.DownloadGameAsync(shellPage);
                 }
@@ -155,18 +150,66 @@ public sealed partial class GameBasePage : Page
                 break;
         }
     }
-    private async void UpdateButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+
+    private async Task<StorageFolder> ShowInstallLocationDialogAsync()
     {
-        var dialog = new ChooseInstallLocationDialog
+        TextBox pathTextBox = new TextBox { PlaceholderText = "Wybierz folder instalacji..." };
+        Button browseButton = new Button { Content = "Przeglądaj" };
+        StackPanel panel = new StackPanel { Spacing = 8 };
+        panel.Children.Add(pathTextBox);
+        panel.Children.Add(browseButton);
+
+        StorageFolder selectedFolder = null;
+
+        browseButton.Click += async (s, e) =>
         {
-            XamlRoot = XamlRoot
+            var picker = new Windows.Storage.Pickers.FolderPicker
+            {
+                SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.ComputerFolder
+            };
+            picker.FileTypeFilter.Add("*");
+
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+
+            var folder = await picker.PickSingleFolderAsync();
+            if (folder != null)
+            {
+                selectedFolder = folder;
+                pathTextBox.Text = folder.Path;
+
+                string token = "GameInstallFolder";
+                Windows.Storage.AccessCache.StorageApplicationPermissions
+                    .FutureAccessList
+                    .AddOrReplace(token, folder);
+            }
+        };
+
+        var dialog = new ContentDialog
+        {
+            XamlRoot = this.XamlRoot,
+            Title = "Wybierz folder instalacji",
+            PrimaryButtonText = "OK",
+            CloseButtonText = "Anuluj",
+            DefaultButton = ContentDialogButton.Primary,
+            Content = panel
+        };
+
+        dialog.PrimaryButtonClick += (s, e) =>
+        {
+            if (selectedFolder == null)
+            {
+                e.Cancel = true;
+                ToolTipService.SetToolTip(pathTextBox, "Musisz wybrać folder instalacji.");
+            }
         };
 
         var result = await dialog.ShowAsync();
+        return result == ContentDialogResult.Primary ? selectedFolder : null;
+    }
 
-        if (result != ContentDialogResult.Primary || dialog.SelectedFolder is null)
-            return;
-
+    private async void UpdateButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
         if (App.MainWindow.Content is not ShellPage shellPage)
         {
             Debug.WriteLine("Nie udało się uzyskać ShellPage.");
