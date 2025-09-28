@@ -55,9 +55,9 @@
                         </TextBlock>
                     </StackPanel>
                     <!--  Przycisk pobrania, aktualizacja i odinstalowanie  -->
-                    <Button x:Name="PlayButton" Width="180" Height="44" Background="#0078D7" Click="PlayButton_Click" Content="Pobierz" FontWeight="SemiBold" Foreground="White" />
+                    <Button x:Name="PlayButton" Width="180" Height="44" Click="PlayButton_Click" Content="Pobierz" Style="{StaticResource AccentButtonStyle}" />
                     <Button x:Name="CheckUpdateButton" Width="180" Height="40" Click="UpdateButton_Click" Content="Aktualizuj" />
-                    <HyperlinkButton x:Name="UninstallButton" Click="UninstallButton_Click" Content="Odinstaluj" FontSize="14" Foreground="LightGray" />
+                    <Button x:Name="UninstallButton" Click="UninstallButton_Click" Content="Odinstaluj" FontSize="14" Style="{StaticResource SubtleButtonStyle}" />
                 </StackPanel>
             </Grid>
         </Grid>

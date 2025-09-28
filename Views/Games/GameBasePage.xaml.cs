@@ -20,8 +20,7 @@ public sealed partial class GameBasePage : Page
         set
         {
             _status = value;
-            //LauncherStatusHelper.UpdateStatus(PlayButton, CheckUpdateButton, UninstallButton, DownloadProgressBorder, _status, gameZip ?? "");
-            LauncherStatusHelper.UpdateStatus(PlayButton, CheckUpdateButton, UninstallButton, null, _status, gameZip ?? "");
+            LauncherStatusHelper.UpdateStatus(PlayButton, CheckUpdateButton, UninstallButton, _status, gameZip ?? "");
         }
     }
 
@@ -32,16 +31,18 @@ public sealed partial class GameBasePage : Page
 
         if (e.Parameter is string gameSymbol && !string.IsNullOrWhiteSpace(gameSymbol))
         {
-            await ViewModel.LoadGameData(gameSymbol);
-            (bool installedP, bool updateP) = ViewModel.CheckForUpdate(gameSymbol); 
+            (bool installedP, bool updateP) = ViewModel.CheckForUpdate(gameSymbol);
 
             if (installedP)
                 Status = LauncherStatus.ready;
             else
                 Status = LauncherStatus.readyNoGame;
 
-            if (updateP)
-                CheckUpdateButton.Visibility = Microsoft.UI.Xaml.Visibility.Visible;
+            CheckUpdateButton.Visibility = updateP
+                ? Microsoft.UI.Xaml.Visibility.Visible
+                : Microsoft.UI.Xaml.Visibility.Collapsed;
+
+            await ViewModel.LoadGameData(gameSymbol);
         }
     }
 

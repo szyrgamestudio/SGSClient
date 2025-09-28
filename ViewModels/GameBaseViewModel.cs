@@ -226,6 +226,13 @@ where g.Symbol = @p0 and gi.LogoP = 0
                     return (false, false);
                 }
 
+                string gameVersion = db.con.scalar(@"
+select
+  g.CurrentVersion
+from Games g
+where g.Symbol = @p0
+", gameIdentifier);
+
                 bool isUpdateAvailable = !string.Equals(localVersion, gameVersion, StringComparison.Ordinal);
                 return (true, isUpdateAvailable);
             }

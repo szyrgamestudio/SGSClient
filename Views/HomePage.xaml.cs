@@ -9,28 +9,24 @@ namespace SGSClient.Views;
 
 public sealed partial class HomePage : Page
 {
+    #region Fields
+    public HomeViewModel HomeViewModel { get; }
+    #endregion
+
     #region Ctor
     public HomePage()
     {
-        ViewModel = App.GetService<HomeViewModel>();
+        HomeViewModel = App.GetService<HomeViewModel>();
         InitializeComponent();
-
     }
-    #endregion
-
-    #region Properties
-    public HomeViewModel ViewModel { get; }
     #endregion
 
     #region Methods
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
-        ViewModel.LoadGamesFromDatabase();
+        HomeViewModel.LoadGamesFromDatabase();
     }
-    #endregion
-
-    #region Private Methods
     private void GamesScrollViewer_Loaded(object sender, RoutedEventArgs e)
     {
         var sv = (ScrollViewer)sender;
