@@ -10,6 +10,7 @@
             </ResourceDictionary.MergedDictionaries>
             <helpers:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
             <helpers:StringToImageSourceConverter x:Key="StringToImageSourceConverter" />
+            <helpers:HtmlToParagraphConverter x:Key="HtmlToParagraphConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -1,25 +1,26 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace SGSClient.Models
 {
     public class GameRating : INotifyPropertyChanged
     {
-        private string _author;
+        private string? _author;
         private int _rating;
-        private string _title;
-        private string _review;
+        private string? _title;
+        private string? _review;
 
         public int UserId { get; set; }
         public int RatingId { get; set; }
 
-        public string Author
+        public string? Author
         {
             get => _author;
             set => SetField(ref _author, value);
         }
 
-        public string Review
+        public string? Review
         {
             get => _review;
             set => SetField(ref _review, value);
@@ -31,13 +32,13 @@ namespace SGSClient.Models
             set => SetField(ref _rating, value);
         }
 
-        public string Title
+        public string? Title
         {
             get => _title;
             set => SetField(ref _title, value);
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = "")
         {

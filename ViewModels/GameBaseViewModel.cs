@@ -57,6 +57,7 @@ namespace SGSClient.ViewModels
         private readonly HttpClient httpClient = new();
         private static readonly string DatabasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "local_game_data.db");
 
+        public int? GameId { get; private set; }
         public string? GameName { get; private set; }
         public string? GameDeveloper { get; private set; }
         public string? GameDescription { get; private set; }
@@ -179,6 +180,7 @@ where g.Symbol = @p0 and gi.LogoP = 0
                 //LoadRatings(gameSymbol ?? "");
                 //LoadGameRatingsStats(gameSymbol ?? "");
 
+                GameId = gameId;
                 GameName = gameName;
                 GameDeveloper = dr.TryGetValue("GameDeveloper") ?? "Brak dostępnych informacji.";
                 GameDescription = dr.TryGetValue("Description") ?? "Brak dostępnych informacji.";
@@ -189,6 +191,7 @@ where g.Symbol = @p0 and gi.LogoP = 0
                 IsDLCVisible = false; //TODO
                 IsAddRatingVisible = _appUser.GetCurrentUser().Id != default;
 
+                OnPropertyChanged(nameof(GameId));
                 OnPropertyChanged(nameof(GameName));
                 OnPropertyChanged(nameof(GameDeveloper));
                 OnPropertyChanged(nameof(GameDescription));
@@ -547,7 +550,7 @@ group by gr.GameId
             }
 
         }
-        public DataSet ReturnUserRating(string gameIdentifier)
+        public DataSet ReturnUserRating(int gameId)
         {
             return db.con.select(@"
 select
@@ -560,33 +563,25 @@ select
 from GameRatings gr
 inner join Games g on g.Id = gr.GameId
 inner join Users u on u.Id = gr.UserId
-where g.Symbol = @p0 and gr.UserId = @p1
-", gameIdentifier, _appUser.GetCurrentUser().Id);
+where g.Id = @p0 and gr.UserId = @p1
+", gameId, _appUser.GetCurrentUser().Id);
         }
-        public void AddRating(string gameIdentifier, GameRating gameRating)
+        public void SaveGameRating(int gameId, GameRating gameRating)
         {
             if (gameRating.RatingId > 0)
                 UpdateRating(gameRating, gameIdentifier);
             else
                 db.con.exec(@"
-declare @gameId int =
-(
-  select
-    g.Id
-  from sgsGames g
-  where g.Symbol = @p0
-)
-
 insert GameRatings (GameId, UserId, Rating, Title, Review, CreationDateTime, ModificationDateTime)
 select
-  @gameId
+  @p0
 , @p1
 , @p2
 , @p3
 , @p4
 , GETDATE()
 , GETDATE()
-", gameIdentifier, _appUser.UserId, gameRating.Rating, gameRating.Title, gameRating.Review);
+", gameId, _appUser.UserId, gameRating.Rating, gameRating.Title, gameRating.Review);
 
             LoadGameRatingsStats(gameIdentifier);
             LoadPage(CurrentPage);

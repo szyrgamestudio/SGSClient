@@ -171,14 +171,17 @@
                 <StackPanel Grid.Row="3" Margin="5" Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="0.5" CornerRadius="5">
                     <TextBlock Margin="5" Padding="5" FontSize="20" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Opis" />
                     <Rectangle Height="1" HorizontalAlignment="Stretch" Fill="{ThemeResource ControlElevationBorderBrush}" />
-                    <TextBox Height="100" Text="{Binding GameDescription, Mode=TwoWay}" PlaceholderText="Tutaj wprowadź opis swojej gry" Margin="5" Padding="5" FontSize="14" x:Name="gameDescriptionTextBox" AutomationProperties.Name="multi-line TextBox" TextWrapping="Wrap" AcceptsReturn="True"></TextBox>
+                    <!--<TextBox Height="100" Text="{Binding GameDescription, Mode=TwoWay}" PlaceholderText="Tutaj wprowadź opis swojej gry" Margin="5" Padding="5" FontSize="14" x:Name="gameDescriptionTextBox" AutomationProperties.Name="multi-line TextBox" TextWrapping="Wrap" AcceptsReturn="True"></TextBox>-->
+                    <RichEditBox x:Name="gameDescriptionRichEditBox" AutomationProperties.Name="editor with custom menu" Loaded="GameDescriptionRichEditBox_Loaded" TextChanged="GameDescriptionRichEditBox_TextChanged" />
+
                 </StackPanel>
 
                 <!-- Wymagania systemowe -->
                 <StackPanel Grid.Row="4" Margin="5" Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="0.5" CornerRadius="5">
                     <TextBlock Margin="5" Padding="5" FontSize="20" Style="{ThemeResource BodyStrongTextBlockStyle}" Text="Wymagania systemowe" />
                     <Rectangle Height="1" HorizontalAlignment="Stretch" Fill="{ThemeResource ControlElevationBorderBrush}" />
-                    <TextBox Height="100" Text="{Binding HardwareRequirements, Mode=TwoWay}" PlaceholderText="Tutaj wprowadź wymagania sprzętowe swojej gry" Margin="5" Padding="5" FontSize="14" x:Name="hardwareRequirementsTextBox" AutomationProperties.Name="multi-line TextBox" TextWrapping="Wrap" AcceptsReturn="True"></TextBox>
+                    <!--<TextBox Height="100" Text="{Binding HardwareRequirements, Mode=TwoWay}" PlaceholderText="Tutaj wprowadź wymagania sprzętowe swojej gry" Margin="5" Padding="5" FontSize="14" x:Name="hardwareRequirementsTextBox" AutomationProperties.Name="multi-line TextBox" TextWrapping="Wrap" AcceptsReturn="True"></TextBox>-->
+                    <RichEditBox x:Name="hardwareRequirementsRichEditBox" AutomationProperties.Name="editor with custom menu" Loaded="HardwareRequirementsRichEditBox_Loaded" TextChanged="HardwareRequirementsRichEditBox_TextChanged" />
                 </StackPanel>
 
                 <!-- Pozostałe informacje -->

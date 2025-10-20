@@ -197,7 +197,7 @@ select
 , g.OtherInformation
 , g.TypeId
 , g.EngineId
-from sgsGames g
+from Games g
 where g.Id = @p0
 ", gameId);
         if (ds.Tables[0].Rows.Count > 0)
@@ -211,7 +211,7 @@ where g.Id = @p0
             ExeName = dr.TryGetValue("ExeName");
             GameDescription = dr.TryGetValue("Description");
             HardwareRequirements = dr.TryGetValue("HardwareRequirements");
-            OtherInfo = dr.TryGetValue("OtherInformation");
+            OtherInfo = dr.TryGetValue("OtherInformation") ?? "";
 
             int gameTypeId = Convert.ToInt32(dr.TryGetValue("TypeId"));
             int gameEngineId = Convert.ToInt32(dr.TryGetValue("EngineId"));
@@ -221,16 +221,21 @@ where g.Id = @p0
 
             DataSet logoData = db.con.select(@"
 select
-  l.LogoPath
-from sgsGameLogo l
-where l.GameId = @p0
+  gi.Url
+from GameImages gi
+where gi.GameId = @p0 and gi.LogoP = 1
 ", gameId);
-            DataSet imagesData = db.con.select(SqlQueries.gameImagesByIdSQL, gameId);
+            DataSet imagesData = db.con.select(@"
+select
+  gi.Url
+from GameImages gi
+where gi.GameId = @p0 and gi.LogoP = 0
+", gameId);
 
             GameLogos.Clear();
             foreach (DataRow dr0 in logoData.Tables[0].Rows)
             {
-                string imageUrl = dr0.TryGetValue("LogoPath").ToString();
+                string imageUrl = dr0.TryGetValue("Url").ToString();
 
                 await LoadLogoFromNextcloud(dr0, NextcloudUsername, NextcloudPassword);
             }
@@ -238,7 +243,7 @@ where l.GameId = @p0
             GameImages.Clear();
             foreach (DataRow dr1 in imagesData.Tables[0].Rows)
             {
-                string imageUrl = dr1.TryGetValue("ImagePath").ToString();
+                string imageUrl = dr1.TryGetValue("Url").ToString();
 
                 await LoadImageFromNextcloud(dr1, NextcloudUsername, NextcloudPassword);
             }
@@ -271,7 +276,20 @@ where l.GameId = @p0
             string hardwareRequirementsParam = string.Join(Environment.NewLine, HardwareRequirements.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
             string otherInfoParam = string.Join(Environment.NewLine, OtherInfo.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
 
-            db.con.select(SqlQueries.updateGameDetailsSQL, GameName, Symbol, CurrentVersion, ZipLink, ExeName, gameDescriptionParam, hardwareRequirementsParam, otherInfoParam, SelectedGameTypeId, SelectedGameEngineId, gameId);
+            db.con.select(@"
+update g set
+  g.Title = @p0
+, g.Symbol = @p1
+, g.CurrentVersion = @p2
+, g.ZipLink = @p3
+, g.ExeName = @p4
+, g.Description = @p5
+, g.HardwareRequirements = @p6
+, g.OtherInformation = @p7
+, g.TypeId = @p8
+, g.EngineId = @p9
+from Games g
+where g.Id = @p10", GameName, Symbol, CurrentVersion, ZipLink, ExeName, gameDescriptionParam, hardwareRequirementsParam, otherInfoParam, SelectedGameTypeId, SelectedGameEngineId, gameId);
         }
         catch (Exception ex)
         {
@@ -283,7 +301,11 @@ where l.GameId = @p0
     }
     private async Task UpdateGameLogo(int gameId)
     {
-        db.con.select(SqlQueries.deleteLogoSQL, gameId);
+        db.con.select(@"
+delete gi from
+GameImages gi
+where gi.GameId = @p0 and gi.LogoP = 1
+", gameId);
         var uploader = new NextcloudUploader("https://cloud.m455yn.dev/", "sgsclient", "yGnxE-Tykxe-SwjwW-NooLc-xSwPT");
 
         foreach (var logo in GameLogos)
@@ -300,12 +322,21 @@ where l.GameId = @p0
                     imageUrl = uploadedUrl;
                 }
             }
-            db.con.select(SqlQueries.insertLogoSQL, gameId, imageUrl);
+            db.con.select(@"
+insert GameImages (GameId, Url, LogoP)
+select
+  @p0
+, @p1
+, 1", gameId, imageUrl);
         }
     }
     private async Task UpdateGameImages(int gameId)
     {
-        db.con.select(SqlQueries.deleteImagesSQL, gameId);
+        db.con.select(@"
+delete gi from
+GameImages gi
+where gi.GameId = @p0 and gi.LogoP = 0
+", gameId);
         var uploader = new NextcloudUploader("https://cloud.m455yn.dev/", "sgsclient", "yGnxE-Tykxe-SwjwW-NooLc-xSwPT");
 
         foreach (var image in GameImages)
@@ -326,7 +357,12 @@ where l.GameId = @p0
             }
 
             // Insert the URL (which may now be from Nextcloud) into the database
-            db.con.select(SqlQueries.insertImageSQL, gameId, imageUrl);
+            db.con.select(@"
+insert GameImages (GameId, Url, LogoP)
+select
+  @p0
+, @p1
+, 0", gameId, imageUrl);
         }
     }
 
@@ -344,7 +380,7 @@ where l.GameId = @p0
     }
     public async Task LoadLogoFromNextcloud(DataRow imageRow, string username, string password)
     {
-        string imageUrl = imageRow["LogoPath"].ToString();
+        string imageUrl = imageRow["Url"].ToString();
 
         using (var client = new HttpClient())
         {
@@ -371,7 +407,7 @@ where l.GameId = @p0
     }
     public async Task LoadImageFromNextcloud(DataRow imageRow, string username, string password)
     {
-        string imageUrl = imageRow["ImagePath"].ToString();
+        string imageUrl = imageRow["Url"].ToString();
 
         using (var client = new HttpClient())
         {

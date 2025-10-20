@@ -1,6 +1,9 @@
 ﻿<Page x:Class="SGSClient.Views.GameBasePage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:behaviors="using:SGSClient.Behaviors" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:helpers="using:SGSClient.Helpers" xmlns:local="using:SGSClient.Models" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" behaviors:NavigationViewHeaderBehavior.HeaderMode="Never" mc:Ignorable="d">
+    <Page.Background>
+        <ImageBrush ImageSource="{Binding GameImages[0].ImageSource}" Stretch="UniformToFill" Opacity="0.12" />
+    </Page.Background>
 
-    <Grid Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}">
+    <Grid >
         <Grid.RowDefinitions>
             <RowDefinition Height="250" />
             <RowDefinition Height="*" />
@@ -8,17 +11,6 @@
 
         <!--  GŁÓWNY HEADER Z TŁEM  -->
         <Grid Grid.Row="0" Height="250">
-            <!--  Tło: gradient + duże logo  -->
-            <Grid>
-                <Grid.Background>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                        <GradientStop Offset="0" Color="#AA000000" />
-                        <GradientStop Offset="1" Color="#66000000" />
-                    </LinearGradientBrush>
-                </Grid.Background>
-                <Image Height="400" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0.12" Source="{Binding GameLogo.ImageSource}" Stretch="UniformToFill" />
-            </Grid>
-
             <!--  Właściwy content nagłówka  -->
             <Grid Margin="30,0">
                 <Grid.ColumnDefinitions>
@@ -38,7 +30,7 @@
                 <StackPanel Grid.Column="1" Margin="25,0,0,0" VerticalAlignment="Center">
                     <TextBlock FontSize="34" FontWeight="Bold" Foreground="White" Text="{Binding GameName}" />
                     <TextBlock Margin="0,6,0,0" FontSize="16" Foreground="LightGray" Text="{Binding GameDeveloper}" />
-                    <TextBlock MaxHeight="60" Margin="0,10,0,0" FontSize="15" Foreground="White" Text="{Binding GameDescription}" TextTrimming="CharacterEllipsis" TextWrapping="Wrap" />
+                    <RichTextBlock MaxHeight="60" Margin="0,10,0,0" FontSize="15" Foreground="White" x:Name="GameDescriptionSmallRichText" TextTrimming="CharacterEllipsis" TextWrapping="Wrap" />
                 </StackPanel>
 
                 <!--  Panel akcji + oceny  -->
@@ -56,6 +48,8 @@
                     </StackPanel>
                     <!--  Przycisk pobrania, aktualizacja i odinstalowanie  -->
                     <Button x:Name="PlayButton" Width="180" Height="44" Click="PlayButton_Click" Content="Pobierz" Style="{StaticResource AccentButtonStyle}" />
+
+                    <Button x:Name="AddRatingButton" Width="180" Height="44" Click="AddRatingButton_Click" Content="Oceń" Style="{StaticResource AccentButtonStyle}" />
                     <Button x:Name="CheckUpdateButton" Width="180" Height="40" Click="UpdateButton_Click" Content="Aktualizuj" />
                     <Button x:Name="UninstallButton" Click="UninstallButton_Click" Content="Odinstaluj" FontSize="14" Style="{StaticResource SubtleButtonStyle}" />
                 </StackPanel>
@@ -83,80 +77,19 @@
                 </ScrollViewer>
 
                 <!--  Sekcje kartowe  -->
-                <Border Margin="25,10" Padding="16" Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}" CornerRadius="14">
+                <Border Margin="25,5" Padding="16" Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}" CornerRadius="14">
                     <StackPanel>
                         <TextBlock FontSize="21" FontWeight="SemiBold" Text="Opis" />
                         <Rectangle Height="1" Margin="0,8" Fill="{ThemeResource ControlElevationBorderBrush}" />
-                        <TextBlock FontSize="15" Text="{Binding GameDescription}" TextWrapping="Wrap" />
+                        <RichTextBlock x:Name="GameDescriptionRichText" TextWrapping="Wrap" />
                     </StackPanel>
                 </Border>
 
-                <Border Margin="25,10" Padding="16" Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}" CornerRadius="14" Visibility="{Binding IsHardwareRequirementsVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Border Margin="25, 0" Padding="16" Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}" CornerRadius="14" Visibility="{Binding IsHardwareRequirementsVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <StackPanel>
                         <TextBlock FontSize="21" FontWeight="SemiBold" Text="Wymagania systemowe" />
                         <Rectangle Height="1" Margin="0,8" Fill="{ThemeResource ControlElevationBorderBrush}" />
-                        <TextBlock FontSize="15" Text="{Binding HardwareRequirements}" />
-                    </StackPanel>
-                </Border>
-
-                <!--  Oceny i recenzje  -->
-                <Border Margin="25,10" Padding="16" Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}" CornerRadius="14" Visibility="Collapsed">
-                    <StackPanel>
-                        <TextBlock FontSize="21" FontWeight="SemiBold" Text="Oceny i recenzje" />
-                        <Rectangle Height="1" Margin="0,8" Fill="{ThemeResource ControlElevationBorderBrush}" />
-
-                        <Grid Margin="0,10">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <!--  Średnia  -->
-                            <StackPanel Grid.Column="0" Margin="0,0,25,0" VerticalAlignment="Center">
-                                <TextBlock FontSize="44" FontWeight="Bold" Text="{Binding AvgRating}" />
-                                <TextBlock FontSize="13" Foreground="Gray">
-                                    <Run Text="Ocen: " />
-                                    <Run Text="{Binding RatingCount}" />
-                                </TextBlock>
-                            </StackPanel>
-                            <!--  Gwiazdki  -->
-                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="5">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Width="22" Text="5" />
-                                    <ProgressBar Width="220" Height="13" Value="{Binding Count5}" />
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Width="22" Text="4" />
-                                    <ProgressBar Width="220" Height="13" Value="{Binding Count4}" />
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Width="22" Text="3" />
-                                    <ProgressBar Width="220" Height="13" Value="{Binding Count3}" />
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Width="22" Text="2" />
-                                    <ProgressBar Width="220" Height="13" Value="{Binding Count2}" />
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Width="22" Text="1" />
-                                    <ProgressBar Width="220" Height="13" Value="{Binding Count1}" />
-                                </StackPanel>
-                            </StackPanel>
-                        </Grid>
-
-                        <!--  Lista recenzji  -->
-                        <ListView Margin="0,10,0,0" ItemsSource="{x:Bind ViewModel.Ratings}">
-                            <ListView.ItemTemplate>
-                                <DataTemplate x:DataType="local:GameRating">
-                                    <StackPanel Margin="0,0,0,14">
-                                        <TextBlock FontSize="16" FontWeight="Bold" Text="{x:Bind Title}" />
-                                        <RatingControl IsReadOnly="True" Value="{x:Bind Rating}" />
-                                        <TextBlock Margin="0,2,0,0" FontSize="14" Text="{x:Bind Review}" TextWrapping="Wrap" />
-                                        <TextBlock FontSize="12" Foreground="Gray" Text="{x:Bind Author}" />
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
-                        <HyperlinkButton Margin="0,10,0,0" HorizontalAlignment="Left" Click="ShowAllReviewsButton_Click" Content="Wyświetl wszystkie recenzje" />
+                        <RichTextBlock x:Name="HardwareRichText" TextWrapping="Wrap" />
                     </StackPanel>
                 </Border>
 

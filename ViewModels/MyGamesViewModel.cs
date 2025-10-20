@@ -43,24 +43,24 @@ select
   g.Id       [GameId]
 , g.Title
 , g.Symbol   [GameSymbol]
-, d.Name     [GameDeveloper]
-, l.LogoPath [LogoPath]
+, u.DisplayName     [GameDeveloper]
+, l.Url [LogoPath]
 , t.Name	 [GameType]
-, g.PayloadName
+--, g.PayloadName
 , g.ExeName
 , g.ZipLink
-, g.VersionLink
+--, g.VersionLink
 , g.Description
 , g.HardwareRequirements
 , g.OtherInformation
 , g.DraftP
-from sgsGames g
-inner join sgsDevelopers d on d.Id = g.DeveloperId
-inner join Registration r on r.DeveloperId = d.Id
-left join sgsGameLogo l on l.GameId = g.Id
-left join sgsGameTypes t on t.Id = g.TypeId
-where r.UserId = @p0
-order by g.Title", _appUser.UserId);
+from Games g
+inner join Users u on u.Id = g.UserId
+left join GameImages l on l.GameId = g.Id and l.LogoP = 1
+left join GameTypes t on t.Id = g.TypeId
+--where r.UserId = @p0
+order by g.Title
+", _appUser.UserId);
 
                 return ds.Tables[0].AsEnumerable().Select(dr => new Game
                 {

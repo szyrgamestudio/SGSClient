@@ -1,8 +1,13 @@
-﻿using Microsoft.UI.Xaml.Controls;
+﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Documents;
 using Microsoft.UI.Xaml.Navigation;
 using SGSClient.Controls;
+using SGSClient.Core.Extensions;
 using SGSClient.Helpers;
+using SGSClient.Models;
 using SGSClient.ViewModels;
+using System.Data;
 using System.Diagnostics;
 using Windows.Storage;
 
@@ -10,6 +15,7 @@ namespace SGSClient.Views;
 public sealed partial class GameBasePage : Page
 {
     private LauncherStatus _status;
+    private GameRating? _gameRating;
     private readonly string? gameZip = "";
 
     public GameBaseViewModel ViewModel { get; }
@@ -38,11 +44,12 @@ public sealed partial class GameBasePage : Page
             else
                 Status = LauncherStatus.readyNoGame;
 
-            CheckUpdateButton.Visibility = updateP
-                ? Microsoft.UI.Xaml.Visibility.Visible
-                : Microsoft.UI.Xaml.Visibility.Collapsed;
+            CheckUpdateButton.Visibility = updateP? Visibility.Visible : Visibility.Collapsed;
 
             await ViewModel.LoadGameData(gameSymbol);
+            GameDescriptionSmallRichText.SetHtml(ViewModel.GameDescription ?? string.Empty);
+            GameDescriptionRichText.SetHtml(ViewModel.GameDescription ?? string.Empty);
+            HardwareRichText.SetHtml(ViewModel.HardwareRequirements ?? string.Empty);
         }
     }
 
@@ -53,44 +60,77 @@ public sealed partial class GameBasePage : Page
     }
 
     #region Rating
-    /*
-    private void RatingRatingControl_ValueChanged(RatingControl sender, object args)
-    {
-        ArgumentNullException.ThrowIfNull(sender);
-    }
     private async void AddRatingButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
         bool hasUserRated = ViewModel.UserRatingP();
+        string title = string.Empty;
+        int rating = 5;
+        string review = string.Empty;
 
-        if (hasUserRated && !String.IsNullOrEmpty(gameIdentifier))
+        if (hasUserRated && !string.IsNullOrEmpty(ViewModel.GameId.ToString()))
         {
-            DataSet ds = ViewModel.ReturnUserRating(gameIdentifier);
+            DataSet ds = ViewModel.ReturnUserRating(ViewModel.GameId ?? 0);
             if (ds.Tables[0].Rows.Count > 0)
             {
-                foreach (DataRow dr in ds.Tables[0].Rows)
-                {
-                    _gameRating = new GameRating
-                    {
-                        RatingId = dr.Field<int>("Id")
-                    };
-                    RatingTitleTextBox.Text = dr.Field<string>("Title");
-                    RatingRatingControl.Value = dr.Field<int>("Rating");
-                    RatingReviewTextBox.Text = dr.Field<string>("Review");
-                    AddRatingDetailsDialog.Title = "Oceń";
-                }
+                var dr = ds.Tables[0].Rows[0];
+                title = dr.TryGetValue("Title");
+                rating = dr.TryGetValue("Rating");
+                review = dr.TryGetValue("Review");
+                _gameRating = new GameRating { RatingId = dr.TryGetValue("Id") };
             }
-            AddRatingDetailsDialog.Title = "Oceń";
-            await AddRatingDetailsDialog.ShowAsync();
         }
         else
         {
             _gameRating = null;
-            RatingTitleTextBox.Text = string.Empty;
-            RatingRatingControl.Value = 5;
-            RatingReviewTextBox.Text = string.Empty;
-            AddRatingDetailsDialog.Title = "Oceń";
-            await AddRatingDetailsDialog.ShowAsync();
         }
+
+        // Tworzymy kontrolki dynamicznie
+        TextBox titleTextBox = new TextBox { Text = title, PlaceholderText = "Tytuł oceny..." };
+        RatingControl ratingControl = new RatingControl { Value = rating, MaxRating = 5 };
+        TextBox reviewTextBox = new TextBox { Text = review, PlaceholderText = "Opinia...", AcceptsReturn = true, Height = 100 };
+
+        StackPanel panel = new StackPanel { Spacing = 8 };
+        panel.Children.Add(titleTextBox);
+        panel.Children.Add(ratingControl);
+        panel.Children.Add(reviewTextBox);
+
+        var dialog = new ContentDialog
+        {
+            XamlRoot = this.XamlRoot,
+            Title = "Oceń grę",
+            PrimaryButtonText = "Zapisz",
+            CloseButtonText = "Anuluj",
+            DefaultButton = ContentDialogButton.Primary,
+            Content = panel
+        };
+
+        dialog.PrimaryButtonClick += (s, eArgs) =>
+        {
+            if (string.IsNullOrWhiteSpace(titleTextBox.Text))
+            {
+                eArgs.Cancel = true;
+                ToolTipService.SetToolTip(titleTextBox, "Tytuł oceny nie może być pusty.");
+            }
+            else
+            {
+                // Zapisujemy dane
+                _gameRating ??= new GameRating();
+                _gameRating.Title = titleTextBox.Text;
+                _gameRating.Rating = (int)ratingControl.Value;
+                _gameRating.Review = reviewTextBox.Text;
+                ViewModel.SaveGameRating(ViewModel.GameId ?? 0, _gameRating);
+            }
+        };
+
+        await dialog.ShowAsync();
+    }
+
+
+
+    /*
+    private void RatingRatingControl_ValueChanged(RatingControl sender, object args)
+    {
+        ArgumentNullException.ThrowIfNull(sender);
     }
     private void AddRatingButton_Click(ContentDialog sender, ContentDialogButtonClickEventArgs args)
     {
@@ -160,7 +200,7 @@ public sealed partial class GameBasePage : Page
         panel.Children.Add(pathTextBox);
         panel.Children.Add(browseButton);
 
-        StorageFolder selectedFolder = null;
+        StorageFolder selectedFolder = default!;
 
         browseButton.Click += async (s, e) =>
         {
@@ -206,7 +246,10 @@ public sealed partial class GameBasePage : Page
         };
 
         var result = await dialog.ShowAsync();
-        return result == ContentDialogResult.Primary ? selectedFolder : null;
+        if (result != ContentDialogResult.Primary || selectedFolder is null)
+            throw new InvalidOperationException("Nie wybrano folderu.");
+
+        return selectedFolder;
     }
 
     private async void UpdateButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)

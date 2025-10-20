@@ -42,7 +42,7 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Button Width="160" Height="220" Margin="0,0,16,16" Padding="16" HorizontalAlignment="Left" VerticalAlignment="Top" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="1" Click="ButtonGame_Click" CornerRadius="8" Tag="{Binding GameSymbol}">
+                                <Button Width="160" Height="220" Margin="0,0,14,14" Padding="14" HorizontalAlignment="Left" VerticalAlignment="Top" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="1" Click="ButtonGame_Click" CornerRadius="8" Tag="{Binding GameSymbol}">
 
                                     <StackPanel HorizontalAlignment="Center" Spacing="8">
                                         <!--  Logo gry  -->

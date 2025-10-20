@@ -1,11 +1,13 @@
-﻿using System.Net.Http.Headers;
-using System.Text;
+﻿using Microsoft.UI.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
+using SGSClient.Helpers;
 using SGSClient.ViewModels;
+using System.Net.Http.Headers;
+using System.Text;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
@@ -34,8 +36,63 @@ namespace SGSClient.Views
                 await ViewModel.LoadGameTypes();
                 await ViewModel.LoadGameEngines();
                 await ViewModel.LoadGameData(gameId);
+                gameDescriptionRichEditBox.SetHtml(ViewModel.GameDescription);
+                hardwareRequirementsRichEditBox.SetHtml(ViewModel.HardwareRequirements);
             }
         }
+        private void GameDescriptionRichEditBox_Loaded(object sender, RoutedEventArgs e)
+        {
+            gameDescriptionRichEditBox.SetHtml(ViewModel.GameDescription ?? string.Empty);
+        }
+
+        private void HardwareRequirementsRichEditBox_Loaded(object sender, RoutedEventArgs e)
+        {
+            hardwareRequirementsRichEditBox.SetHtml(ViewModel.HardwareRequirements ?? string.Empty);
+        }
+
+        private void GameDescriptionRichEditBox_TextChanged(object sender, RoutedEventArgs e)
+        {
+            gameDescriptionRichEditBox.Document.GetText(Microsoft.UI.Text.TextGetOptions.None, out string plain);
+            plain = plain?.Trim() ?? string.Empty;
+
+            if (plain.Length == 0)
+                ViewModel.GameDescription = string.Empty;
+            else
+                ViewModel.GameDescription = gameDescriptionRichEditBox.GetHtml();
+        }
+
+        private void HardwareRequirementsRichEditBox_TextChanged(object sender, RoutedEventArgs e)
+        {
+            hardwareRequirementsRichEditBox.Document.GetText(Microsoft.UI.Text.TextGetOptions.None, out string plain);
+            plain = plain?.Trim() ?? string.Empty;
+
+            if (plain.Length == 0)
+                ViewModel.HardwareRequirements = string.Empty;
+            else
+                ViewModel.HardwareRequirements = hardwareRequirementsRichEditBox.GetHtml();
+        }
+
+
+
+
+        //private void Menu_Opening(object sender, object e)
+        //{
+        //    CommandBarFlyout myFlyout = sender as CommandBarFlyout;
+        //    if (myFlyout.Target == gameDescriptionRichEditBox)
+        //    {
+        //        AppBarButton myButton = new AppBarButton();
+        //        myButton.Command = new StandardUICommand(StandardUICommandKind.Share);
+        //        myFlyout.PrimaryCommands.Add(myButton);
+        //    }
+        //}
+
+        //private void gameDescriptionRichEditBox_Loaded(object sender, RoutedEventArgs e)
+        //{
+        //    gameDescriptionRichEditBox.SelectionFlyout.Opening += Menu_Opening;
+        //    gameDescriptionRichEditBox.ContextFlyout.Opening += Menu_Opening;
+        //}
+
+
 
         #region Logo
         private async void AddLogoButton_Click(object sender, RoutedEventArgs e)

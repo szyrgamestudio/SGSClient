@@ -1,9 +1,5 @@
 ﻿<Page x:Class="SGSClient.Views.HomePage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:behaviors="using:SGSClient.Behaviors" xmlns:controls="using:SGSClient.Controls" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:models="using:SGSClient.Models" behaviors:NavigationViewHeaderBehavior.HeaderMode="Never" DataContext="{x:Bind HomeViewModel, Mode=OneWay}" mc:Ignorable="d">
     <Grid>
-
-        <!--  Mica tło  -->
-        <Grid Background="{ThemeResource SystemControlAcrylicWindowBrush}" />
-
         <!--  główny układ  -->
         <Grid>
             <Grid.RowDefinitions>
@@ -11,7 +7,7 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <!--  HEADER  -->
-            <Grid Height="300">
+            <Grid Height="300" Grid.Row="0">
                 <controls:HomePageHeaderImage />
                 <StackPanel Margin="36,0,0,0" VerticalAlignment="Center" Spacing="8">
                     <TextBlock FontSize="48" FontWeight="Bold" Foreground="White" Text="SGSClient" />
