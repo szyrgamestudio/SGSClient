@@ -4,6 +4,8 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using SGSClient.ViewModels;
+using System.Data;
+using System.Net.Http.Headers;
 
 namespace SGSClient.Views;
 
@@ -57,7 +59,6 @@ public sealed partial class HomePage : Page
             }
         }
     }
-
     #endregion
 
 }

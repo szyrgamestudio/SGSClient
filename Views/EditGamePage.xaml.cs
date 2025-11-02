@@ -38,6 +38,7 @@ namespace SGSClient.Views
                 await ViewModel.LoadGameData(gameId);
                 gameDescriptionRichEditBox.SetHtml(ViewModel.GameDescription);
                 hardwareRequirementsRichEditBox.SetHtml(ViewModel.HardwareRequirements);
+                otherInfoRichEditBox.SetHtml(ViewModel.OtherInfo);
             }
         }
         private void GameDescriptionRichEditBox_Loaded(object sender, RoutedEventArgs e)
@@ -49,6 +50,12 @@ namespace SGSClient.Views
         {
             hardwareRequirementsRichEditBox.SetHtml(ViewModel.HardwareRequirements ?? string.Empty);
         }
+
+        private void OtherInfoRichEditBox_Loaded(object sender, RoutedEventArgs e)
+        {
+            otherInfoRichEditBox.SetHtml(ViewModel.OtherInfo ?? string.Empty);
+        }
+
 
         private void GameDescriptionRichEditBox_TextChanged(object sender, RoutedEventArgs e)
         {
@@ -72,7 +79,16 @@ namespace SGSClient.Views
                 ViewModel.HardwareRequirements = hardwareRequirementsRichEditBox.GetHtml();
         }
 
+        private void OtherInfoRichEditBox_TextChanged(object sender, RoutedEventArgs e)
+        {
+            otherInfoRichEditBox.Document.GetText(Microsoft.UI.Text.TextGetOptions.None, out string plain);
+            plain = plain?.Trim() ?? string.Empty;
 
+            if (plain.Length == 0)
+                ViewModel.OtherInfo = string.Empty;
+            else
+                ViewModel.OtherInfo = otherInfoRichEditBox.GetHtml();
+        }
 
 
         //private void Menu_Opening(object sender, object e)

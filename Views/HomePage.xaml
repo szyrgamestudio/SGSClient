@@ -35,7 +35,7 @@
                                     <!--  Tło gry (logo)  -->
                                     <Border BorderBrush="{ThemeResource ControlElevationBorderBrush}" CornerRadius="{StaticResource OverlayCornerRadius}">
                                         <Border.Background>
-                                            <ImageBrush ImageSource="{x:Bind LogoPath}" Stretch="UniformToFill" />
+                                            <ImageBrush ImageSource="{x:Bind LogoImage, Mode=OneWay}" Stretch="UniformToFill"/>
                                         </Border.Background>
                                     </Border>
 

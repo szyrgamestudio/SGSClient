@@ -190,7 +190,8 @@
                     <Rectangle Height="1" HorizontalAlignment="Stretch" Fill="{ThemeResource ControlElevationBorderBrush}" />
                     <ComboBox Grid.Row="3" Grid.Column="1" Margin="5" x:Name="comboBoxGameEngine" ItemsSource="{Binding GameEngines}" SelectedItem="{Binding SelectedGameEngine, Mode=TwoWay}" PlaceholderText="Wybierz silnik gry" VerticalAlignment="Center" Width="200"/>
                     <ComboBox Grid.Row="4" Grid.Column="1" Margin="5" x:Name="comboBoxGameType" ItemsSource="{Binding GameTypes}" SelectedItem="{Binding SelectedGameType, Mode=TwoWay}" PlaceholderText="Wybierz rodzaj gry" VerticalAlignment="Center" Width="200"/>
-                    <TextBox Text="{Binding GameLogo, Mode=TwoWay}" PlaceholderText="Tutaj wprowadź dodatkowe informacje o grze" Margin="5" Padding="5" FontSize="14" x:Name="otherInfoTextBox" AutomationProperties.Name="multi-line TextBox" TextWrapping="Wrap" AcceptsReturn="True"></TextBox>
+                    <!--<TextBox Text="{Binding GameLogo, Mode=TwoWay}" PlaceholderText="Tutaj wprowadź dodatkowe informacje o grze" Margin="5" Padding="5" FontSize="14" x:Name="otherInfoTextBox" AutomationProperties.Name="multi-line TextBox" TextWrapping="Wrap" AcceptsReturn="True"></TextBox>-->
+                    <RichEditBox x:Name="otherInfoRichEditBox" AutomationProperties.Name="editor with custom menu" Loaded="OtherInfoRichEditBox_Loaded" TextChanged="OtherInfoRichEditBox_TextChanged" />
                 </StackPanel>
             </Grid>
         </ScrollViewer>
