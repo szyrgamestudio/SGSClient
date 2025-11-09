@@ -137,11 +137,74 @@
   &lt;/actions&gt;
 &lt;/toast&gt;</value>
   </data>
+  <data name="HomePage_BugBtn.Text" xml:space="preserve">
+    <value>Report a bug</value>
+  </data>
+  <data name="HomePage_BugBtnDesc.Text" xml:space="preserve">
+    <value>Go to SGSClient's GitHub repository, where you can report bug you found.</value>
+  </data>
+  <data name="HomePage_BugBtnTooltip.ToolTipService.ToolTip" xml:space="preserve">
+    <value>Alternatively, you can report an error occurrence by going to the DEVSZYR server and write on the correct channel there.</value>
+  </data>
+  <data name="HomePage_DevWarning.Message" xml:space="preserve">
+    <value>You are using the trial version of SGSClient. Please report errors to kontakt@szyrgamestudio.com.</value>
+  </data>
+  <data name="HomePage_DevWarning.Title" xml:space="preserve">
+    <value>Warning!</value>
+  </data>
+  <data name="HomePage_GamesBtn.Text" xml:space="preserve">
+    <value>Games</value>
+  </data>
+  <data name="HomePage_GamesBtnDesc.Text" xml:space="preserve">
+    <value>Browse all available games.</value>
+  </data>
   <data name="HomePage_MyAccountBtn.Text" xml:space="preserve">
     <value>My Account</value>
   </data>
   <data name="HomePage_MyAccountBtnDesc.Text" xml:space="preserve">
     <value>Log in or register, then apply to add your own game to SGSClient.</value>
+  </data>
+  <data name="LoginPage_Error_EmailInvalid" xml:space="preserve">
+    <value>Enter the correct e-mail address.</value>
+  </data>
+  <data name="LoginPage_Error_EmailReq" xml:space="preserve">
+    <value>The email address is required.</value>
+  </data>
+  <data name="LoginPage_Error_PasswdReq" xml:space="preserve">
+    <value>The password is required.</value>
+  </data>
+  <data name="LoginPage_ForgotPasswdBtn.Text" xml:space="preserve">
+    <value>Did you forget the password?</value>
+  </data>
+  <data name="LoginPage_Login.Text" xml:space="preserve">
+    <value>Log in to your account</value>
+  </data>
+  <data name="LoginPage_Password.Text" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="LoginPage_RegisterBtn.Text" xml:space="preserve">
+    <value>Sign up</value>
+  </data>
+  <data name="RegisterPage_AccountName.Text" xml:space="preserve">
+    <value>Account name</value>
+  </data>
+  <data name="RegisterPage_Error_PasswdConfirmReq" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="RegisterPage_Error_PasswdDiff" xml:space="preserve">
+    <value>The passwords entered are different</value>
+  </data>
+  <data name="RegisterPage_Passwd.Text" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="RegisterPage_PasswdConfirm.Text" xml:space="preserve">
+    <value>Confirm password</value>
+  </data>
+  <data name="RegisterPage_Register.Text" xml:space="preserve">
+    <value>Create new account</value>
+  </data>
+  <data name="RegisterPage_RegisterBtn.Content" xml:space="preserve">
+    <value>Sign up</value>
   </data>
   <data name="SettingsPage_PrivacyTermsLink.Content" xml:space="preserve">
     <value>Privacy Policy</value>
@@ -221,69 +284,6 @@
   <data name="WebView_Reload.Content" xml:space="preserve">
     <value>Refresh</value>
   </data>
-  <data name="HomePage_GamesBtn.Text" xml:space="preserve">
-    <value>Games</value>
-  </data>
-  <data name="RegisterPage_Passwd.Text" xml:space="preserve">
-    <value>Password</value>
-  </data>
-  <data name="RegisterPage_PasswdConfirm.Text" xml:space="preserve">
-    <value>Confirm password</value>
-  </data>
-  <data name="RegisterPage_Register.Text" xml:space="preserve">
-    <value>Create new account</value>
-  </data>
-  <data name="RegisterPage_RegisterBtn.Content" xml:space="preserve">
-    <value>Sign up</value>
-  </data>
-  <data name="RegisterPage_AccountName.Text" xml:space="preserve">
-    <value>Account name</value>
-  </data>
-  <data name="LoginPage_RegisterBtn.Text" xml:space="preserve">
-    <value>Sign up</value>
-  </data>
-  <data name="LoginPage_Password.Text" xml:space="preserve">
-    <value>Password</value>
-  </data>
-  <data name="HomePage_BugBtn.Text" xml:space="preserve">
-    <value>Report a bug</value>
-  </data>
-  <data name="HomePage_BugBtnDesc.Text" xml:space="preserve">
-    <value>Go to SGSClient's GitHub repository, where you can report bug you found.</value>
-  </data>
-  <data name="HomePage_BugBtnTooltip.ToolTipService.ToolTip" xml:space="preserve">
-    <value>Alternatively, you can report an error occurrence by going to the DEVSZYR server and write on the correct channel there.</value>
-  </data>
-  <data name="HomePage_DevWarning.Message" xml:space="preserve">
-    <value>You are using the trial version of SGSClient. Please report errors to kontakt@szyrgamestudio.com.</value>
-  </data>
-  <data name="HomePage_DevWarning.Title" xml:space="preserve">
-    <value>Warning!</value>
-  </data>
-  <data name="RegisterPage_Error_PasswdConfirmReq" xml:space="preserve">
-    <value>Password</value>
-  </data>
-  <data name="HomePage_GamesBtnDesc.Text" xml:space="preserve">
-    <value>Browse all available games.</value>
-  </data>
-  <data name="LoginPage_Error_EmailInvalid" xml:space="preserve">
-    <value>Enter the correct e-mail address.</value>
-  </data>
-  <data name="LoginPage_Login.Text" xml:space="preserve">
-    <value>Log in to your account</value>
-  </data>
-  <data name="LoginPage_ForgotPasswdBtn.Text" xml:space="preserve">
-    <value>Did you forget the password?</value>
-  </data>
-  <data name="LoginPage_Error_PasswdReq" xml:space="preserve">
-    <value>The password is required.</value>
-  </data>
-  <data name="LoginPage_Error_EmailReq" xml:space="preserve">
-    <value>The email address is required.</value>
-  </data>
-  <data name="RegisterPage_Error_PasswdDiff" xml:space="preserve">
-    <value>The passwords entered are different</value>
-  </data>
   <data name="Error_EmptyPath" xml:space="preserve">
     <value>The path cannot be empty.</value>
   </data>
@@ -295,5 +295,8 @@
   </data>
   <data name="UploadGamePage_ZIPTextBox" xml:space="preserve">
     <value>Zip file</value>
+  </data>
+  <data name="RestartLanguageNotice" xml:space="preserve">
+    <value>The language change will take effect after restarting the application.</value>
   </data>
 </root>

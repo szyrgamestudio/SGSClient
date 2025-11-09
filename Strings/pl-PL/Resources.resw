@@ -296,4 +296,7 @@
   <data name="UploadGamePage_ZIPTextBox" xml:space="preserve">
     <value>Plik ZIP</value>
   </data>
+  <data name="RestartLanguageNotice" xml:space="preserve">
+    <value>Zmiana języka zostanie zastosowana po ponownym uruchomieniu aplikacji</value>
+  </data>
 </root>

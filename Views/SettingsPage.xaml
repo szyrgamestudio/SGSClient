@@ -77,6 +77,36 @@
 
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
+
+                <labs:SettingsExpander Description="Wybierz język interfejsu aplikacji" Header="Język aplikacji">
+                    <labs:SettingsExpander.HeaderIcon>
+                        <FontIcon Glyph="&#xE775;" />
+                    </labs:SettingsExpander.HeaderIcon>
+                    <labs:SettingsExpander.Items>
+                        <labs:SettingsCard
+            HorizontalContentAlignment="Left"
+            ContentAlignment="Vertical">
+                            <StackPanel Margin="-12,0,0,0" Orientation="Vertical">
+                                <ComboBox
+                    x:Name="LanguageSelector"
+                    Width="200"
+                    ItemsSource="{x:Bind ViewModel.LanguageItems, Mode=OneWay}"
+                    DisplayMemberPath="DisplayName"
+                    SelectedValuePath="LanguageTag"
+                    SelectedValue="{x:Bind ViewModel.SelectedLanguage, Mode=TwoWay}"
+                    Loaded="LanguageSelector_Loaded"
+                    SelectionChanged="LanguageSelector_SelectionChanged" />
+                                <TextBlock
+                    FontSize="12"
+                    Margin="0,4,0,0"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    Text="{Binding Source='RestartLanguageNotice', Converter={StaticResource L}, Mode=OneWay}" />
+                            </StackPanel>
+                        </labs:SettingsCard>
+                    </labs:SettingsExpander.Items>
+                </labs:SettingsExpander>
+
+
                 <!-- About Section -->
                 <labs:SettingsExpander Description="© 2025 SzyrGameStudio. All rights reserved." Header="SGSClient">
                     <TextBlock

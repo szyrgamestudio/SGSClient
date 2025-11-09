@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Kiota.Abstractions;
 using Microsoft.UI.Xaml.Media.Imaging;
 using SGSClient.Core.Authorization;
 using SGSClient.Core.Database;
@@ -8,6 +9,7 @@ using SGSClient.Core.Utilities.LogUtility;
 using SGSClient.Models;
 using SGSClient.Views;
 using SQLite;
+using System;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Diagnostics;
@@ -59,6 +61,7 @@ namespace SGSClient.ViewModels
 
         public int? GameId { get; private set; }
         public string? GameName { get; private set; }
+        public string? GameIdentifier { get; private set; }
         public string? GameDeveloper { get; private set; }
         public string? GameDescription { get; private set; }
         public string? HardwareRequirements { get; private set; }
@@ -69,6 +72,8 @@ namespace SGSClient.ViewModels
         public bool IsAddRatingVisible { get; private set; }
         public bool CanGoToPreviousPage => CurrentPage > 0;
         public bool CanGoToNextPage => (CurrentPage + 1) * PageSize < _allRatings.Count;
+
+        public string GameTime { get; private set; } = "0 min";
 
         #region Logo
         private GameImage _gameLogo;
@@ -163,12 +168,17 @@ select
 from GameImages gi
 inner join Games g on g.Id = gi.GameId
 where g.Symbol = @p0 and gi.LogoP = 0
-", gameSymbol);
+
+/*3*/
+select
+  ISNULL(ugt.TotalTime, 0) GameTime
+from (select 1 x) x
+left join UsersGameTime ugt on ugt.GameId = @p1 and ugt.UserId = @p2
+", gameSymbol, gameId, _appUser.GetCurrentUser().Id);
 
             if (ds.Tables[0].Rows.Count > 0)
             {
                 DataRow dr = ds.Tables[0].Rows[0];
-
                 gameId = dr.TryGetValue("GameId");
                 gameZip = dr.TryGetValue("ZipLink");
                 gameExe = dr.TryGetValue("ExeName");
@@ -184,6 +194,7 @@ where g.Symbol = @p0 and gi.LogoP = 0
                 GameName = gameName;
                 GameDeveloper = dr.TryGetValue("GameDeveloper") ?? "Brak dostępnych informacji.";
                 GameDescription = dr.TryGetValue("Description") ?? "Brak dostępnych informacji.";
+                GameIdentifier = dr.TryGetValue("GameSymbol") ?? null;
                 HardwareRequirements = dr.TryGetValue("HardwareRequirements") ?? "Brak dostępnych informacji.";
                 OtherInformations = dr.TryGetValue("OtherInformation");
                 IsOtherInformationsVisible = !String.IsNullOrEmpty(dr.TryGetValue("OtherInformation"));
@@ -191,8 +202,14 @@ where g.Symbol = @p0 and gi.LogoP = 0
                 IsDLCVisible = false; //TODO
                 IsAddRatingVisible = _appUser.GetCurrentUser().Id != default;
 
+                dr = ds.Tables[3].Rows[0];
+                GameTime = FormatPlayTime(dr.TryGetValue("GameTime") ?? 0);
+
+                OnPropertyChanged(nameof(GameTime));
+
                 OnPropertyChanged(nameof(GameId));
                 OnPropertyChanged(nameof(GameName));
+                OnPropertyChanged(nameof(GameIdentifier));
                 OnPropertyChanged(nameof(GameDeveloper));
                 OnPropertyChanged(nameof(GameDescription));
                 OnPropertyChanged(nameof(HardwareRequirements));
@@ -215,6 +232,7 @@ where g.Symbol = @p0 and gi.LogoP = 0
                 {
                     await LoadImageFromNextcloud(dr1, nextcloudLogin, nextcloudPassword);
                 }
+
             }
         }
         public (bool IsInstalled, bool IsUpdateAvailable) CheckForUpdate(string gameIdentifier)
@@ -258,8 +276,8 @@ where g.Symbol = @p0
 
             StorageFolder? installFolder = null;
 
-            if (StorageApplicationPermissions.FutureAccessList.ContainsItem("GameInstallFolder"))
-                installFolder = await StorageApplicationPermissions.FutureAccessList.GetFolderAsync("GameInstallFolder");
+            if (StorageApplicationPermissions.FutureAccessList.ContainsItem($"GameInstallFolder_{gameIdentifier}"))
+                installFolder = await StorageApplicationPermissions.FutureAccessList.GetFolderAsync($"GameInstallFolder_{gameIdentifier}");
 
             if (installFolder is null)
             {
@@ -467,11 +485,31 @@ select
 , @p2
 , @p3
 ", _appUser.GetCurrentUser().Id, gameId, DateTime.Now, totalTime);
+
             }
+
+            GameTime = FormatPlayTime((int)dbTime);
+
 
             CoreApplication.Exit();
 
         }
+
+        public static string FormatPlayTime(int seconds)
+        {
+            if (seconds < 60)
+                return $"{seconds}s";
+
+            var time = TimeSpan.FromSeconds(seconds);
+
+            if (time.TotalHours >= 1)
+                return $"{(int)time.TotalHours}h";
+            if (time.TotalMinutes >= 1)
+                return $"{(int)time.TotalMinutes} min";
+
+            return $"{seconds}s";
+        }
+
 
         #region User Ratings
         public bool UserRatingP()

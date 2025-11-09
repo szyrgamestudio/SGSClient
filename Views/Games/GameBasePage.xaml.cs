@@ -175,7 +175,7 @@ public sealed partial class GameBasePage : Page
         switch (Status)
         {
             case LauncherStatus.readyNoGame:
-                var folder = await ShowInstallLocationDialogAsync();
+                var folder = await ShowInstallLocationDialogAsync(ViewModel.GameIdentifier);
                 if (folder != null)
                 {
                     await ViewModel.DownloadGameAsync(shellPage);
@@ -192,7 +192,7 @@ public sealed partial class GameBasePage : Page
         }
     }
 
-    private async Task<StorageFolder> ShowInstallLocationDialogAsync()
+    private async Task<StorageFolder> ShowInstallLocationDialogAsync(string gameIdentifier)
     {
         TextBox pathTextBox = new TextBox { PlaceholderText = "Wybierz folder instalacji..." };
         Button browseButton = new Button { Content = "Przeglądaj" };
@@ -219,7 +219,7 @@ public sealed partial class GameBasePage : Page
                 selectedFolder = folder;
                 pathTextBox.Text = folder.Path;
 
-                string token = "GameInstallFolder";
+                string token = $"GameInstallFolder_{gameIdentifier}";
                 Windows.Storage.AccessCache.StorageApplicationPermissions
                     .FutureAccessList
                     .AddOrReplace(token, folder);

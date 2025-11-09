@@ -1,19 +1,27 @@
-﻿using System.ComponentModel;
-using System.Reflection;
-using System.Windows.Input;
-
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-
 using Microsoft.UI.Xaml;
-
 using SGSClient.Contracts.Services;
 using SGSClient.Core.Authorization;
 using SGSClient.Helpers;
-
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Reflection;
+using System.Windows.Input;
 using Windows.ApplicationModel;
 
 namespace SGSClient.ViewModels;
+public class LanguageItem
+{
+    public LanguageItem(string tag, string name)
+    {
+        LanguageTag = tag;
+        DisplayName = name;
+    }
+
+    public string LanguageTag { get; }
+    public string DisplayName { get; }
+}
 
 public partial class SettingsViewModel : ObservableRecipient, INotifyPropertyChanged
 {
@@ -31,6 +39,18 @@ public partial class SettingsViewModel : ObservableRecipient, INotifyPropertyCha
     public ICommand SwitchThemeCommand
     {
         get;
+    }
+    public ObservableCollection<LanguageItem> LanguageItems { get; } = new()
+    {
+        new("pl-PL", "Polski"),
+        new("en-US", "English"),
+    };
+
+    private string selectedLanguage;
+    public string SelectedLanguage
+    {
+        get => selectedLanguage;
+        set => SetProperty(ref selectedLanguage, value);
     }
 
     public SettingsViewModel(IThemeSelectorService themeSelectorService, IAppUser appUser, INavigationService navigationService)

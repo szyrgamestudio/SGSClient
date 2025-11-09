@@ -11,6 +11,7 @@
             <helpers:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
             <helpers:StringToImageSourceConverter x:Key="StringToImageSourceConverter" />
             <helpers:HtmlToParagraphConverter x:Key="HtmlToParagraphConverter" />
+            <helpers:LConverterDynamic x:Key="L" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>
