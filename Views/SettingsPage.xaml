@@ -33,7 +33,7 @@
                 <TextBlock Text="Ustawienia aplikacji" Margin="{StaticResource SettingsPageHeaderTextBox}" />
             </StackPanel>
             <StackPanel>
-                <labs:SettingsExpander Description="Wybierz motyw aplikacji do wyświetlenia" Header="Wygląd aplikacji">
+                <labs:SettingsExpander Description="{Binding Source='ApplicationLookDesc', Converter={StaticResource L}, Mode=OneWay}" Header="{Binding Source='ApplicationLook', Converter={StaticResource L}, Mode=OneWay}">
                     <labs:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE771;" />
                     </labs:SettingsExpander.HeaderIcon>
@@ -78,7 +78,7 @@
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
 
-                <labs:SettingsExpander Description="Wybierz język interfejsu aplikacji" Header="Język aplikacji">
+                <labs:SettingsExpander Description="{Binding Source='ApplicationLanguageDesc', Converter={StaticResource L}, Mode=OneWay}" Header="{Binding Source='ApplicationLanguage', Converter={StaticResource L}, Mode=OneWay}">
                     <labs:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE775;" />
                     </labs:SettingsExpander.HeaderIcon>

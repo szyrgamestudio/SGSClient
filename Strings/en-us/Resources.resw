@@ -299,4 +299,16 @@
   <data name="RestartLanguageNotice" xml:space="preserve">
     <value>The language change will take effect after restarting the application.</value>
   </data>
+  <data name="ApplicationLanguage" xml:space="preserve">
+    <value>Application language</value>
+  </data>
+  <data name="ApplicationLanguageDesc" xml:space="preserve">
+    <value>Select the application interface language</value>
+  </data>
+  <data name="ApplicationLook" xml:space="preserve">
+    <value>App appearance</value>
+  </data>
+  <data name="ApplicationLookDesc" xml:space="preserve">
+    <value>Select the application theme to display</value>
+  </data>
 </root>
