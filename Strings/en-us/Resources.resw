@@ -311,4 +311,34 @@
   <data name="ApplicationLookDesc" xml:space="preserve">
     <value>Select the application theme to display</value>
   </data>
+  <data name="ApplicationSettings" xml:space="preserve">
+    <value>Application settings</value>
+  </data>
+  <data name="AccountSettingsCardDesc" xml:space="preserve">
+    <value>Set up basic information such as your password and email address.</value>
+  </data>
+  <data name="AccountSettingsCardHeader" xml:space="preserve">
+    <value>Your information</value>
+  </data>
+  <data name="AccountSettings" xml:space="preserve">
+    <value>Account settings</value>
+  </data>
+  <data name="ReportError" xml:space="preserve">
+    <value>Report an bug</value>
+  </data>
+  <data name="PasswordReset" xml:space="preserve">
+    <value>Password reset</value>
+  </data>
+  <data name="Change account settings" xml:space="preserve">
+    <value>Change account settings</value>
+  </data>
+  <data name="Change password" xml:space="preserve">
+    <value>Change password</value>
+  </data>
+  <data name="Logout" xml:space="preserve">
+    <value>Logout</value>
+  </data>
+  <data name="Manage account session" xml:space="preserve">
+    <value>Manage account session</value>
+  </data>
 </root>
