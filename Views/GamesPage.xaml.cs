@@ -23,6 +23,7 @@ namespace SGSClient.Views
         {
             base.OnNavigatedTo(e);
             ViewModel.LoadGamesFromDatabase();
+            _ = ViewModel.LoadFiltersAsync();
         }
         private void ButtonGame_Click(object sender, RoutedEventArgs e)
         {
@@ -38,21 +39,7 @@ namespace SGSClient.Views
 
         #region Filters
 
-        private void SearchTextBox_KeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
-        {
-            if (e.Key == Windows.System.VirtualKey.Enter)
-            {
-                ApplyFilters();
-            }
-        }
-        private void SearchAuthorTextBox_KeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
-        {
-            if (e.Key == Windows.System.VirtualKey.Enter)
-            {
-                ApplyFilters();
-            }
-        }
-        private void CategoryComboBox_KeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+        private void Input_KeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
         {
             if (e.Key == Windows.System.VirtualKey.Enter)
             {
@@ -67,22 +54,25 @@ namespace SGSClient.Views
         {
             SearchTextBox.Text = string.Empty;
             SearchAuthorTextBox.Text = string.Empty;
-            CategoryComboBox.SelectedIndex = -1;
+            //CategoryComboBox.SelectedIndex = -1;
             GamesItemsControl.ItemsSource = ViewModel.GamesList;
         }
         private void ApplyFilters()
         {
             string searchTitleText = SearchTextBox.Text.ToLower();
             string searchAuthorText = SearchAuthorTextBox.Text.ToLower();
-            string? selectedCategory = (CategoryComboBox.SelectedItem as ComboBoxItem)?.Content.ToString();
+            int? selectedTypeId = ViewModel.SelectedGameType?.Id;
+            int? selectedEngineId = ViewModel.SelectedGameEngine?.Id;
 
             var filteredGames = ViewModel.GamesList.Where(game =>
-                (string.IsNullOrEmpty(searchTitleText) || 
-                    (!string.IsNullOrEmpty(game.GameTitle) && 
+                (string.IsNullOrEmpty(searchTitleText) ||
+                    (!string.IsNullOrEmpty(game.GameTitle) &&
                      game.GameTitle.Contains(searchTitleText, StringComparison.OrdinalIgnoreCase)))
-                && (string.IsNullOrEmpty(searchAuthorText) || 
-                    (!string.IsNullOrEmpty(game.GameDeveloper) && 
+                && (string.IsNullOrEmpty(searchAuthorText) ||
+                    (!string.IsNullOrEmpty(game.GameDeveloper) &&
                      game.GameDeveloper.Contains(searchAuthorText, StringComparison.OrdinalIgnoreCase)))
+                && (!selectedTypeId.HasValue || game.GameTypeId == selectedTypeId.Value)
+                && (!selectedEngineId.HasValue || game.GameEngineId == selectedEngineId.Value)
             ).ToList();
 
             GamesItemsControl.ItemsSource = filteredGames;

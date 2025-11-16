@@ -341,4 +341,43 @@
   <data name="Manage account session" xml:space="preserve">
     <value>Zarządzaj sesją konta</value>
   </data>
+  <data name="Recommended games" xml:space="preserve">
+    <value>Polecane gry</value>
+  </data>
+  <data name="Show more" xml:space="preserve">
+    <value>Zobacz więcej</value>
+  </data>
+  <data name="Clear filters" xml:space="preserve">
+    <value>Wyczyść filtry</value>
+  </data>
+  <data name="Select category" xml:space="preserve">
+    <value>Wybierz kategorię</value>
+  </data>
+  <data name="All games" xml:space="preserve">
+    <value>Wszystkie gry</value>
+  </data>
+  <data name="Search by author" xml:space="preserve">
+    <value>Szukaj po autorze</value>
+  </data>
+  <data name="Search by name" xml:space="preserve">
+    <value>Szukaj po nazwie</value>
+  </data>
+  <data name="FilterButton" xml:space="preserve">
+    <value>Filtruj</value>
+  </data>
+  <data name="Select game type" xml:space="preserve">
+    <value>Wybierz rodzaj gry</value>
+  </data>
+  <data name="Select game engine" xml:space="preserve">
+    <value>Wybierz silnik gry</value>
+  </data>
+  <data name="Log in" xml:space="preserve">
+    <value>Zaloguj się</value>
+  </data>
+  <data name="Add game" xml:space="preserve">
+    <value>Dodaj grę</value>
+  </data>
+  <data name="My profile" xml:space="preserve">
+    <value>Mój profil</value>
+  </data>
 </root>

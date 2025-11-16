@@ -24,6 +24,8 @@ select
 , g.HardwareRequirements
 , g.OtherInformation
 , g.DraftP
+, g.EngineId GameEngineId
+, g.TypeId   GameTypeId
 from Games g
 inner join Users u on u.Id = g.UserId
 inner join GameImages gi on gi.GameId = g.Id and gi.LogoP = 1
@@ -49,6 +51,8 @@ select
 , g.HardwareRequirements
 , g.OtherInformation
 , g.DraftP
+, g.EngineId GameEngineId
+, g.TypeId   GameTypeId
 from Games g
 inner join Users u on u.Id = g.UserId
 inner join GameImages gi on gi.GameId = g.Id and gi.LogoP = 1
@@ -78,7 +82,9 @@ order by g.Title", bypassDraftP);
                     OtherInformations = dr.TryGetValue<string>("OtherInformation"),
                     LogoPath = dr.TryGetValue<string>("LogoPath"),
                     GameType = dr.TryGetValue<string>("GameType"),
-                    DraftP = dr.TryGetValue<bool>("DraftP")
+                    DraftP = dr.TryGetValue<bool>("DraftP"),
+                    GameTypeId = dr.TryGetValue<int?>("GameTypeId") ?? 0,
+                    GameEngineId = dr.TryGetValue<int?>("GameEngineId") ?? 0
                 };
 
                 return baseGame;

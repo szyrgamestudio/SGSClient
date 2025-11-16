@@ -9,6 +9,7 @@ using SGSClient.Models;
 using SGSClient.ViewModels;
 using Windows.Storage;
 using Windows.System;
+using SGSClient.Helpers;
 
 namespace SGSClient.Views;
 
@@ -107,13 +108,12 @@ public sealed partial class ShellPage : Page
         {
             flyout.Items.Add(new MenuFlyoutItem { Text = ViewModel.UserMenuText, IsEnabled = false });
             flyout.Items.Add(new MenuFlyoutSeparator());
-            flyout.Items.Add(new MenuFlyoutItem { Text = "Dodaj grę", Command = ViewModel.AddGameCommand });
-            flyout.Items.Add(new MenuFlyoutItem { Text = "Moja biblioteka", Command = ViewModel.MyGamesCommand });
-            flyout.Items.Add(new MenuFlyoutItem { Text = "Wyloguj się", Command = ViewModel.LogoutCommand });
+            flyout.Items.Add(new MenuFlyoutItem { Text = L.p("Add game"), Command = ViewModel.AddGameCommand });
+            flyout.Items.Add(new MenuFlyoutItem { Text = L.p("My profile"), Command = ViewModel.MyGamesCommand });
         }
         else
         {
-            flyout.Items.Add(new MenuFlyoutItem { Text = "Zaloguj się", Command = ViewModel.LoginCommand });
+            flyout.Items.Add(new MenuFlyoutItem { Text = L.p("Log in"), Command = ViewModel.LoginCommand });
         }
 
         flyout.ShowAt((FrameworkElement)sender);

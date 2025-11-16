@@ -18,6 +18,9 @@ public partial class Game : ObservableObject
     public string? GameDescription { get; set; }
     public string? HardwareRequirements { get; set; }
     public string? OtherInformations { get; set; }
+    public int? GameTypeId { get; set; } = null;
+    public int? GameEngineId { get; set; } = null;
+
 
     // oryginalny URL do logo (np. z Nextcloud)
     public string? LogoPath { get; set; }

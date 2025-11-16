@@ -18,6 +18,12 @@ namespace SGSClient.ViewModels
     {
         private readonly IAppUser _appUser;
         private readonly IAppInfo _appInfo;
+        public ObservableCollection<GameTypeItem> GameTypes { get; } = new();
+        public ObservableCollection<GameEngineItem> GameEngines { get; } = new();
+
+        public GameTypeItem SelectedGameType { get; set; }
+        public GameEngineItem SelectedGameEngine { get; set; }
+
         public ObservableCollection<Game> GamesList { get; private set; } = new();
         public GamesViewModel(IAppUser appUser, IAppInfo appInfo)
         {
@@ -54,6 +60,16 @@ namespace SGSClient.ViewModels
                 .ToList();
 
             await Task.WhenAll(tasks);
+        }
+        public async Task LoadFiltersAsync()
+        {
+            GameTypes.Clear();
+            foreach (var t in GameTypesRepository.FetchGameTypes())
+                GameTypes.Add(t);
+
+            GameEngines.Clear();
+            foreach (var e in GameEnginesRepository.FetchGameEngines())
+                GameEngines.Add(e);
         }
 
         private async Task LoadLogoCachedAsync(Game game, string username, string password)

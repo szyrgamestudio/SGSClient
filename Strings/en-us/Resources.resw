@@ -341,4 +341,43 @@
   <data name="Manage account session" xml:space="preserve">
     <value>Manage account session</value>
   </data>
+  <data name="Recommended games" xml:space="preserve">
+    <value>Recommended games</value>
+  </data>
+  <data name="Show more" xml:space="preserve">
+    <value>Show more</value>
+  </data>
+  <data name="Clear filters" xml:space="preserve">
+    <value>Clear filters</value>
+  </data>
+  <data name="Select category" xml:space="preserve">
+    <value>Select category</value>
+  </data>
+  <data name="All games" xml:space="preserve">
+    <value>All games</value>
+  </data>
+  <data name="Search by author" xml:space="preserve">
+    <value>Search by author</value>
+  </data>
+  <data name="Search by name" xml:space="preserve">
+    <value>Search by name</value>
+  </data>
+  <data name="FilterButton" xml:space="preserve">
+    <value>Filter</value>
+  </data>
+  <data name="Select game type" xml:space="preserve">
+    <value>Select game type</value>
+  </data>
+  <data name="Select game engine" xml:space="preserve">
+    <value>Select game engine</value>
+  </data>
+  <data name="Log in" xml:space="preserve">
+    <value>Log in</value>
+  </data>
+  <data name="Add game" xml:space="preserve">
+    <value>Add game</value>
+  </data>
+  <data name="My profile" xml:space="preserve">
+    <value>My profile</value>
+  </data>
 </root>

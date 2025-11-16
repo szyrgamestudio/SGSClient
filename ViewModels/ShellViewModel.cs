@@ -1,10 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using SGSClient.Contracts.Services;
 using SGSClient.Core.Authorization;
-using SGSClient.Core.Database;
-using SGSClient.Core.Extensions;
+using SGSClient.Helpers;
 using System.Windows.Input;
 
 namespace SGSClient.ViewModels;
@@ -19,7 +19,7 @@ public partial class ShellViewModel : ObservableRecipient
     private object? selected;
 
     [ObservableProperty]
-    private string userDisplayName;
+    private string userDisplayName = string.Empty;
 
     [ObservableProperty]
     private string? userEmail;
@@ -28,7 +28,7 @@ public partial class ShellViewModel : ObservableRecipient
     private bool isUserLoggedIn;
 
     [ObservableProperty]
-    private string userMenuText; // Wartość używana w XAML
+    private string userMenuText = string.Empty;
 
     public ICommand LoginCommand { get; }
     public ICommand LogoutCommand { get; }
@@ -64,7 +64,7 @@ public partial class ShellViewModel : ObservableRecipient
             return;
         }
 
-        var selectedItem = NavigationViewService.GetSelectedItem(e.SourcePageType);
+        NavigationViewItem selectedItem = NavigationViewService.GetSelectedItem(e.SourcePageType);
         if (selectedItem != null)
         {
             Selected = selectedItem;
@@ -74,8 +74,8 @@ public partial class ShellViewModel : ObservableRecipient
     private void UpdateUserData()
     {
         IsUserLoggedIn = _appUser.IsLoggedIn;
-        UserDisplayName = IsUserLoggedIn ? _appUser.GetCurrentUser().DisplayName : "Zaloguj się";
-        UserMenuText = IsUserLoggedIn ? _appUser.GetCurrentUser().DisplayName : "Zaloguj się";
+        UserDisplayName = IsUserLoggedIn ? _appUser.GetCurrentUser().DisplayName : L.p("Log in");
+        UserMenuText = IsUserLoggedIn ? _appUser.GetCurrentUser().DisplayName : L.p("Log in");
     }
 
     private async Task ExecuteLoginAsync()
@@ -93,7 +93,7 @@ public partial class ShellViewModel : ObservableRecipient
         UpdateUserData();
     }
 
-    public string GetUserDisplayNameAsync()
+    public string? GetUserDisplayNameAsync()
     {
         if (_appUser.IsLoggedIn)
         {
@@ -109,7 +109,6 @@ public partial class ShellViewModel : ObservableRecipient
     {
         NavigationService.NavigateTo(typeof(MyGamesViewModel).FullName!);
     }
-
     public void NavigateToUpload()
     {
         NavigationService.NavigateTo(typeof(UploadGameViewModel).FullName!);

@@ -1,4 +1,9 @@
-﻿<Page x:Class="SGSClient.Views.HomePage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:behaviors="using:SGSClient.Behaviors" xmlns:controls="using:SGSClient.Controls" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:models="using:SGSClient.Models" behaviors:NavigationViewHeaderBehavior.HeaderMode="Never" DataContext="{x:Bind HomeViewModel, Mode=OneWay}" mc:Ignorable="d">
+﻿<Page
+    x:Class="SGSClient.Views.HomePage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:behaviors="using:SGSClient.Behaviors" xmlns:controls="using:SGSClient.Controls" xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:models="using:SGSClient.Models" behaviors:NavigationViewHeaderBehavior.HeaderMode="Never"
+    DataContext="{x:Bind HomeViewModel, Mode=OneWay}"
+    mc:Ignorable="d">
     <Grid>
         <!--  główny układ  -->
         <Grid>
@@ -7,20 +12,29 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <!--  HEADER  -->
-            <Grid Height="300" Grid.Row="0">
+            <Grid Grid.Row="0" Height="300">
                 <controls:HomePageHeaderImage />
-                <StackPanel Margin="36,0,0,0" VerticalAlignment="Center" Spacing="8">
-                    <TextBlock FontSize="48" FontWeight="Bold" Foreground="White" Text="SGSClient" />
-                    <TextBlock FontSize="18" FontWeight="Light" Foreground="White" Text="https://szyrgamestudio.github.io/" />
+                <StackPanel
+                    Margin="36,0,0,0" VerticalAlignment="Center" Spacing="8">
+                    <TextBlock
+                        FontSize="48" FontWeight="Bold" Foreground="White"
+                        Text="SGSClient" />
+                    <TextBlock
+                        FontSize="18" FontWeight="Light" Foreground="White"
+                        Text="https://szyrgamestudio.github.io/" />
                 </StackPanel>
             </Grid>
 
             <!--  CONTENT  -->
-            <ScrollViewer Grid.Row="1" Margin="20" HorizontalScrollBarVisibility="Auto" HorizontalScrollMode="Enabled" Loaded="GamesScrollViewer_Loaded">
+            <ScrollViewer
+                Grid.Row="1" Margin="20" HorizontalScrollBarVisibility="Auto"
+                HorizontalScrollMode="Enabled" Loaded="GamesScrollViewer_Loaded">
                 <StackPanel Spacing="30">
 
                     <!--  Polecane gry  -->
-                    <TextBlock FontSize="24" FontWeight="Bold" Foreground="White" Text="Polecane gry" />
+                    <TextBlock
+                        FontSize="24" FontWeight="Bold" Foreground="White"
+                        Text="{Binding Source='Recommended games', Converter={StaticResource L}, Mode=OneWay}" />
 
                     <ItemsControl ItemsSource="{x:Bind HomeViewModel.GamesFeaturedList, Mode=OneWay}">
                         <ItemsControl.ItemsPanel>
@@ -35,18 +49,36 @@
                                     <!--  Tło gry (logo)  -->
                                     <Border BorderBrush="{ThemeResource ControlElevationBorderBrush}" CornerRadius="{StaticResource OverlayCornerRadius}">
                                         <Border.Background>
-                                            <ImageBrush ImageSource="{x:Bind LogoImage, Mode=OneWay}" Stretch="UniformToFill"/>
+                                            <ImageBrush ImageSource="{x:Bind LogoImage, Mode=OneWay}" Stretch="UniformToFill" />
                                         </Border.Background>
                                     </Border>
 
                                     <!--  Nakładka półprzezroczysta dla czytelności tekstu  -->
-                                    <Border Background="{ThemeResource ControlOnImageFillColorDefaultBrush}" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="0.1" CornerRadius="{StaticResource OverlayCornerRadius}" />
+                                    <Border
+                                        Background="{ThemeResource ControlOnImageFillColorDefaultBrush}"
+                                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                        BorderThickness="0.1"
+                                        CornerRadius="{StaticResource OverlayCornerRadius}" />
 
                                     <!--  Treść karty  -->
-                                    <StackPanel Padding="12" VerticalAlignment="Bottom" Spacing="8">
-                                        <TextBlock FontWeight="Bold" Foreground="White" Text="{x:Bind GameName}" />
-                                        <TextBlock FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="{x:Bind GameDeveloper}" TextWrapping="Wrap" />
-                                        <Button Height="32" HorizontalAlignment="Left" Background="{ThemeResource AccentFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}" Click="ButtonGame_Click" Content="Zobacz więcej" CornerRadius="{StaticResource ControlCornerRadius}" Tag="{Binding GameSymbol}" />
+                                    <StackPanel
+                                        Padding="12" VerticalAlignment="Bottom" Spacing="8">
+                                        <TextBlock
+                                            FontWeight="Bold" Foreground="White"
+                                            Text="{x:Bind GameName}" />
+                                        <TextBlock
+                                            FontSize="12"
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                            Text="{x:Bind GameDeveloper}"
+                                            TextWrapping="Wrap" />
+                                        <Button
+                                            Height="32" HorizontalAlignment="Left"
+                                            Background="{ThemeResource AccentFillColorDefaultBrush}"
+                                            BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+                                            Click="ButtonGame_Click"
+                                            Content="{Binding Source='Show more', Converter={StaticResource L}, Mode=OneWay}"
+                                            CornerRadius="{StaticResource ControlCornerRadius}"
+                                            Tag="{Binding GameSymbol}" />
                                     </StackPanel>
                                 </Grid>
                             </DataTemplate>
