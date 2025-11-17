@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Kiota.Abstractions;
+using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using SGSClient.Core.Authorization;
 using SGSClient.Core.Database;
@@ -26,38 +27,59 @@ namespace SGSClient.ViewModels
         #region Variables
         private readonly IAppUser _appUser;
         private readonly IAppInfo _appInfo;
-        private ObservableCollection<GameRating> _allRatings;
-        private const int PageSize = 2;
-        [ObservableProperty]
-        private ObservableCollection<GameRating> ratings;
-        [ObservableProperty]
-        private int currentPage;
-        [ObservableProperty]
-        private int ratingCount;
-        [ObservableProperty]
-        private string avgRating;
-        [ObservableProperty]
-        private int count1;
-        [ObservableProperty]
-        private int count2;
-        [ObservableProperty]
-        private int count3;
-        [ObservableProperty]
-        private int count4;
-        [ObservableProperty]
-        private int count5;
-        private string? rootPath;
+        private readonly HttpClient httpClient = new();
+        private static readonly string DatabasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "local_game_data.db");
+
+        private int _ratingCount;
+        private ObservableCollection<GameRating> _ratings = new();
+        private double _avgRating;
+
         private string? gamepath;
         private int? gameId;
-        private string? versionFile;
         private string? gameZip;
         private string? gameExe;
         private string? gameIdentifier;
         private string? gameName;
         private string? gameZipLink;
-        private string gameVersion;
-        private readonly HttpClient httpClient = new();
-        private static readonly string DatabasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "local_game_data.db");
+        private string gameVersion = "0.0.0";
+
+        private GameImage _gameLogo;
+        private ObservableCollection<GameImage> _gameImages = new();
+        public ImageSource? BackgroundImage => GameImages.FirstOrDefault()?.ImageSource;
+
+
+        #endregion
+
+        #region Properties
+        public int RatingCount
+        {
+            get => _ratingCount;
+            set => SetProperty(ref _ratingCount, value);
+        }
+
+        public ObservableCollection<GameRating> Ratings
+        {
+            get => _ratings;
+            set
+            {
+                if (SetProperty(ref _ratings, value))
+                {
+                    OnPropertyChanged(nameof(RatingsMinimal));
+                }
+            }
+        }
+
+        public double AvgRating
+        {
+            get => _avgRating;
+            set { _avgRating = value; OnPropertyChanged(); }
+        }
+        private ObservableCollection<GameRating> _ratingsMinimal = new();
+        public ObservableCollection<GameRating> RatingsMinimal
+        {
+            get => _ratingsMinimal;
+            private set => SetProperty(ref _ratingsMinimal, value);
+        }
 
         public int? GameId { get; private set; }
         public string? GameName { get; private set; }
@@ -70,64 +92,33 @@ namespace SGSClient.ViewModels
         public bool IsHardwareRequirementsVisible { get; private set; }
         public bool IsDLCVisible { get; private set; }
         public bool IsAddRatingVisible { get; private set; }
-        public bool CanGoToPreviousPage => CurrentPage > 0;
-        public bool CanGoToNextPage => (CurrentPage + 1) * PageSize < _allRatings.Count;
-
         public string GameTime { get; private set; } = "0 min";
 
-        #region Logo
-        private GameImage _gameLogo;
         public GameImage GameLogo
         {
             get => _gameLogo;
-            set
-            {
-                _gameLogo = value;
-                OnPropertyChanged(nameof(GameLogo));
-            }
+            set => SetProperty(ref _gameLogo, value);
         }
+
         public ObservableCollection<GameImage> GameLogos { get; set; } = new();
-
-        #endregion
-
-        #region Images gallery
-        private ObservableCollection<GameImage> _gameImages;
         public ObservableCollection<GameImage> GameImages
         {
             get => _gameImages;
-            set
-            {
-                _gameImages = value;
-                OnPropertyChanged(nameof(GameImages));
-            }
+            set => SetProperty(ref _gameImages, value);
         }
-        public ObservableCollection<string> GameImagePaths { get; set; } = new ObservableCollection<string>();
-        #endregion
 
+        public ObservableCollection<string> GameImagePaths { get; set; } = new();
         #endregion
 
         public GameBaseViewModel(IAppUser appUser, IAppInfo appInfo)
         {
             _appUser = appUser;
             _appInfo = appInfo;
-
-            _allRatings = [];
-            ratingCount = 0;
-            avgRating = "5.0";
-            count1 = 0;
-            count2 = 0;
-            count3 = 0;
-            count4 = 0;
-            count5 = 0;
-
-
-            CurrentPage = 0;
-
-            GameLogos = [];
-            GameImages = [];
-            Ratings = [];
         }
 
+
+
+        #region Methods
         public async Task LoadGameData(string gameSymbol)
         {
             string nextcloudLogin = _appInfo.GetAppSetting("NextcloudLogin").Value;
@@ -174,7 +165,7 @@ select
   ISNULL(ugt.TotalTime, 0) GameTime
 from (select 1 x) x
 left join UsersGameTime ugt on ugt.GameId = @p1 and ugt.UserId = @p2
-", gameSymbol, gameId, _appUser.GetCurrentUser().Id);
+", gameSymbol, gameId ?? 0, _appUser.GetCurrentUser().Id);
 
             if (ds.Tables[0].Rows.Count > 0)
             {
@@ -187,8 +178,8 @@ left join UsersGameTime ugt on ugt.GameId = @p1 and ugt.UserId = @p2
                 gameZipLink = dr.TryGetValue("ZipLink");
                 gameVersion = dr.TryGetValue("CurrentVersion") ?? "0.0.0";
 
-                //LoadRatings(gameSymbol ?? "");
-                //LoadGameRatingsStats(gameSymbol ?? "");
+                LoadRatings(gameSymbol ?? "");
+                LoadGameRatingsStats(gameSymbol ?? "");
 
                 GameId = gameId;
                 GameName = gameName;
@@ -218,6 +209,7 @@ left join UsersGameTime ugt on ugt.GameId = @p1 and ugt.UserId = @p2
                 OnPropertyChanged(nameof(IsHardwareRequirementsVisible));
                 OnPropertyChanged(nameof(IsDLCVisible));
                 OnPropertyChanged(nameof(IsAddRatingVisible));
+                OnPropertyChanged(nameof(Ratings));
 
                 GameLogos.Clear();
                 GameImages.Clear();
@@ -233,6 +225,7 @@ left join UsersGameTime ugt on ugt.GameId = @p1 and ugt.UserId = @p2
                     await LoadImageFromNextcloud(dr1, nextcloudLogin, nextcloudPassword);
                 }
 
+                OnPropertyChanged(nameof(BackgroundImage));
             }
         }
         public (bool IsInstalled, bool IsUpdateAvailable) CheckForUpdate(string gameIdentifier)
@@ -351,34 +344,45 @@ where g.Symbol = @p0
         }
 
         #region UI
-        public async Task LoadLogoFromNextcloud(DataRow imageRow, string username, string password)
+        public async Task LoadLogoFromNextcloud(DataRow dr, string username, string password)
         {
-            string imageUrl = imageRow["Url"].ToString();
+            if (dr == null) return;
+            string? urlObj = dr.TryGetValue("Url");
+            if (string.IsNullOrWhiteSpace(urlObj)) return;
+            string imageUrl = urlObj;
 
-            using (var client = new HttpClient())
+            try
             {
                 var authHeader = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}"));
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authHeader);
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authHeader);
 
-                var response = await client.GetAsync(imageUrl);
-                if (response.IsSuccessStatusCode)
+                using var response = await httpClient.GetAsync(imageUrl);
+                if (!response.IsSuccessStatusCode)
                 {
-                    var imageStream = await response.Content.ReadAsStreamAsync();
-                    BitmapImage bitmapImage = new BitmapImage();
-                    await bitmapImage.SetSourceAsync(imageStream.AsRandomAccessStream());
+                    var fallbackImage = new GameImage(imageUrl);
+                    GameLogos.Add(fallbackImage);
+                    GameLogo = fallbackImage;
+                    return;
+                }
 
-                    GameImage gameImage = new GameImage(imageUrl, bitmapImage);
-                    GameLogo = gameImage;
-                    GameLogos.Add(gameImage);
-                }
-                else
+                using var imageStream = await response.Content.ReadAsStreamAsync();
+                BitmapImage bitmapImage = new BitmapImage
                 {
-                    GameImage gameImage = new GameImage(imageUrl);
-                    GameLogos.Add(gameImage);
-                    GameLogo = gameImage;
-                }
+                    DecodePixelWidth = 200
+                };
+                await bitmapImage.SetSourceAsync(imageStream.AsRandomAccessStream());
+
+                GameImage gameImage = new GameImage(imageUrl, bitmapImage);
+                GameLogos.Add(gameImage);
+                GameLogo = gameImage;
             }
-
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Błąd pobierania loga: {ex.Message}");
+                var fallbackImage = new GameImage(imageUrl);
+                GameLogos.Add(fallbackImage);
+                GameLogo = fallbackImage;
+            }
         }
         public async Task LoadImageFromNextcloud(DataRow imageRow, string username, string password)
         {
@@ -528,7 +532,7 @@ where gr.UserId = @p0
         }
         public void LoadRatings(string gameIdentifier)
         {
-            _allRatings.Clear();
+            Ratings.Clear();
 
             DataSet ds = db.con.select(@"
 select
@@ -546,30 +550,29 @@ where g.Symbol = @p0
 
             foreach (DataRow dr in ds.Tables[0].Rows)
             {
-                _allRatings.Add(new GameRating
+                Ratings.Add(new GameRating
                 {
                     RatingId = dr.TryGetValue("Id"),
                     UserId = dr.TryGetValue("UserId"),
-                    Author = dr.TryGetValue("Name"),
+                    Author = dr.TryGetValue("DisplayName"),
                     Rating = dr.TryGetValue("Rating"),
                     Title = dr.TryGetValue("Title"),
                     Review = dr.TryGetValue("Review")
                 });
             }
 
-            LoadPage(0);
+            RatingsMinimal.Clear();
+            foreach (var r in Ratings.Take(2))
+                RatingsMinimal.Add(r);
+
+            OnPropertyChanged(nameof(RatingsMinimal));
         }
         public void LoadGameRatingsStats(string gameIdentifier)
         {
             DataSet ds = db.con.select(@"
 select 
   COUNT(gr.Id) RatingCount
-, CAST(ROUND(CAST(AVG(gr.Rating) as decimal(10, 1)), 1) as nvarchar) AvgRating
-, SUM(case when gr.Rating = 1 then 1 else 0 end) * 100 / COUNT(gr.Id) Count1
-, SUM(case when gr.Rating = 2 then 1 else 0 end) * 100 / COUNT(gr.Id) Count2
-, SUM(case when gr.Rating = 3 then 1 else 0 end) * 100 / COUNT(gr.Id) Count3
-, SUM(case when gr.Rating = 4 then 1 else 0 end) * 100 / COUNT(gr.Id) Count4
-, SUM(case when gr.Rating = 5 then 1 else 0 end) * 100 / COUNT(gr.Id) Count5
+, ROUND(AVG(CAST(gr.Rating AS decimal(10,2))), 2) AvgRating
 from GameRatings gr
 inner join Games g on g.Id = gr.GameId
 where g.Symbol = @p0
@@ -579,12 +582,7 @@ group by gr.GameId
             foreach (DataRow dr in ds.Tables[0].Rows)
             {
                 RatingCount = dr.TryGetValue("RatingCount");
-                AvgRating = dr.TryGetValue("AvgRating");
-                Count1 = dr.TryGetValue("Count1");
-                Count2 = dr.TryGetValue("Count2");
-                Count3 = dr.TryGetValue("Count3");
-                Count4 = dr.TryGetValue("Count4");
-                Count5 = dr.TryGetValue("Count5");
+                AvgRating = dr.TryGetValue<double>("AvgRating");
             }
 
         }
@@ -622,7 +620,6 @@ select
 ", gameId, _appUser.UserId, gameRating.Rating, gameRating.Title, gameRating.Review);
 
             LoadGameRatingsStats(gameIdentifier);
-            LoadPage(CurrentPage);
         }
         public void UpdateRating(GameRating gameRating, string gameIdentifier)
         {
@@ -636,20 +633,8 @@ from GameRatings r
 where r.Id = @p0
 ", gameRating.RatingId, gameRating.Rating, gameRating.Title, gameRating.Review);
             LoadGameRatingsStats(gameIdentifier);
-            LoadPage(CurrentPage);
         }
-        public void LoadPage(int pageNumber)
-        {
-            Ratings.Clear();
-            CurrentPage = pageNumber;
-            var ratingsToShow = _allRatings.Skip(CurrentPage * PageSize).Take(PageSize);
-            foreach (var gameRating in ratingsToShow)
-            {
-                Ratings.Add(gameRating);
-            }
-            OnPropertyChanged(nameof(CanGoToPreviousPage));
-            OnPropertyChanged(nameof(CanGoToNextPage));
-        }
+        #endregion
         #endregion
     }
 }

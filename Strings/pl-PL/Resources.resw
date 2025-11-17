@@ -380,4 +380,28 @@
   <data name="My profile" xml:space="preserve">
     <value>Mój profil</value>
   </data>
+  <data name="Download" xml:space="preserve">
+    <value>Pobierz</value>
+  </data>
+  <data name="Rate" xml:space="preserve">
+    <value>Oceń</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>Aktualizuj</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Opis</value>
+  </data>
+  <data name="Hardware requirements" xml:space="preserve">
+    <value>Wymagania systemowe</value>
+  </data>
+  <data name="Install" xml:space="preserve">
+    <value>Zainstaluj</value>
+  </data>
+  <data name="Recent reviews" xml:space="preserve">
+    <value>Najnowsze recenzje</value>
+  </data>
+  <data name="Show all" xml:space="preserve">
+    <value>Pokaż wszystko</value>
+  </data>
 </root>

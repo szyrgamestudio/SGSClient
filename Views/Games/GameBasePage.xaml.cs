@@ -35,6 +35,7 @@ public sealed partial class GameBasePage : Page
         base.OnNavigatedTo(e);
         DataContext = ViewModel;
 
+
         if (e.Parameter is string gameSymbol && !string.IsNullOrWhiteSpace(gameSymbol))
         {
             (bool installedP, bool updateP) = ViewModel.CheckForUpdate(gameSymbol);
@@ -246,8 +247,8 @@ public sealed partial class GameBasePage : Page
         };
 
         var result = await dialog.ShowAsync();
-        if (result != ContentDialogResult.Primary || selectedFolder is null)
-            throw new InvalidOperationException("Nie wybrano folderu.");
+        //if (result != ContentDialogResult.Primary || selectedFolder is null)
+            //throw new InvalidOperationException("Nie wybrano folderu.");
 
         return selectedFolder;
     }

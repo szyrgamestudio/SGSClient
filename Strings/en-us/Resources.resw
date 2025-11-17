@@ -380,4 +380,28 @@
   <data name="My profile" xml:space="preserve">
     <value>My profile</value>
   </data>
+  <data name="Download" xml:space="preserve">
+    <value>Download</value>
+  </data>
+  <data name="Rate" xml:space="preserve">
+    <value>Rate</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>Update</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="Hardware requirements" xml:space="preserve">
+    <value>Hardware requirements</value>
+  </data>
+  <data name="Install" xml:space="preserve">
+    <value>Install</value>
+  </data>
+  <data name="Recent reviews" xml:space="preserve">
+    <value>Recent reviews</value>
+  </data>
+  <data name="Show all" xml:space="preserve">
+    <value>Show all</value>
+  </data>
 </root>
