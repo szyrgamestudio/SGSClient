@@ -129,7 +129,7 @@
                                 <Rectangle Height="1" Fill="{ThemeResource ControlElevationBorderBrush}" />
 
                                 <ListView BorderThickness="0"
-                                          ItemsSource="{x:Bind ViewModel.RatingsMinimal, Mode=OneWay}"
+                                          ItemsSource="{Binding RatingsMinimal}"
                                           SelectionMode="None">
                                     <ListView.ItemTemplate>
                                         <DataTemplate x:DataType="models:GameRating">

@@ -404,4 +404,16 @@
   <data name="Show all" xml:space="preserve">
     <value>Pokaż wszystko</value>
   </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Anuluj</value>
+  </data>
+  <data name="Select the installation folder" xml:space="preserve">
+    <value>Wybierz folder instalacji</value>
+  </data>
+  <data name="Browse" xml:space="preserve">
+    <value>Przeglądaj</value>
+  </data>
+  <data name="Select installation folder" xml:space="preserve">
+    <value>Wybierz folder instalacji</value>
+  </data>
 </root>

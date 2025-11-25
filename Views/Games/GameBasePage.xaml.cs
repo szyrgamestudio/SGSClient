@@ -195,8 +195,8 @@ public sealed partial class GameBasePage : Page
 
     private async Task<StorageFolder> ShowInstallLocationDialogAsync(string gameIdentifier)
     {
-        TextBox pathTextBox = new TextBox { PlaceholderText = "Wybierz folder instalacji..." };
-        Button browseButton = new Button { Content = "Przeglądaj" };
+        TextBox pathTextBox = new TextBox { PlaceholderText = L.p("Select the installation folder") + "..." };
+        Button browseButton = new Button { Content = L.p("Browse") };
         StackPanel panel = new StackPanel { Spacing = 8 };
         panel.Children.Add(pathTextBox);
         panel.Children.Add(browseButton);
@@ -230,9 +230,9 @@ public sealed partial class GameBasePage : Page
         var dialog = new ContentDialog
         {
             XamlRoot = this.XamlRoot,
-            Title = "Wybierz folder instalacji",
+            Title = L.p("Select installation folder"),
             PrimaryButtonText = "OK",
-            CloseButtonText = "Anuluj",
+            CloseButtonText = L.p("Cancel"),
             DefaultButton = ContentDialogButton.Primary,
             Content = panel
         };
@@ -242,7 +242,7 @@ public sealed partial class GameBasePage : Page
             if (selectedFolder == null)
             {
                 e.Cancel = true;
-                ToolTipService.SetToolTip(pathTextBox, "Musisz wybrać folder instalacji.");
+                ToolTipService.SetToolTip(pathTextBox, L.p("You must select the installation folder."));
             }
         };
 
