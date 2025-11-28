@@ -8,9 +8,7 @@ using SGSClient.Core.Helpers;
 using SGSClient.Models;
 using System.Collections.ObjectModel;
 using System.Data;
-using System.Diagnostics;
 using System.Text.RegularExpressions;
-using Windows.Gaming.Input;
 using Windows.Storage;
 namespace SGSClient.ViewModels;
 
@@ -201,9 +199,9 @@ from GameEngines ge
             return false;
         }
 
-        string gameDescriptionParam = string.Join(Environment.NewLine, GameDescription.Split(["\r\n", "\n", "\r"], StringSplitOptions.None));
-        string hardwareRequirementsParam = string.Join(Environment.NewLine, HardwareRequirements.Split(["\r\n", "\n", "\r"], StringSplitOptions.None));
-        string otherInfoParam = string.Join(Environment.NewLine, OtherInfo.Split(["\r\n", "\n", "\r"], StringSplitOptions.None));
+        string gameDescriptionParam = string.Join(Environment.NewLine, GameDescription.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
+        string hardwareRequirementsParam = string.Join(Environment.NewLine, HardwareRequirements.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
+        string otherInfoParam = string.Join(Environment.NewLine, OtherInfo.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
 
         var uploader = new NextcloudUploader("https://cloud.m455yn.dev/", NextcloudUsername, NextcloudPassword);
         string nextcloudFolder = GameName;
@@ -288,16 +286,16 @@ select
         foreach (var url in uploadedGalleryUrls)
         {
             db.con.exec(@"
-insert sgsGameImages (GameId, ImagePath)
-select @p0, @p1
+insert GameImages (GameId, Url, LogoP)
+select @p0, @p1, 0
 ", gameId.ToSqlParameter(), url.ToSqlParameter());
         }
 
         if (!string.IsNullOrWhiteSpace(GameLogoUrl))
         {
             db.con.exec(@"
-insert sgsGameLogo (GameId, LogoPath)
-select @p0, @p1
+insert GameImages (GameId, Url, LogoP)
+select @p0, @p1, 1
 ", gameId.ToSqlParameter(), GameLogoUrl.ToSqlParameter());
         }
 

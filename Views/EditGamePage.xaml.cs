@@ -19,9 +19,12 @@ namespace SGSClient.Views
         private int gameId;
         public string GameId { get; private set; }
         public EditGameViewModel ViewModel { get; }
+        public ShellViewModel ShellViewModel { get; }
         public EditGamePage()
         {
             ViewModel = App.GetService<EditGameViewModel>();
+            ShellViewModel = App.GetService<ShellViewModel>();
+
             InitializeComponent();
             DataContext = ViewModel;
         }
@@ -91,107 +94,13 @@ namespace SGSClient.Views
         }
 
 
-        //private void Menu_Opening(object sender, object e)
-        //{
-        //    CommandBarFlyout myFlyout = sender as CommandBarFlyout;
-        //    if (myFlyout.Target == gameDescriptionRichEditBox)
-        //    {
-        //        AppBarButton myButton = new AppBarButton();
-        //        myButton.Command = new StandardUICommand(StandardUICommandKind.Share);
-        //        myFlyout.PrimaryCommands.Add(myButton);
-        //    }
-        //}
-
-        //private void gameDescriptionRichEditBox_Loaded(object sender, RoutedEventArgs e)
-        //{
-        //    gameDescriptionRichEditBox.SelectionFlyout.Opening += Menu_Opening;
-        //    gameDescriptionRichEditBox.ContextFlyout.Opening += Menu_Opening;
-        //}
-
-
-
-        #region Logo
-        private async void AddLogoButton_Click(object sender, RoutedEventArgs e)
-        {
-            var picker = new FileOpenPicker();
-            picker.ViewMode = PickerViewMode.Thumbnail;
-            picker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
-            picker.FileTypeFilter.Add(".jpg");
-            picker.FileTypeFilter.Add(".jpeg");
-            picker.FileTypeFilter.Add(".png");
-
-            // Inicjalizuj picker z uchwytem okna
-            Helpers.WindowHelper.InitializeWithWindow(picker, App.MainWindow);
-
-            StorageFile file = await picker.PickSingleFileAsync();
-            if (file != null)
-            {
-                // Load the selected image
-                using (IRandomAccessStream fileStream = await file.OpenAsync(FileAccessMode.Read))
-                {
-                    var bitmapImage = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage();
-                    await bitmapImage.SetSourceAsync(fileStream);
-
-                    var newGameImage = new GameImage(bitmapImage)
-                    {
-                        Url = file.Path
-                    };
-
-                    ViewModel.GameLogos.Add(newGameImage);
-                    AddLogoBtn.IsEnabled = false;
-                    //await OpenImagePreviewDialog(newGameImage);
-                }
-            }
-        }
+        #region Buttons
         private void RemoveLogoButton_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button button && button.DataContext is GameImage gameImage)
                 ViewModel.GameLogos.Remove(gameImage);
 
             AddLogoBtn.IsEnabled = true;
-        }
-        #endregion
-
-        #region Images gallery
-        private async void AddImageButton_Click(object sender, RoutedEventArgs e)
-        {
-            var picker = new FileOpenPicker();
-            picker.ViewMode = PickerViewMode.Thumbnail;
-            picker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
-            picker.FileTypeFilter.Add(".jpg");
-            picker.FileTypeFilter.Add(".jpeg");
-            picker.FileTypeFilter.Add(".png");
-
-            // Inicjalizuj picker z uchwytem okna
-            Helpers.WindowHelper.InitializeWithWindow(picker, App.MainWindow);
-
-            StorageFile file = await picker.PickSingleFileAsync();
-            if (file != null)
-            {
-                // Load the selected image
-                using (IRandomAccessStream fileStream = await file.OpenAsync(FileAccessMode.Read))
-                {
-                    var bitmapImage = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage();
-                    await bitmapImage.SetSourceAsync(fileStream);
-
-                    // Add the selected image to the GameImages collection
-                    var newGameImage = new GameImage(bitmapImage)
-                    {
-                        Url = file.Path // Store the image path (URL)
-                    };
-
-                    ViewModel.GameImages.Add(newGameImage);
-
-                    // Open the preview dialog to show the image immediately
-                    await OpenImagePreviewDialog(newGameImage);
-                }
-            }
-            else
-            {
-                // If no file is chosen, add a placeholder image
-                //var placeholderImage = new GameImage("ms-appx:///Assets/placeholder.png");
-                //ViewModel.GameImages.Add(placeholderImage);
-            }
         }
         private void RemoveImageButton_Click(object sender, RoutedEventArgs e)
         {
@@ -207,20 +116,37 @@ namespace SGSClient.Views
                 _ = OpenImagePreviewDialog(gameImage);
             }
         }
-        #endregion
 
-        #region Buttons
-        private async void ButtonSave_Click(object sender, RoutedEventArgs e)
-        {
-            await ViewModel.SaveGameData(gameId);
-            Frame.GoBack(new DrillInNavigationTransitionInfo());
-        }
         private void ButtonCancel_Click(object sender, RoutedEventArgs e)
         {
             Frame.Navigate(typeof(MyGamesPage), new DrillInNavigationTransitionInfo());
         }
+        private async void ButtonSave_Click(object sender, RoutedEventArgs e)
+        {
+            string userId = ShellViewModel.GetUserDisplayNameAsync();
+            bool success = await ViewModel.SaveGameData(gameId);
+
+            if (success)
+                Frame.Navigate(typeof(MyGamesPage), new DrillInNavigationTransitionInfo());
+            else
+                ShowMessageDialog("Błąd", "Nie udało się dodać gry.");
+        }
         #endregion
 
+        #region Dialogs
+        private async void ShowMessageDialog(string title, string content)
+        {
+            ContentDialog messageDialog = new ContentDialog
+            {
+                Title = title,
+                Content = content,
+                PrimaryButtonText = "OK",
+                //CloseButtonText = "Anuluj",
+                XamlRoot = this.Content.XamlRoot
+            };
+
+            ContentDialogResult result = await messageDialog.ShowAsync();
+        }
         private async Task OpenImagePreviewDialog(GameImage gameImage)
         {
             var previewDialog = new ContentDialog
@@ -331,5 +257,90 @@ namespace SGSClient.Views
             // Show the dialog
             await previewDialog.ShowAsync();
         }
+        #endregion
+
+        #region File pickers
+        private async void PickZIPFile_Click(object sender, RoutedEventArgs e)
+        {
+            var picker = new FileOpenPicker();
+            picker.ViewMode = PickerViewMode.Thumbnail;
+            picker.SuggestedStartLocation = PickerLocationId.Desktop;
+            picker.FileTypeFilter.Add(".zip");
+
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+
+            StorageFile file = await picker.PickSingleFileAsync();
+            if (file != null)
+            {
+                var viewModel = (EditGameViewModel)DataContext;
+                viewModel.ZipFile = file;
+                viewModel.ZipLink = file.Name;
+            }
+        }
+        private async void PickLogoImage_Click(object sender, RoutedEventArgs e)
+        {
+            var picker = new FileOpenPicker();
+            picker.FileTypeFilter.Add(".png");
+            picker.FileTypeFilter.Add(".jpg");
+            picker.FileTypeFilter.Add(".jpeg");
+            picker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
+
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+
+            StorageFile file = await picker.PickSingleFileAsync();
+            if (file != null)
+            {
+                //gameLogoTextBox.Text = file.Path;
+                using (IRandomAccessStream fileStream = await file.OpenAsync(FileAccessMode.Read))
+                {
+                    var bitmapImage = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage();
+                    await bitmapImage.SetSourceAsync(fileStream);
+
+                    var newGameImage = new GameImage(bitmapImage)
+                    {
+                        Url = file.Path
+                    };
+
+                    ViewModel.GameLogos.Add(newGameImage);
+                    AddLogoBtn.IsEnabled = false;
+                }
+
+            }
+        }
+        private async void PickScreenshotImage_Click(object sender, RoutedEventArgs e)
+        {
+            var picker = new FileOpenPicker();
+            picker.FileTypeFilter.Add(".png");
+            picker.FileTypeFilter.Add(".jpg");
+            picker.FileTypeFilter.Add(".jpeg");
+            picker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
+
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindow);
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+
+            StorageFile file = await picker.PickSingleFileAsync();
+            if (file != null)
+            {
+                using (IRandomAccessStream fileStream = await file.OpenAsync(FileAccessMode.Read))
+                {
+                    var bitmapImage = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage();
+                    await bitmapImage.SetSourceAsync(fileStream);
+
+                    // Add the selected image to the GameImages collection
+                    var newGameImage = new GameImage(bitmapImage)
+                    {
+                        Url = file.Path // Store the image path (URL)
+                    };
+
+                    ViewModel.GameImages.Add(newGameImage);
+
+                    // Open the preview dialog to show the image immediately
+                    await OpenImagePreviewDialog(newGameImage);
+                }
+            }
+        }
+        #endregion
     }
 }

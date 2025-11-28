@@ -1,9 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Graph.Models;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
+using SGSClient.Core.Authorization;
 using SGSClient.Core.Database;
 using SGSClient.Core.Extensions;
 using SGSClient.Core.Helpers;
+using SGSClient.Core.Utilities.AppInfoUtility.Interfaces;
 using SGSClient.Models;
 using System.Collections.ObjectModel;
 using System.Data;
@@ -11,13 +14,14 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.RegularExpressions;
 using Windows.Storage;
-using static SGSClient.Views.EditGamePage;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace SGSClient.ViewModels;
 
 public partial class EditGameViewModel : ObservableRecipient
 {
+    private readonly IAppUser _appUser;
+    private readonly IAppInfo _appInfo;
+
     private StorageFile _zipFile;
     public StorageFile ZipFile
     {
@@ -28,8 +32,6 @@ public partial class EditGameViewModel : ObservableRecipient
             OnPropertyChanged();
         }
     }
-    public string NextcloudUsername { get; set; } = "sgsclient";
-    public string NextcloudPassword { get; set; } = "yGnxE-Tykxe-SwjwW-NooLc-xSwPT";
 
     public ObservableCollection<GameTypeItem> GameTypes { get; set; } = [];
     public ObservableCollection<GameEngineItem> GameEngines { get; set; } = [];
@@ -114,8 +116,10 @@ public partial class EditGameViewModel : ObservableRecipient
     public ObservableCollection<string> GameImagePaths { get; set; } = new ObservableCollection<string>();
     #endregion
 
-    public EditGameViewModel()
+    public EditGameViewModel(IAppUser appUser, IAppInfo appInfo)
     {
+        _appUser = appUser;
+        _appInfo = appInfo;
         GameLogos = [];
         GameImages = [];
     }
@@ -185,6 +189,9 @@ from GameEngines ge
     }
     public async Task LoadGameData(int gameId)
     {
+        string nextcloudLogin = _appInfo.GetAppSetting("NextcloudLogin").Value;
+        string nextcloudPassword = _appInfo.GetAppSetting("NextcloudPassword").Value;
+
         DataSet ds = db.con.select(@"
 select
   g.Title
@@ -237,7 +244,7 @@ where gi.GameId = @p0 and gi.LogoP = 0
             {
                 string imageUrl = dr0.TryGetValue("Url").ToString();
 
-                await LoadLogoFromNextcloud(dr0, NextcloudUsername, NextcloudPassword);
+                await LoadLogoFromNextcloud(dr0, nextcloudLogin, nextcloudPassword);
             }
 
             GameImages.Clear();
@@ -245,21 +252,24 @@ where gi.GameId = @p0 and gi.LogoP = 0
             {
                 string imageUrl = dr1.TryGetValue("Url").ToString();
 
-                await LoadImageFromNextcloud(dr1, NextcloudUsername, NextcloudPassword);
+                await LoadImageFromNextcloud(dr1, nextcloudLogin, nextcloudPassword);
             }
 
         }
     }
 
-    public async Task SaveGameData(int gameId)
+    public async Task<bool> SaveGameData(int gameId)
     {
+        string nextcloudLogin = _appInfo.GetAppSetting("NextcloudLogin").Value;
+        string nextcloudPassword = _appInfo.GetAppSetting("NextcloudPassword").Value;
+
         if (string.IsNullOrEmpty(GameName) ||
             string.IsNullOrEmpty(CurrentVersion) ||
-            string.IsNullOrEmpty(ZipLink) ||
+            (ZipFile == null && string.IsNullOrEmpty(ZipLink)) ||
             string.IsNullOrEmpty(ExeName) ||
             string.IsNullOrEmpty(GameDescription))
         {
-            return;
+            return false;
         }
 
         string pattern = @"^\d+\.\d+\.\d+$";
@@ -267,16 +277,58 @@ where gi.GameId = @p0 and gi.LogoP = 0
         if (!isMatch)
         {
             ShowMessageDialog("Błąd", "Wprowadzono wersję w niepoprawnym formacie.\nUpewnij się, że format wersji wygląda następująco: x.x.x");
-            return;
+            return false;
         }
 
-        try
-        {
-            string gameDescriptionParam = string.Join(Environment.NewLine, GameDescription.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
-            string hardwareRequirementsParam = string.Join(Environment.NewLine, HardwareRequirements.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
-            string otherInfoParam = string.Join(Environment.NewLine, OtherInfo.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
+        string gameDescriptionParam = string.Join(Environment.NewLine, GameDescription.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
+        string hardwareRequirementsParam = string.Join(Environment.NewLine, HardwareRequirements.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
+        string otherInfoParam = string.Join(Environment.NewLine, OtherInfo.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
 
-            db.con.select(@"
+        var uploader = new NextcloudUploader("https://cloud.m455yn.dev/", nextcloudLogin, nextcloudPassword);
+        string nextcloudFolder = gameName;
+
+        #region ZIP File Upload
+        if (ZipFile != null)
+        {
+            string zipName = Guid.NewGuid() + ".zip";
+            ZipLink = await uploader.UploadFileAsync(ZipFile.Path, nextcloudFolder, zipName);
+        }
+        else if (Path.IsPathRooted(ZipLink))
+        {
+            ZipLink = await uploader.UploadFileAsync(ZipLink, nextcloudFolder, Guid.NewGuid() + ".zip");
+        }
+        #endregion
+
+        #region GameLogo File Upload
+        if (GameLogos.FirstOrDefault() is GameImage logoImage && Path.IsPathRooted(logoImage.Url))
+        {
+            string ext = Path.GetExtension(logoImage.Url);
+            GameLogoUrl = await uploader.UploadFileAsync(logoImage.Url, nextcloudFolder, $"logo{ext}", _appUser.GetCurrentUser().UserId);
+        }
+        #endregion
+
+        #region GameScreenshots Files Upload
+        List<string> uploadedGalleryUrls = new();
+        int index = 1;
+        foreach (var path in GameImages)
+        {
+            if (string.IsNullOrWhiteSpace(path.Url)) continue;
+
+            if (Path.IsPathRooted(path.Url))
+            {
+                string ext = Path.GetExtension(path.Url);
+                string uploadedUrl = await uploader.UploadFileAsync(path.Url, nextcloudFolder, $"zrzutEkranu_{index++}{ext}", _appUser.GetCurrentUser().UserId);
+                if (uploadedUrl != null)
+                    uploadedGalleryUrls.Add(uploadedUrl);
+            }
+            else
+            {
+                uploadedGalleryUrls.Add(path.Url);
+            }
+        }
+        #endregion
+
+        db.con.select(@"
 update g set
   g.Title = @p0
 , g.Symbol = @p1
@@ -290,80 +342,24 @@ update g set
 , g.EngineId = @p9
 from Games g
 where g.Id = @p10", GameName, Symbol, CurrentVersion, ZipLink, ExeName, gameDescriptionParam, hardwareRequirementsParam, otherInfoParam, SelectedGameTypeId, SelectedGameEngineId, gameId);
-        }
-        catch (Exception ex)
+
+        foreach (var url in uploadedGalleryUrls)
         {
-            Console.WriteLine($"Error: {ex.Message}");
-        }
-
-        await UpdateGameLogo(gameId);
-        await UpdateGameImages(gameId);
-    }
-    private async Task UpdateGameLogo(int gameId)
-    {
-        db.con.select(@"
-delete gi from
-GameImages gi
-where gi.GameId = @p0 and gi.LogoP = 1
-", gameId);
-        var uploader = new NextcloudUploader("https://cloud.m455yn.dev/", "sgsclient", "yGnxE-Tykxe-SwjwW-NooLc-xSwPT");
-
-        foreach (var logo in GameLogos)
-        {
-            string imageUrl = logo.Url;
-
-            if (Path.IsPathRooted(imageUrl))
-            {
-                var file = await StorageFile.GetFileFromPathAsync(imageUrl);
-                string uploadedUrl = await uploader.UploadFileAsync(file.Path);
-
-                if (uploadedUrl != null)
-                {
-                    imageUrl = uploadedUrl;
-                }
-            }
-            db.con.select(@"
+            db.con.exec(@"
 insert GameImages (GameId, Url, LogoP)
-select
-  @p0
-, @p1
-, 1", gameId, imageUrl);
+select @p0, @p1, 0
+", gameId.ToSqlParameter(), url.ToSqlParameter());
         }
-    }
-    private async Task UpdateGameImages(int gameId)
-    {
-        db.con.select(@"
-delete gi from
-GameImages gi
-where gi.GameId = @p0 and gi.LogoP = 0
-", gameId);
-        var uploader = new NextcloudUploader("https://cloud.m455yn.dev/", "sgsclient", "yGnxE-Tykxe-SwjwW-NooLc-xSwPT");
 
-        foreach (var image in GameImages)
+        if (!string.IsNullOrWhiteSpace(GameLogoUrl))
         {
-            string imageUrl = image.Url;
-
-            // Check if the image is a local file
-            if (Path.IsPathRooted(imageUrl))
-            {
-                // It's a local file, so upload it to Nextcloud
-                var file = await StorageFile.GetFileFromPathAsync(imageUrl);
-                string uploadedUrl = await uploader.UploadFileAsync(file.Path); // Upload file and get URL
-
-                if (uploadedUrl != null)
-                {
-                    imageUrl = uploadedUrl; // Update URL with the Nextcloud URL
-                }
-            }
-
-            // Insert the URL (which may now be from Nextcloud) into the database
-            db.con.select(@"
+            db.con.exec(@"
 insert GameImages (GameId, Url, LogoP)
-select
-  @p0
-, @p1
-, 0", gameId, imageUrl);
+select @p0, @p1, 1
+", gameId.ToSqlParameter(), GameLogoUrl.ToSqlParameter());
         }
+
+        return gameId > 0;
     }
 
     #region Helper Methods
