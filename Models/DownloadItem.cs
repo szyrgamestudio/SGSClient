@@ -1,9 +1,13 @@
 ﻿using SevenZipExtractor;
+using SGSClient.Core.Database;
+using SGSClient.Core.Extensions;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading.Tasks;
 using Windows.Storage;
 
@@ -85,10 +89,25 @@ namespace SGSClient.Models
 
         public async Task StartDownloadAsync(HttpClient httpClient)
         {
+            string nextcloudLogin = db.con.scalar(@"
+select
+  s.Value
+from AppSettings s
+where s.[Key] = @p0", "NextcloudLogin");
+
+            string nextcloudPassword = db.con.scalar(@"
+select
+  s.Value
+from AppSettings s
+where s.[Key] = @p0", "NextcloudPassword");
+
             if (DestinationFolder == null)
             {
                 throw new InvalidOperationException("Destination folder is not set.");
             }
+
+            var authHeader = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{nextcloudLogin}:{nextcloudPassword}"));
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authHeader);
 
             using var response = await httpClient.GetAsync(DownloadUrl, HttpCompletionOption.ResponseHeadersRead);
             response.EnsureSuccessStatusCode();

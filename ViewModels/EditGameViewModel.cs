@@ -343,21 +343,47 @@ update g set
 from Games g
 where g.Id = @p10", GameName, Symbol, CurrentVersion, ZipLink, ExeName, gameDescriptionParam, hardwareRequirementsParam, otherInfoParam, SelectedGameTypeId, SelectedGameEngineId, gameId);
 
+        // utworzenie tabeli tymczasowej
+        db.con.exec(@"
+create table #gmi
+(
+    gameid int
+  , url nvarchar(max)
+  , logop bit
+)
+");
+
+        // wrzucenie galerii
         foreach (var url in uploadedGalleryUrls)
         {
             db.con.exec(@"
-insert GameImages (GameId, Url, LogoP)
+insert #gmi (gameid, url, logop)
 select @p0, @p1, 0
 ", gameId.ToSqlParameter(), url.ToSqlParameter());
         }
 
+        // wrzucenie logo
         if (!string.IsNullOrWhiteSpace(GameLogoUrl))
         {
             db.con.exec(@"
-insert GameImages (GameId, Url, LogoP)
+insert #gmi (gameid, url, logop)
 select @p0, @p1, 1
 ", gameId.ToSqlParameter(), GameLogoUrl.ToSqlParameter());
         }
+
+        // MERGE (dodaje nowe, usuwa brakujące, zostawia stare)
+        db.con.exec(@"
+delete from GameImages where GameId = @p0
+
+insert GameImages(GameId, Url, LogoP)
+select
+  g.gameid
+, g.url
+, g.logop
+from #gmi g
+
+drop table #gmi
+", gameId.ToSqlParameter());
 
         return gameId > 0;
     }
