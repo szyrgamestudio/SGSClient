@@ -416,4 +416,10 @@
   <data name="Select installation folder" xml:space="preserve">
     <value>Wybierz folder instalacji</value>
   </data>
+  <data name="Play" xml:space="preserve">
+    <value>Graj</value>
+  </data>
+  <data name="Uninstall" xml:space="preserve">
+    <value>Odinstaluj</value>
+  </data>
 </root>

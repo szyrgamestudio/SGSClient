@@ -1,6 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Documents;
+using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using SGSClient.Controls;
 using SGSClient.Core.Extensions;
@@ -12,10 +13,12 @@ using System.Diagnostics;
 using Windows.Storage;
 
 namespace SGSClient.Views;
+
 public sealed partial class GameBasePage : Page
 {
     private LauncherStatus _status;
     private GameRating? _gameRating;
+    private string? _gameSymbol;
     private readonly string? gameZip = "";
 
     public GameBaseViewModel ViewModel { get; }
@@ -39,13 +42,14 @@ public sealed partial class GameBasePage : Page
         if (e.Parameter is string gameSymbol && !string.IsNullOrWhiteSpace(gameSymbol))
         {
             (bool installedP, bool updateP) = ViewModel.CheckForUpdate(gameSymbol);
+            _gameSymbol = gameSymbol;
 
             if (installedP)
                 Status = LauncherStatus.ready;
             else
                 Status = LauncherStatus.readyNoGame;
 
-            CheckUpdateButton.Visibility = updateP? Visibility.Visible : Visibility.Collapsed;
+            CheckUpdateButton.Visibility = updateP ? Visibility.Visible : Visibility.Collapsed;
 
             await ViewModel.LoadGameData(gameSymbol);
             GameDescriptionSmallRichText.SetHtml(ViewModel.GameDescription ?? string.Empty);
@@ -181,6 +185,8 @@ public sealed partial class GameBasePage : Page
                 {
                     await ViewModel.DownloadGameAsync(shellPage);
                 }
+                if (!string.IsNullOrWhiteSpace(_gameSymbol))
+                    Frame.Navigate(typeof(GameBasePage), _gameSymbol, new DrillInNavigationTransitionInfo());
                 break;
 
             case LauncherStatus.ready:
@@ -248,7 +254,7 @@ public sealed partial class GameBasePage : Page
 
         var result = await dialog.ShowAsync();
         //if (result != ContentDialogResult.Primary || selectedFolder is null)
-            //throw new InvalidOperationException("Nie wybrano folderu.");
+        //throw new InvalidOperationException("Nie wybrano folderu.");
 
         return selectedFolder;
     }
@@ -262,10 +268,17 @@ public sealed partial class GameBasePage : Page
         }
 
         await ViewModel.DownloadGameAsync(shellPage);
+
+        if (!string.IsNullOrWhiteSpace(_gameSymbol))
+            Frame.Navigate(typeof(GameBasePage), _gameSymbol, new DrillInNavigationTransitionInfo());
     }
     private void UninstallButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
     {
         ViewModel.UninstallGame();
+        if (_gameSymbol == null)
+            return;
+
+        Frame.Navigate(typeof(GameBasePage), _gameSymbol, new DrillInNavigationTransitionInfo());
     }
     #endregion
 }

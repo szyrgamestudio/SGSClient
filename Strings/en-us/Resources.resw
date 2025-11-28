@@ -416,4 +416,10 @@
   <data name="Select installation folder" xml:space="preserve">
     <value>Select installation folder</value>
   </data>
+  <data name="Play" xml:space="preserve">
+    <value>Play</value>
+  </data>
+  <data name="Uninstall" xml:space="preserve">
+    <value>Uninstall</value>
+  </data>
 </root>

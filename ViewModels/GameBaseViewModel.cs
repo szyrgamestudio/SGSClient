@@ -278,7 +278,7 @@ where g.Symbol = @p0
                 return;
             }
 
-            shellPage?.AddDownload(gameName, gameIdentifier, gameZipLink, installFolder, GameLogo.Url);
+            await shellPage?.AddDownload(gameName, gameIdentifier, gameZipLink, installFolder, GameLogo.Url);
 
             string installPath = Path.Combine(installFolder.Path, gameIdentifier);
             await SetLocalVersion(gameIdentifier, gameVersion, gameExe, installPath);
@@ -324,18 +324,27 @@ where g.Symbol = @p0
 
         public void UninstallGame()
         {
-            using var db = new SQLiteConnection(DatabasePath);
-            var game = db.Table<GameVersion>().FirstOrDefault(g => g.Identifier == gameIdentifier);
-            string path = game?.Path ?? string.Empty;
+            string path;
+            bool dbEmpty = false;
+
+            using (var db = new SQLiteConnection(DatabasePath))
+            {
+                var game = db.Table<GameVersion>().FirstOrDefault(g => g.Identifier == gameIdentifier);
+                path = game?.Path ?? string.Empty;
+
+                if (game != null)
+                    db.Delete(game);
+
+                dbEmpty = !db.Table<GameVersion>().Any();
+            }
 
             try
             {
-                if (Directory.Exists(path))
+                if (!string.IsNullOrEmpty(path) && Directory.Exists(path))
                     Directory.Delete(path, true);
 
-                if (!db.Table<GameVersion>().Any())
-                    if (File.Exists(DatabasePath))
-                        File.Delete(DatabasePath);
+                if (dbEmpty && File.Exists(DatabasePath))
+                    File.Delete(DatabasePath);
             }
             catch (Exception ex)
             {
