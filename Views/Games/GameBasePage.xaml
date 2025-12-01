@@ -97,7 +97,7 @@
 
 
                 <!--  Ostatnie recenzje  -->
-                <StackPanel>
+                <StackPanel Visibility="{Binding IsRatingVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <StackPanel.Resources>
                         <Style TargetType="Expander">
                             <Setter Property="HorizontalAlignment" Value="Stretch" />

@@ -91,6 +91,7 @@ namespace SGSClient.ViewModels
         public bool IsOtherInformationsVisible { get; private set; }
         public bool IsHardwareRequirementsVisible { get; private set; }
         public bool IsDLCVisible { get; private set; }
+        public bool IsRatingVisible { get; private set; }
         public bool IsAddRatingVisible { get; private set; }
         public string GameTime { get; private set; } = "0 min";
 
@@ -123,6 +124,8 @@ namespace SGSClient.ViewModels
         {
             string nextcloudLogin = _appInfo.GetAppSetting("NextcloudLogin").Value;
             string nextcloudPassword = _appInfo.GetAppSetting("NextcloudPassword").Value;
+
+            int userId = _appUser.GetCurrentUser().Id;
 
             DataSet ds = db.con.select(@"
 /*0*/
@@ -159,13 +162,7 @@ select
 from GameImages gi
 inner join Games g on g.Id = gi.GameId
 where g.Symbol = @p0 and gi.LogoP = 0
-
-/*3*/
-select
-  ISNULL(ugt.TotalTime, 0) GameTime
-from (select 1 x) x
-left join UsersGameTime ugt on ugt.GameId = @p1 and ugt.UserId = @p2
-", gameSymbol, gameId ?? 0, _appUser.GetCurrentUser().Id);
+", gameSymbol);
 
             if (ds.Tables[0].Rows.Count > 0)
             {
@@ -192,8 +189,15 @@ left join UsersGameTime ugt on ugt.GameId = @p1 and ugt.UserId = @p2
                 IsHardwareRequirementsVisible = !String.IsNullOrEmpty(dr.TryGetValue("HardwareRequirements"));
                 IsDLCVisible = false; //TODO
                 IsAddRatingVisible = _appUser.GetCurrentUser().Id != default;
+                DataSet dss = db.con.select(@"
+/*0*/
+select
+  i.PlayTimeSec GameTime
+from (select 1 x) x
+left join UserGameInfo i on i.GameId = @p0 and i.UserId = @p1
+", GameId.ToInt32(), userId);
+                dr = dss.Tables[0].Rows[0];
 
-                dr = ds.Tables[3].Rows[0];
                 GameTime = FormatPlayTime(dr.TryGetValue("GameTime") ?? 0);
 
                 OnPropertyChanged(nameof(GameTime));
@@ -477,30 +481,7 @@ select
 from UsersGameTime ugt
 where ugt.GameId = @p0 and ugt.UserId = @p1", gameId, _appUser.GetCurrentUser().Id) ?? -1;
 
-            double totalTime = (dbTime ?? 0) + elapsedTime.TotalSeconds;
-
-            if (dbTime >= 0)
-            {
-                db.con.exec(@"
-update ugt set 
-  ugt.TotalTime = @p0
-, ugt.LastPlayed = @p1
-from UsersGameTime ugt
-where ugt.GameId = @p2 and ugt.UserId = @p3", totalTime, DateTime.Now, gameId, _appUser.GetCurrentUser().Id);
-            }
-            else
-            {
-                db.con.exec(@"
-insert UsersGameTime (UserId, GameId, LastPlayed, TotalTime)
-select
-  @p0
-, @p1
-, @p2
-, @p3
-", _appUser.GetCurrentUser().Id, gameId, DateTime.Now, totalTime);
-
-            }
-
+            _appUser.RegisterGamePlayed(gameId.ToInt32(), elapsedTime.TotalSeconds.ToInt32());
             GameTime = FormatPlayTime((int)dbTime);
 
 
@@ -508,19 +489,24 @@ select
 
         }
 
-        public static string FormatPlayTime(int seconds)
+        public static string FormatPlayTime(int totalSeconds)
         {
-            if (seconds < 60)
+            int hours = totalSeconds / 3600;
+            int minutes = (totalSeconds % 3600) / 60;
+            int seconds = totalSeconds % 60;
+
+            if (hours > 0)
+            {
+                return $"{hours}h {minutes}m";
+            }
+            else if (minutes > 0)
+            {
+                return $"{minutes}m {seconds}s";
+            }
+            else
+            {
                 return $"{seconds}s";
-
-            var time = TimeSpan.FromSeconds(seconds);
-
-            if (time.TotalHours >= 1)
-                return $"{(int)time.TotalHours}h";
-            if (time.TotalMinutes >= 1)
-                return $"{(int)time.TotalMinutes} min";
-
-            return $"{seconds}s";
+            }
         }
 
 
@@ -594,6 +580,11 @@ group by gr.GameId
                 AvgRating = dr.TryGetValue<double>("AvgRating");
             }
 
+            if (AvgRating == 0)
+            {
+                IsRatingVisible = false;
+                AvgRating = 5;
+            }
         }
         public DataSet ReturnUserRating(int gameId)
         {

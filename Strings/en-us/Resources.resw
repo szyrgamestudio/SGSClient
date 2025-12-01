@@ -422,4 +422,7 @@
   <data name="Uninstall" xml:space="preserve">
     <value>Uninstall</value>
   </data>
+  <data name="Shell_Profile.Content" xml:space="preserve">
+    <value>Profile</value>
+  </data>
 </root>

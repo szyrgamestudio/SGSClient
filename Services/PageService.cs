@@ -22,6 +22,7 @@ public class PageService : IPageService
         Configure<MyGamesViewModel, MyGamesPage>();
         Configure<EditGameViewModel, EditGamePage>();
         Configure<SettingsUserViewModel, SettingsUserPage>();
+        Configure<ProfileViewModel, ProfilePage>();
     }
 
     public Type GetPageType(string key)

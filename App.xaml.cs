@@ -87,6 +87,8 @@ public partial class App : Application
             services.AddSingleton<PasswordHasher, PasswordHasher>();
 
             // Views and ViewModels
+            services.AddTransient<ProfileViewModel>();
+            services.AddTransient<ProfilePage>();
             services.AddTransient<SettingsUserViewModel>();
             services.AddTransient<SettingsUserPage>();
             services.AddTransient<EditGameViewModel>();
