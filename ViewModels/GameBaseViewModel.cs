@@ -91,7 +91,7 @@ namespace SGSClient.ViewModels
         public bool IsOtherInformationsVisible { get; private set; }
         public bool IsHardwareRequirementsVisible { get; private set; }
         public bool IsDLCVisible { get; private set; }
-        public bool IsRatingVisible { get; private set; }
+        public bool IsRatingVisible { get; private set; } = true;
         public bool IsAddRatingVisible { get; private set; }
         public string GameTime { get; private set; } = "0 min";
 

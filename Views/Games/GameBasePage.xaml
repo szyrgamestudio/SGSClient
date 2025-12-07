@@ -47,7 +47,9 @@
                 <StackPanel Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center" Spacing="10">
                     <!--  Sekcja OCENY w headerze  -->
                     <StackPanel Margin="0,0,0,8" HorizontalAlignment="Right" Orientation="Horizontal">
-                        <SymbolIcon Width="24" Height="24" VerticalAlignment="Center" Foreground="Gold" Symbol="Favorite" />
+                        <Button Click="AddRatingButton_Click">
+                            <SymbolIcon Width="24" Height="24" VerticalAlignment="Center" Foreground="Gold" Symbol="Favorite" />
+                        </Button>
                         <TextBlock Margin="8,0,0,0" VerticalAlignment="Center" FontSize="30" FontWeight="Bold" Foreground="White"
                                    Text="{Binding AvgRating}" />
                         <TextBlock Margin="4,0,0,0" VerticalAlignment="Center" FontSize="16" Foreground="Gray" Text="/ 5" />
