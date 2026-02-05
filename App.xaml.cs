@@ -160,7 +160,7 @@ public partial class App : Application
         base.OnLaunched(args);
         fss?.Hide();
         fss = null;
-        DiscordManager.Initialize();
+        //DiscordManager.Initialize();
         await App.GetService<IActivationService>().ActivateAsync(args);
     }
 }

@@ -300,10 +300,16 @@ where gi.GameId = @p0 and gi.LogoP = 0
         #endregion
 
         #region GameLogo File Upload
-        if (GameLogos.FirstOrDefault() is GameImage logoImage && Path.IsPathRooted(logoImage.Url))
+        var logoImage = GameLogos.FirstOrDefault();
+
+        if (logoImage != null && Path.IsPathRooted(logoImage.Url))
         {
             string ext = Path.GetExtension(logoImage.Url);
             GameLogoUrl = await uploader.UploadFileAsync(logoImage.Url, nextcloudFolder, $"logo{ext}", _appUser.GetCurrentUser().UserId);
+        }
+        else if (logoImage != null && !string.IsNullOrWhiteSpace(logoImage.Url))
+        {
+            GameLogoUrl = logoImage.Url;
         }
         #endregion
 
@@ -372,8 +378,12 @@ select @p0, @p1, 1
         }
 
         // MERGE (dodaje nowe, usuwa brakujące, zostawia stare)
-        db.con.exec(@"
-delete from GameImages where GameId = @p0
+
+        if (!string.IsNullOrWhiteSpace(GameLogoUrl) || uploadedGalleryUrls.Any())
+        {
+            db.con.exec(@"
+delete gi from GameImages gi
+where gi.GameId = @p0
 
 insert GameImages(GameId, Url, LogoP)
 select
@@ -384,6 +394,14 @@ from #gmi g
 
 drop table #gmi
 ", gameId.ToSqlParameter());
+        }
+        else
+        {
+            db.con.exec(@"
+drop table #gmi
+", gameId.ToSqlParameter());
+
+        }
 
         return gameId > 0;
     }

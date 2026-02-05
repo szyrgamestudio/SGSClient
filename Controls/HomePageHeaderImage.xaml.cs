@@ -1,6 +1,6 @@
 using System.Numerics;
+using CommunityToolkit.WinUI;
 using CommunityToolkit.WinUI.Animations;
-using CommunityToolkit.WinUI.UI;
 using Microsoft.Graphics.Canvas.Effects;
 using Microsoft.UI;
 using Microsoft.UI.Composition;

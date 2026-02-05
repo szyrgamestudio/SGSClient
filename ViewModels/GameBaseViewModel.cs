@@ -145,7 +145,7 @@ select
 , g.DraftP
 from Games g
 inner join Users u on u.Id = g.UserId
-inner join GameImages gi on gi.GameId = g.Id and gi.LogoP = 1
+left join GameImages gi on gi.GameId = g.Id and gi.LogoP = 1
 where g.Symbol = @p0
 order by g.Title
 

@@ -28,7 +28,7 @@ select
 , g.TypeId   GameTypeId
 from Games g
 inner join Users u on u.Id = g.UserId
-inner join GameImages gi on gi.GameId = g.Id and gi.LogoP = 1
+left join GameImages gi on gi.GameId = g.Id and gi.LogoP = 1
 where g.DraftP = 0 and @p0 = 0 or @p0 = 1
 order by g.Title", bypassDraftP);
 

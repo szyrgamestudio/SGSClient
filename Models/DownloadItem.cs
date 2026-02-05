@@ -30,6 +30,7 @@ namespace SGSClient.Models
         public string GameIdentifier { get; }
         public string DownloadUrl { get; }
         public StorageFolder DestinationFolder { get; }
+        public string ZipFileName { get; set; } = "";
 
         private double _progress;
         public double Progress
@@ -78,13 +79,14 @@ namespace SGSClient.Models
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public DownloadItem(string gameName, string gameIdentifier, string downloadUrl, StorageFolder destinationFolder, string gameIcon = "ms-appx:///Assets/placeholder.png")
+        public DownloadItem(string gameName, string gameIdentifier, string downloadUrl, StorageFolder destinationFolder, string zipFileName, string gameIcon = "ms-appx:///Assets/placeholder.png")
         {
             GameName = gameName;
             GameIdentifier = gameIdentifier;
             DownloadUrl = downloadUrl;
             DestinationFolder = destinationFolder;
             GameIcon = gameIcon;
+            ZipFileName = zipFileName;
         }
 
         public async Task StartDownloadAsync(HttpClient httpClient)

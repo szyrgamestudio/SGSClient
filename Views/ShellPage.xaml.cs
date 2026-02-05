@@ -9,7 +9,6 @@ using SGSClient.Models;
 using SGSClient.ViewModels;
 using Windows.Storage;
 using Windows.System;
-using SGSClient.Helpers;
 
 namespace SGSClient.Views;
 
@@ -125,7 +124,7 @@ public sealed partial class ShellPage : Page
             throw new ArgumentNullException(nameof(folder), "Destination folder cannot be null.");
         }
 
-        var downloadItem = new DownloadItem(gameName, gameIdentifier, url, folder, gameLogo);
+        var downloadItem = new DownloadItem(gameName, gameIdentifier, url, folder, "", gameLogo);
         DownloadViewModel.Instance.ActiveDownloads.Add(downloadItem);
 
         DownloadBar.Visibility = Visibility.Visible;
@@ -138,7 +137,7 @@ public sealed partial class ShellPage : Page
     {
         try
         {
-            string fileName = item.GameName.Replace(" ", "");
+            string fileName = item.GameIdentifier.Replace(" ", "");
             fileName = string.Concat(fileName.Split(Path.GetInvalidFileNameChars()));
 
             await Task.Run(async () =>
