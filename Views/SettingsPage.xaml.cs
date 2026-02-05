@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Labs.WinUI;
-using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using SGSClient.Core.Authorization;
 using SGSClient.ViewModels;
