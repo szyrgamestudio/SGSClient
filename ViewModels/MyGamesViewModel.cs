@@ -53,12 +53,12 @@ select
 , g.Description
 , g.HardwareRequirements
 , g.OtherInformation
-, g.DraftP
+, ~g.DraftP DraftP
 from Games g
 inner join Users u on u.Id = g.UserId
 left join GameImages l on l.GameId = g.Id and l.LogoP = 1
 left join GameTypes t on t.Id = g.TypeId
-where (r.UserId = @p0 or @p0 = 1)
+where u.UserId = @p0
 order by g.Title
 ", _appUser.UserId);
 

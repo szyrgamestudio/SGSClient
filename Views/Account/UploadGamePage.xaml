@@ -40,7 +40,7 @@
                         </Grid>
                         <TextBlock Grid.Column="0" Margin="0,5,5,0" Padding="0,5,5,0" HorizontalAlignment="Center" Text="Nazwa gry:*" />
                         <TextBox x:Name="gameNameTextBox" Grid.Column="1" Width="400" Margin="125,5,5,5" PlaceholderText="Nazwa gry"
-                                 Text="{Binding GameName}" />
+                                 Text="{Binding GameName, Mode=TwoWay}" />
                     </StackPanel>
                     <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
                         <Grid>

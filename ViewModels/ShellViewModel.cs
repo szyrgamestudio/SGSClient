@@ -69,6 +69,8 @@ public partial class ShellViewModel : ObservableRecipient
         {
             Selected = selectedItem;
         }
+
+        UpdateUserData();
     }
 
     private void UpdateUserData()

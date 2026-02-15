@@ -14,4 +14,9 @@ public partial class SettingsUserViewModel : ObservableRecipient
     {
         await _appUser.ResetPasswordAsync(IntPtr.Zero);
     }
+
+    public async Task LogoutCommand()
+    {
+         await _appUser.LogoutAsync(IntPtr.Zero);
+    }
 }

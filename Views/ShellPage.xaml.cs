@@ -129,7 +129,12 @@ public sealed partial class ShellPage : Page
 
         DownloadBar.Visibility = Visibility.Visible;
 
-        using var httpClient = new HttpClient();
+        var handler = new HttpClientHandler
+        {
+            PreAuthenticate = true,
+            UseDefaultCredentials = false
+        };
+        using var httpClient = new HttpClient(handler);
         await downloadItem.StartDownloadAsync(httpClient);
         await ExtractAndCleanup(downloadItem);
     }

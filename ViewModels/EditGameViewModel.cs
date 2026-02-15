@@ -281,8 +281,8 @@ where gi.GameId = @p0 and gi.LogoP = 0
         }
 
         string gameDescriptionParam = string.Join(Environment.NewLine, GameDescription.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
-        string hardwareRequirementsParam = string.Join(Environment.NewLine, HardwareRequirements.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
-        string otherInfoParam = string.Join(Environment.NewLine, OtherInfo.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
+        string hardwareRequirementsParam = string.Join(Environment.NewLine, (HardwareRequirements ?? string.Empty).Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
+        string otherInfoParam = string.Join(Environment.NewLine, (OtherInfo ?? string.Empty).Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
 
         var uploader = new NextcloudUploader("https://cloud.m455yn.dev/", nextcloudLogin, nextcloudPassword);
         string nextcloudFolder = gameName;

@@ -18,9 +18,10 @@ public sealed partial class SettingsUserPage : Page
         InitializeComponent();
     }
 
-    private void LogoutButton_Click(object sender, RoutedEventArgs e)
+    private async void LogoutButton_Click(object sender, RoutedEventArgs e)
     {
-        //Frame.Navigate(typeof(LoginPage));
+        await ViewModel.LogoutCommand();
+        Frame.Navigate(typeof(HomePage));
     }
     private async void ChangePasswordButton_Click(object sender, RoutedEventArgs e)
     {

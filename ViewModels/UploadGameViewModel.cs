@@ -5,6 +5,7 @@ using SGSClient.Core.Authorization;
 using SGSClient.Core.Database;
 using SGSClient.Core.Extensions;
 using SGSClient.Core.Helpers;
+using SGSClient.Core.Utilities.AppInfoUtility.Interfaces;
 using SGSClient.Models;
 using System.Collections.ObjectModel;
 using System.Data;
@@ -15,6 +16,8 @@ namespace SGSClient.ViewModels;
 public partial class UploadGameViewModel : ObservableRecipient
 {
     private readonly IAppUser _appUser;
+    private readonly IAppInfo _appInfo;
+
     private StorageFile _zipFile;
     public StorageFile ZipFile
     {
@@ -25,8 +28,7 @@ public partial class UploadGameViewModel : ObservableRecipient
             OnPropertyChanged();
         }
     }
-    public string NextcloudUsername { get; set; } = "sgsclient";
-    public string NextcloudPassword { get; set; } = "yGnxE-Tykxe-SwjwW-NooLc-xSwPT";
+
     public ObservableCollection<GameTypeItem> GameTypes { get; set; } = [];
     public ObservableCollection<GameEngineItem> GameEngines { get; set; } = [];
 
@@ -110,9 +112,10 @@ public partial class UploadGameViewModel : ObservableRecipient
     public ObservableCollection<string> GameImagePaths { get; set; } = new ObservableCollection<string>();
     #endregion
 
-    public UploadGameViewModel(IAppUser appUser)
+    public UploadGameViewModel(IAppUser appUser, IAppInfo appInfo)
     {
         _appUser = appUser;
+        _appInfo = appInfo;
         GameLogos = [];
         GameImages = [];
     }
@@ -182,6 +185,9 @@ from GameEngines ge
     }
     public async Task<bool> AddGameData()
     {
+        string nextcloudLogin = _appInfo.GetAppSetting("NextcloudLogin").Value;
+        string nextcloudPassword = _appInfo.GetAppSetting("NextcloudPassword").Value;
+
         if (string.IsNullOrEmpty(GameName) ||
             string.IsNullOrEmpty(CurrentVersion) ||
             (ZipFile == null && string.IsNullOrEmpty(ZipLink)) ||
@@ -200,11 +206,11 @@ from GameEngines ge
         }
 
         string gameDescriptionParam = string.Join(Environment.NewLine, GameDescription.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
-        string hardwareRequirementsParam = string.Join(Environment.NewLine, HardwareRequirements.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
-        string otherInfoParam = string.Join(Environment.NewLine, OtherInfo.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
+        string hardwareRequirementsParam = string.Join(Environment.NewLine, (HardwareRequirements ?? string.Empty).Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
+        string otherInfoParam = string.Join(Environment.NewLine, (OtherInfo ?? string.Empty).Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
 
-        var uploader = new NextcloudUploader("https://cloud.m455yn.dev/", NextcloudUsername, NextcloudPassword);
-        string nextcloudFolder = GameName;
+        var uploader = new NextcloudUploader("https://cloud.m455yn.dev/", nextcloudLogin, nextcloudPassword);
+        string nextcloudFolder = gameName;
 
         #region ZIP File Upload
         if (ZipFile != null)
@@ -219,10 +225,16 @@ from GameEngines ge
         #endregion
 
         #region GameLogo File Upload
-        if (GameLogos.FirstOrDefault() is GameImage logoImage && Path.IsPathRooted(logoImage.Url))
+        var logoImage = GameLogos.FirstOrDefault();
+
+        if (logoImage != null && Path.IsPathRooted(logoImage.Url))
         {
             string ext = Path.GetExtension(logoImage.Url);
             GameLogoUrl = await uploader.UploadFileAsync(logoImage.Url, nextcloudFolder, $"logo{ext}", _appUser.GetCurrentUser().UserId);
+        }
+        else if (logoImage != null && !string.IsNullOrWhiteSpace(logoImage.Url))
+        {
+            GameLogoUrl = logoImage.Url;
         }
         #endregion
 
@@ -248,29 +260,28 @@ from GameEngines ge
         #endregion
 
         SqlCommand cmd = new(@"
-insert sgsGames (UserId, Title, PayloadName, ExeName, ZipLink, VersionLink, CurrentVersion, Description, HardwareRequirements, OtherInformation, Symbol, EngineId, TypeId, DraftP)
+insert Games (UserId, Title, Symbol, CurrentVersion, ExeName, ZipLink, Description, HardwareRequirements, OtherInformation, EngineId, TypeId, DraftP, FeaturedP)
 select 
   @userId
 , @gameName
-, null
+, @Symbol
+, @currentVersion
 , @ExeName
 , @ZipLink
-, @currentVersion
-, @currentVersion
 , @gameDescriptionParam
 , @hardwareRequirementsParam
 , @otherInformationsParam
-, @Symbol
 , @GameEngine
 , @GameType
-, 1
+, 0
+, 0
 
 select
   SCOPE_IDENTITY()
 ", db.con);
 
         cmd.Parameters.AddWithValue("gameName", GameName.ToSqlParameter());
-        cmd.Parameters.AddWithValue("userId", _appUser.GetCurrentUser().UserId.ToSqlParameter());
+        cmd.Parameters.AddWithValue("userId", _appUser.GetCurrentUser().Id.ToSqlParameter());
         cmd.Parameters.AddWithValue("exeName", ExeName.ToSqlParameter());
         cmd.Parameters.AddWithValue("zipLink", ZipLink.ToSqlParameter());
         cmd.Parameters.AddWithValue("currentVersion", CurrentVersion.ToSqlParameter());
@@ -301,6 +312,8 @@ select @p0, @p1, 1
 
         return gameId > 0;
     }
+
+    #region Helper Methods
     private static async void ShowMessageDialog(string title, string content)
     {
         ContentDialog messageDialog = new ContentDialog
@@ -312,4 +325,5 @@ select @p0, @p1, 1
 
         ContentDialogResult result = await messageDialog.ShowAsync();
     }
+    #endregion
 }
