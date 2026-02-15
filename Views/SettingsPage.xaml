@@ -92,7 +92,7 @@
 
 
                 <!--  About Section  -->
-                <labs:SettingsExpander Description="© 2025 SzyrGameStudio. All rights reserved." Header="SGSClient">
+                <labs:SettingsExpander Description="©2026 M455YN &amp; SzyrGameStudio. All rights reserved." Header="SGSClient">
                     <TextBlock
                         Margin="0,-2,0,0"
                         Foreground="{ThemeResource TextFillColorSecondaryBrush}"
